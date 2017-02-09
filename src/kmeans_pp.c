@@ -1,0 +1,209 @@
+#include "math.h"
+#include "R.h"
+#include "convex_kmeans.h"
+#include "convex_kmeans_util.h"
+
+// Function prototypes
+void lloyd_update_centers(double* D, double* centers, int* cluster_assignment, int n, int m, int K, int* iwork);
+int lloyd_update_clusters(double* D, double* centers, int* cluster_assignment, int n, int m, int K);
+int sample_discrete_distribution(double* prob_dist,int n);
+void update_min_distance(double* D, double* min_center_distance, int new_center_idx, int n, int m);
+void min_distance_to_probability(double* min_distances, double* prob_dist, int n);
+double euclidean_distance(double* p1, double* p2, int m);
+
+// R ACCESS POINT
+void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r){
+    int K = *K0;
+    int n = *n0;
+    int m = *m0;
+    kmeans_pp(D,K,n,m,cluster_assignment_r,centers_r);
+}
+
+// C ACCESS POINT
+void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r) {
+    workspace work;
+    work.dwork = (double *) R_alloc(2*n + m*K,sizeof(double));
+    work.iwork = (int *) R_alloc(K+n,sizeof(int));
+    kmeans_pp_impl(D,K,n,m,cluster_assignment_r,centers_r,&work);
+}
+
+// INTERNAL ACCESS POINT
+// Column major matrix layouts. Each column is a different data point.
+// The matrix D should be m0 \times \n0 dimensional.
+// NOT THREAD SAFE -- USES R INTERNALS RNG
+// REQUIRES K+n length iwork
+// REQUIRES 2n+ mK length dwork
+void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
+                    double* centers_r, workspace* work) {
+    GetRNGstate();
+
+    //////////////////////////////////////
+    //// STEP 1 - K-means++ Initialization
+    //////////////////////////////////////
+    double* prob_dist = work -> dwork;
+    double* min_center_distance = prob_dist + n;
+    int* initial_centers = work -> iwork;
+    int tmp1;
+    
+    //choose first center
+    double q = unif_rand(); // random U[0,1]
+    int c_idx = round((n+0.98-1)*q - 0.49); // approximately U[0,d-1]
+    initial_centers[0] = c_idx;
+    for(int i= 0; i < n; i++){
+        if(i != c_idx){
+            min_center_distance[i] = euclidean_distance(D+m*i,D+m*c_idx,m);
+        } else {
+            min_center_distance[i] = 0.0;
+        }
+    }
+    min_distance_to_probability(min_center_distance,prob_dist,n);
+
+    // generate centers 1..K-2
+    for(int i=1; i < K-1; i++){
+        tmp1 = sample_discrete_distribution(prob_dist,n);
+        initial_centers[i] = tmp1;
+        update_min_distance(D,min_center_distance,tmp1,n,m);
+        min_distance_to_probability(min_center_distance,prob_dist,n);
+    }
+    // get last center (idx K-1)
+    initial_centers[K-1] = sample_discrete_distribution(prob_dist,n);
+    
+    ///////////////////////////////////
+    //// STEP 2 - K-means Clustering (Lloyd's Algorithm)
+    ///////////////////////////////////
+    double* centers = min_center_distance + n;
+    int* cluster_assignment = initial_centers + K;
+    int unchanged = 0;
+
+    // initial clustering, zeros assignment to clusters, guarantees change in first iteration
+    for(int k=0; k < K; k++){
+        tmp1 = initial_centers[k];
+        memcpy(centers + k*m,D+tmp1*m,m*sizeof(double));
+    }
+    for(int i=0; i < n; i++) cluster_assignment[i] = 0;
+
+    // iterate
+    while(!unchanged){
+        // 1. Update Clusters
+        unchanged = lloyd_update_clusters(D,centers,cluster_assignment,n,m,K);
+
+        // 2. Update Centroids
+        lloyd_update_centers(D,centers,cluster_assignment,n,m,K,initial_centers);
+    }
+
+    ///////////////////////////////////
+    //// STEP 3 - Set Return Values
+    ///////////////////////////////////
+
+    PutRNGstate();
+    memcpy(centers_r,centers,K*m*sizeof(double));
+    memcpy(cluster_assignment_r,cluster_assignment,n*sizeof(int));
+}
+
+// REQUIRES iwork of length K
+void lloyd_update_centers(double* D, double* centers, int* cluster_assignment, int n, int m, int K, int* iwork){
+    int tmp1;
+    double dtmp1;
+    double* tmp_ptr1;
+    double* tmp_ptr2;
+    int* cluster_sizes;
+    cluster_sizes = iwork;
+
+    // zero out current cluster centers, sizes
+    for(int i=0; i < m*K; i++) centers[i] = 0;
+    for(int i=0; i < K; i++) cluster_sizes[i] = 0;
+
+    // create new centers
+    for(int i=0; i < n; i++){
+        tmp1 = cluster_assignment[i];
+        cluster_sizes[tmp1] = cluster_sizes[tmp1] + 1;
+        tmp_ptr1 = centers + tmp1*m;
+        tmp_ptr2 = D + i*m;
+        for(int j = 0; j < m; j++){
+            dtmp1 = *tmp_ptr1 + *tmp_ptr2;
+            *tmp_ptr1 = dtmp1;
+            tmp_ptr1++;
+            tmp_ptr2++;
+        }
+    }
+
+    for(int k=0; k < K; k++){
+        for(int i=0; i < m; i++){
+            tmp1 = k*m + i;
+            dtmp1 = centers[tmp1];
+            centers[tmp1] = dtmp1 / cluster_sizes[k];
+        }
+    }
+}
+
+int lloyd_update_clusters(double* D, double* centers, int* cluster_assignment, int n, int m, int K){
+    double dtmp1;
+    int unchanged = 1;
+    for(int i=0; i < n; i++) {
+        int k=0;
+        double min_dist = euclidean_distance(D + i*m,centers + k*m,m);
+        int min_dist_idx = k;
+        for(k = 1; k < K; k++){
+            dtmp1 = euclidean_distance(D + i*m,centers + k*m,m);
+            if(dtmp1 < min_dist){
+                min_dist = dtmp1;
+                min_dist_idx = k;
+            }
+        }
+        if(cluster_assignment[i] != min_dist_idx){
+            cluster_assignment[i] = min_dist_idx;
+            unchanged = 0;
+        }
+    }
+    return unchanged;
+}
+
+// MUST BE CALLED FROM WITHIN GetRNGState, PutRNGState PAIR
+int sample_discrete_distribution(double* prob_dist,int n){
+    double q = unif_rand();
+    int cur_idx = 0;
+    double total = 0.0;
+    for(cur_idx = 0; cur_idx < n; cur_idx++){
+        total = total + prob_dist[cur_idx];
+        if(total > q) break;
+    }
+    return cur_idx;
+}
+
+void update_min_distance(double* D, double* min_center_distance, int new_center_idx, int n, int m){
+    double dtmp1;
+    for(int i=0; i < n; i++){
+        //only update if non-zero
+        if(min_center_distance[i] > 0.0){
+            dtmp1 = euclidean_distance(D+i*m,D+new_center_idx*m,m);
+            min_center_distance[i] = min_center_distance[i] > dtmp1 ? dtmp1 : min_center_distance[i];
+        }
+    }
+}
+
+void min_distance_to_probability(double* min_distances, double* prob_dist, int n) {
+    double tmp1;
+    double dist_sum = 0.0;
+    for(int i = 0; i < n; i++){
+        dist_sum = dist_sum + min_distances[i];
+    }
+    for(int i=0; i < n; i++){
+        tmp1 = min_distances[i] / dist_sum;
+        prob_dist[i] = tmp1;
+    }
+}
+
+double euclidean_distance(double* p1, double* p2, int m) {
+    double acc = 0.0;
+    double dtmp1;
+
+    for(int i=0; i < m; i++) {
+        dtmp1 = (*p1) - (*p2);
+        acc = acc + dtmp1*dtmp1;
+        p1++;
+        p2++;
+    }
+
+    return acc;
+}
+
