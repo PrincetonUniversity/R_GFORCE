@@ -6,7 +6,17 @@
 # optional initial feasible, optional E
 # OUTPUTS: 
 
+
+#' Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm.
+#' 
+#' @param D a matrix \eqn{D} as defined above.
+#' @param K number of clusters.
+#' @param force_opts tuning parameters. \code{NULL} signifies defaults will be used.
+#' @param D_Kmeans matrix to be used for initial integer solution. \code{NULL} signifies that \code{D} will be used.
+#' @param X0 initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.
+#' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
 #' @useDynLib GFORCE primal_dual_adar_R
+#' @export
 gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = NULL) {
     d <- ncol(D)
 
@@ -99,10 +109,14 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     return(res)
 }
 
-
-# Solve the PECOK SDP using the FORCE algorithm
-# Same outputs as FORCE, but also will include the
-# matrix D
-gforce.PECOK <- function(K, X=NULL, D=NULL, force_opts = NULL) {
+#' Uses the FORCE algorithm to solve the PECOK SDP.
+#' 
+#' @param K number of clusters.
+#' @param X \eqn{n x d} matrix. Either this or \code{D} must be specified.
+#' @param D \eqn{d x d} matrix. Either this or \code{X} must be specified.
+#' @inheritParams gforce.FORCE
+#' @seealso \code{\link{gforce.FORCE.options}}
+#' @export
+gforce.PECOK <- function(K, X=NULL, D=NULL, force_opts = NULL, X0 = NULL, E = NULL) {
 
 }

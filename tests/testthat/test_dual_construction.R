@@ -2,7 +2,7 @@
 
 context('Test Dual Construction')
 
-# TEST FORM - test_that("NAME",{  })
+#' @useDynLib GFORCE kmeans_dual_solution_primal_min_R
 test_that("Dual Construction",{
     set.seed(12345) #need to set seed bc doesnt always exist
     dat <- generate_glatent_dc(5,20,20,3,4)
@@ -20,7 +20,7 @@ test_that("Dual Construction",{
     Y_T <- 0
     feasible <- 0
 
-    result <- .C("kmeans_dual_solution_primal_min_R",
+    result <- .C(kmeans_dual_solution_primal_min_R,
                  ga_hat=as.integer(dat$group_assignments),
                  D=as.double(diff),
                  K= as.integer(K),

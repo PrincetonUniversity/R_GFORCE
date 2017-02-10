@@ -1,6 +1,8 @@
 context('Test Primal Dual Algorithm')
 
 # TEST FORM - test_that("NAME",{  })
+
+#' @useDynLib GFORCE test_smoothed_gradient_S_base
 test_that("GS_t Base",{
 
     K <- 5
@@ -15,7 +17,7 @@ test_that("GS_t Base",{
     E <- ren_start_res$E
     S_min_r <- 0
 
-    result <- .C("test_smoothed_gradient_S_base",
+    result <- .C(test_smoothed_gradient_S_base,
                  X= as.double(X),
                  E = as.double(E),
                  GS_t = numeric(d^2),
@@ -29,7 +31,7 @@ test_that("GS_t Base",{
     expect_equal(comp_Smin,result$S_min_r)
     })
 
-
+#' @useDynLib GFORCE test_smoothed_gradient_X_base
 test_that("GX_t Base",{
     K <- 5
     d <- 20
@@ -51,7 +53,7 @@ test_that("GX_t Base",{
     E_sqrt <- V%*%(D^(0.5))%*%t(V)
     ESI <- solve(E_sqrt)
 
-    result <- .C("test_smoothed_gradient_X_base",
+    result <- .C(test_smoothed_gradient_X_base,
                  X= as.double(X),
                  ESI = as.double(ESI),
                  GX_t = numeric(d^2),
@@ -68,6 +70,7 @@ test_that("GX_t Base",{
     expect_equal(comp_E_X_E,E_X_E)
     })
 
+#' @useDynLib GFORCE test_smoothed_gradient
 test_that("Smoothed Gradient (GX_t, GS_t)",{
     set.seed(12345)
     K <- 5
@@ -93,7 +96,7 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     mu <- 0.5*0.01/log(d)
     gradSX <- smoothed_gradient(X,E,ESI,mu)
 
-    result <- .C("test_smoothed_gradient",
+    result <- .C(test_smoothed_gradient,
                  X= as.double(X),
                  E = as.double(E),
                  ESI = as.double(ESI),
@@ -109,7 +112,7 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     expect_equal(GS_t,gradSX$GS)
     })
 
-
+#' @useDynLib GFORCE test_project_C_perpendicular
 test_that("Projection onto C Perpendicular",{
     set.seed(12345)
     K <- 5
@@ -135,7 +138,7 @@ test_that("Projection onto C Perpendicular",{
     mu <- 0.5*0.01/log(d)
     gradSX <- smoothed_gradient(X,E,ESI,mu)
 
-    result <- .C("test_project_C_perpendicular",
+    result <- .C(test_project_C_perpendicular,
                  D= as.double(diff),
                  d = as.integer(d),
                  K = as.integer(K),
@@ -148,7 +151,7 @@ test_that("Projection onto C Perpendicular",{
     expect_equal(comp_Z$Z_proj,Z_proj)
     })
 
-
+#' @useDynLib GFORCE test_project_E
 test_that("Projection Onto PSD Cone Border",{
     K <- 5
     d <- 20
@@ -172,7 +175,7 @@ test_that("Projection Onto PSD Cone Border",{
     mu <- 0.5*0.01/log(d)
     res <- smoothed_objective(X,E,ESI,mu)
     lmin <- res$lambda_min
-    result <- .C("test_project_E",
+    result <- .C(test_project_E,
                  E= as.double(E),
                  X = as.double(X),
                  d = as.integer(d),
@@ -184,6 +187,7 @@ test_that("Projection Onto PSD Cone Border",{
     expect_equal(Z_proj_comp,Z_proj)
     })
 
+#' @useDynLib GFORCE test_smoothed_objective
 test_that("Smoothed Objective",{
     set.seed(12345)
     K <- 5
@@ -210,7 +214,7 @@ test_that("Smoothed Objective",{
     comp_result <- smoothed_objective(X,E,ESI,mu)
 
 
-    result <- .C("test_smoothed_objective",
+    result <- .C(test_smoothed_objective,
                  X= as.double(X),
                  E = as.double(E),
                  ESI = as.double(ESI),
@@ -280,6 +284,7 @@ test_that("Smoothed Objective",{
 #     expect_equal(1,1)
 #     })
 
+#' @useDynLib GFORCE test_clust_to_opt_val
 test_that("K-Means Objective Value",{
 
     K <- 5
@@ -287,7 +292,7 @@ test_that("K-Means Objective Value",{
     dat <- generate_glatent_dc(K,d,d,3,4)
     sh <- t(dat$X)%*%dat$X / d
     opt_val_r <- 0
-    result <- .C("test_clust_to_opt_val",
+    result <- .C(test_clust_to_opt_val,
                  D = as.double(sh),
                  d = as.integer(d),
                  K = as.integer(K),

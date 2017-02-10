@@ -11,7 +11,7 @@ gamma_hat <- function(X){
   n_xc_xd <- (ones_d%*%t(ips_diag) + ips_diag%*%t(ones_d) - 2*ips)^0.5
   
   # call C implementation
-#  dyn.load(LIB_PECOK_GAMMA_SO)
+#  dyn.load(LIB_PECOK_GAMMA_PAR_SO)
   result <- .C("pecok_gamma",
                IPS=as.double(ips),
                n_xc_xd=as.double(n_xc_xd),

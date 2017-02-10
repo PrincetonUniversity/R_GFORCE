@@ -2,6 +2,8 @@
 context('Test K-means++ Algorithm')
 
 # TEST FORM - test_that("NAME",{  })
+
+#' @useDynLib GFORCE kmeans_pp_R
 test_that("K-means++",{
 
     K <- 5
@@ -13,7 +15,7 @@ test_that("K-means++",{
     for(i in 1:num_random_exps){
         dat <- generate_glatent_dc(K,d,d,3,4)
         sh <- t(dat$X)%*%dat$X / 20
-        result <- .C("kmeans_pp_R",
+        result <- .C(kmeans_pp_R,
                      D=as.double(sh),
                      K= as.integer(K),
                      n = as.integer(d),
