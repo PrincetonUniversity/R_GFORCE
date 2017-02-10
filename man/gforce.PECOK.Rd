@@ -24,6 +24,6 @@ gforce.PECOK(K, X = NULL, D = NULL, force_opts = NULL, X0 = NULL,
 Uses the FORCE algorithm to solve the PECOK SDP.
 }
 \seealso{
-\code{\link{gforce.FORCE.options}}
+\code{\link{gforce.defaults}}
 }
 

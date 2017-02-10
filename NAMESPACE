@@ -2,6 +2,8 @@
 
 export(gforce.FORCE)
 export(gforce.PECOK)
+export(gforce.defaults)
+export(gforce.metrics)
 useDynLib(GFORCE,kmeans_dual_solution_primal_min_R)
 useDynLib(GFORCE,kmeans_pp_R)
 useDynLib(GFORCE,primal_dual_adar_R)

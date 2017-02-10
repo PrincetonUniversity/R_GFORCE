@@ -1,5 +1,30 @@
 # FUNCTIONS FOR CLUSTERING AND METRICS
 
+#' Evaluates the correctness of a clustering solution.
+#'
+#' This can be used for either data or variable clustering. Cluster names
+#' can be either strings or numbers. Arbitrary data types cannot be used.
+#' @param true_clust length \eqn{d} vector of cluster assignments. This represents the
+#' true, or reference, clustering.
+#' @param est_clust length \eqn{d} vector of cluster assignments. This represents the
+#' estimated clustering.
+#' @param method the method used to evaluate the quality of the clustering solution \code{est_clust}.
+#' The three options are \code{'purity'}, \code{'perfect'}, \code{'misclassified-points'}.
+#' @export
+gforce.metrics <- function(true_clust,est_clust,method='purity') {
+  if(method=='purity'){
+    res <- purity_measure(true_clust,est_clust)
+    return(res)
+  } else if(method=='perfect'){
+    res <- check_perfect_recovery(true_clust,est_clust)
+    return(res)
+  } else if(method=='misclassified-points'){
+    res <- misclassified_points(true_clust,est_clust)
+  } else {
+    stop("gforce.metrics -- Need to specify either 'purity', 'perfect' or 'misclassified-points' as method.")
+  }
+}
+
 check_perfect_recovery <- function(original,recovered){
   group_ids_orig <- unique(original)
   group_ids_recov <- unique(recovered)
@@ -36,7 +61,7 @@ check_perfect_recovery <- function(original,recovered){
   return(same)
 }
 
-purity_measure <- function(ga_hat,ga){
+purity_measure <- function(ga,ga_hat){
   group_ids_ga <- unique(ga)
   group_ids_ga_hat <- unique(ga_hat)
   K <- length(group_ids_ga_hat)
@@ -74,7 +99,7 @@ kmeanspp <- function(D, K) {
   return(res$cluster)
 }
 
-misclassified_points <- function(ga_hat,ga){
+misclassified_points <- function(ga,ga_hat){
   group_ids_ga <- unique(ga)
   group_ids_ga_hat <- unique(ga_hat)
   K <- length(group_ids_ga_hat)

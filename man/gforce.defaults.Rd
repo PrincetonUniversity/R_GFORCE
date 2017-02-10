@@ -4,7 +4,12 @@
 \alias{gforce.defaults}
 \title{Provides the default tuning parameters for \code{\link{gforce.FORCE}}.}
 \usage{
-gforce.defaults()
+gforce.defaults(d, K)
+}
+\arguments{
+\item{d}{dimension of random vector or number of datapoints.}
+
+\item{K}{number of clusters.}
 }
 \description{
 Provides the default tuning parameters for \code{\link{gforce.FORCE}}.

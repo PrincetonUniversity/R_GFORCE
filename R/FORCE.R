@@ -21,7 +21,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     d <- ncol(D)
 
     if(is.null(force_opts)){
-        force_opts <- pgd_adar_default_options_fixed(d,K)
+        force_opts <- geforce.defaults(d,K)
     }
 
     if(is.null(D_Kmeans)) {
@@ -115,14 +115,52 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
 #' @param X \eqn{n x d} matrix. Either this or \code{D} must be specified.
 #' @param D \eqn{d x d} matrix. Either this or \code{X} must be specified.
 #' @inheritParams gforce.FORCE
-#' @seealso \code{\link{gforce.FORCE.options}}
+#' @seealso \code{\link{gforce.defaults}}
 #' @export
 gforce.PECOK <- function(K, X=NULL, D=NULL, force_opts = NULL, X0 = NULL, E = NULL) {
+  if(is.null(X) && is.null(D)) {
+    stop('gforce.PECOK -- You must specify one of X or D.')
+  } else if (!is.null(X) && !is.null(D)) {
+    stop('gforce.PECOK -- You must specify one of X or D.')
+  }
 
+  if(is.null(D)){
+
+  }
+
+  res <- gforce.FORCE(D,K,force_opts = force_opts, X0 = X0, E = E)
+  res$D <- D
+  return(res)
 }
 
 
 #' Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
-gforce.defaults <- function(){
-    ;
+#' @param d dimension of random vector or number of datapoints.
+#' @param K number of clusters.
+#' @export
+gforce.defaults <- function(d,K){
+  options <- NULL
+  options$alpha = 10^-4
+  options$alpha_decrease_time = 10
+  options$alpha_max = 1
+  options$alpha_min = 10^-16
+  options$alpha_mode = 0
+  options$dual_frequency = 50
+  options$duality_gap = 10^-5
+  options$early_stop = 0
+  options$early_stop_length = 0
+  options$eps_obj = 0.01
+  options$finish_pgd = 0
+  options$initial_mixing = 2/d
+  options$kmeans_iter = 10
+  options$max_iter = 500
+  options$pgd_result_mode = 0
+  options$random_seed = -1
+  options$restarts = c(100)
+  options$slack_scale = 1
+  options$start_mode = 1
+  options$tau = 0.8
+  options$verbose = 0
+
+  return(options)
 }
