@@ -43,6 +43,8 @@ void kmeans_dual_solution_primal_min(int* ga_hat, double* D, int K, int d, doubl
                                         double* Y_T_r, int* feasible_r);
 void primal_dual_adar(double* D, double* sigma_hat, double* E, double* ESI, double* X0, 
                         int d, int K, pgd_opts* opts, pgd_results* results);
+
+
 // R Access Points
 void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r);
 void primal_dual_adar_R(double* D, double* sigma_hat, double* E, double* ESI, double* X0, int* d, int* K, 
@@ -55,5 +57,7 @@ void primal_dual_adar_R(double* D, double* sigma_hat, double* E, double* ESI, do
 void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *dimension, 
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0, 
                                         double* Y_a_r, double* Y_T_r, int* feasible_r);
+void v_measure(double *IPS,double *n_xc_xd, int *dimension, double *vm);
+void v_measure_par(double *IPS,double *n_xc_xd, int *dimension, double *vm);
 
 #endif

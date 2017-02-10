@@ -1,5 +1,8 @@
+
 # returns diagonalized gamma_hat used in PECOK
-gamma_hat <- function(X){
+#' @useDynLib GFORCE v_measure
+#' @useDynLib GFORCE v_measure_par
+gamma_hat <- function(X,par=FALSE){
   dims <- dim(X)
   n <- dims[1]
   d <- dims[2]
@@ -10,13 +13,20 @@ gamma_hat <- function(X){
   ones_d <- matrix(rep(1,d),ncol=1)
   n_xc_xd <- (ones_d%*%t(ips_diag) + ips_diag%*%t(ones_d) - 2*ips)^0.5
   
-  # call C implementation
-#  dyn.load(LIB_PECOK_GAMMA_PAR_SO)
-  result <- .C("pecok_gamma",
-               IPS=as.double(ips),
-               n_xc_xd=as.double(n_xc_xd),
-               dimension=as.integer(d),
-               vm=numeric(d^2))
+  if(par){
+    result <- .C("v_measure_par",
+                 IPS=as.double(ips),
+                 n_xc_xd=as.double(n_xc_xd),
+                 dimension=as.integer(d),
+                 vm=numeric(d^2))
+  } else{
+    result <- .C("v_measure",
+                 IPS=as.double(ips),
+                 n_xc_xd=as.double(n_xc_xd),
+                 dimension=as.integer(d),
+                 vm=numeric(d^2))
+  }
+  
   Vs_upper <- matrix(result$vm,ncol=d)
   Vs <- Vs_upper + t(Vs_upper)
   for(a in 1:d){
