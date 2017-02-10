@@ -120,3 +120,9 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
 gforce.PECOK <- function(K, X=NULL, D=NULL, force_opts = NULL, X0 = NULL, E = NULL) {
 
 }
+
+
+#' Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
+gforce.defaults <- function(){
+    ;
+}

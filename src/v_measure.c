@@ -3,7 +3,7 @@
 #include "omp.h"
 #include "convex_kmeans.h"
 
-void v_measure(double *IPS,double *n_xc_xd, int *dimension, double *vm)
+void v_measure(double* restrict IPS,double* restrict n_xc_xd, int *dimension, double* restrict vm)
 {
     int p = *dimension;
     /* return UPPER diagonal matrix of V measures b/c in COLMAJOR ORDER */
@@ -32,7 +32,7 @@ void v_measure(double *IPS,double *n_xc_xd, int *dimension, double *vm)
 
 /* return UPPER diagonal matrix of V measures b/c in COLMAJOR ORDER */
 /* a is row and b is column */
-void v_measure_par(double *IPS,double *n_xc_xd, int *dimension, double *vm)
+void v_measure_par(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm)
 {
     int* tmp_ptr;
     int p = *dimension;

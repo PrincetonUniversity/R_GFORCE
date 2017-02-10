@@ -128,7 +128,7 @@ void initialize_problem_instance(double* D, double* E, double* ESI, double mu, i
 
 
 // VECTOR, MATRIX OPS
-void daps(double* A, int inc_A, double c, int d){
+void daps(double* restrict A, int inc_A, double c, int d){
     double dtmp;
     if(inc_A == 1){
         for(int i=0; i < d; i++){
@@ -143,7 +143,7 @@ void daps(double* A, int inc_A, double c, int d){
     }
 }
 
-void dsmtd(double* A, double* B, int d, const char side){
+void dsmtd(double* restrict A, double* restrict B, int d, const char side){
     int stride = 1;
     if(side == 'R'){
         for(int i=0; i <d; i++){
@@ -157,7 +157,7 @@ void dsmtd(double* A, double* B, int d, const char side){
     }
 }
 
-void dvexp(double* A, int d) {
+void dvexp(double* restrict A, int d) {
     double tmp;
     for(int i = 0; i < d; i++){
         tmp = *A;
@@ -166,7 +166,7 @@ void dvexp(double* A, int d) {
     }
 }
 
-double dsumv(double* A, int d){
+double dsumv(double* restrict A, int d){
     double acc = 0;
     for(int i=0; i < d; i++){
         acc = acc + *A;
@@ -175,7 +175,7 @@ double dsumv(double* A, int d){
     return acc;
 }
 
-double dtrace(double* A, int d){
+double dtrace(double* restrict A, int d){
     double trace = 0;
     for(int i=0; i < d; i++){
         trace = trace + *A;
@@ -185,7 +185,7 @@ double dtrace(double* A, int d){
 }
 
 
-void dcsum(double* A, int d, double* A_csums){
+void dcsum(double* restrict A, int d, double* restrict A_csums){
     // zero A_csums
     double* tmp_ptr = A_csums;
     double dtmp;
@@ -204,7 +204,7 @@ void dcsum(double* A, int d, double* A_csums){
     }
 }
 
-void dxpyez(int d, double* X, double* Y, double* Z){
+void dxpyez(int d, double* restrict X, double* restrict Y, double* restrict Z){
     double dtmp1;
     for(int i=0; i < d; i++){
         dtmp1 = *X + *Y;

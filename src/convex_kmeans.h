@@ -57,7 +57,7 @@ void primal_dual_adar_R(double* D, double* sigma_hat, double* E, double* ESI, do
 void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *dimension, 
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0, 
                                         double* Y_a_r, double* Y_T_r, int* feasible_r);
-void v_measure(double *IPS,double *n_xc_xd, int *dimension, double *vm);
-void v_measure_par(double *IPS,double *n_xc_xd, int *dimension, double *vm);
+void v_measure(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);
+void v_measure_par(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);
 
 #endif

@@ -2,7 +2,6 @@ context('Test PECOK Estimators')
 
 # TEST FORM - test_that("NAME",{  })
 
-#' @useDynLib GFORCE test_smoothed_gradient_S_base
 test_that("Test V Measures",{
   K <- 5
   d <- 20
