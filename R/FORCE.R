@@ -114,25 +114,30 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
 #' @param K number of clusters.
 #' @param X \eqn{n x d} matrix. Either this or \code{D} must be specified.
 #' @param D \eqn{d x d} matrix. Either this or \code{X} must be specified.
+#' @param sigma_hat \eqn{d x d} matrix. If \code{D} is specified, this argument should be the
+#' estimated covariance matrix. It is not strictly necessary to provide it, but it should be for
+#' optimal performance. If \code{X} is specified, it will be ignored.
+#' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed, 
+#' a multi-threaded method is called, otherwise a single-threaded method is called.
 #' @inheritParams gforce.FORCE
 #' @seealso \code{\link{gforce.defaults}}
 #' @export
-gforce.PECOK <- function(K, X=NULL, D=NULL, force_opts = NULL, X0 = NULL, E = NULL) {
+gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL, X0 = NULL, E = NULL, gamma_par = FALSE) {
   if(is.null(X) && is.null(D)) {
     stop('gforce.PECOK -- You must specify one of X or D.')
   } else if (!is.null(X) && !is.null(D)) {
     stop('gforce.PECOK -- You must specify one of X or D.')
   }
-
   if(is.null(D)){
-
+    n <- nrow(X)
+    gamma_hat <- gforce.Gamma(X)
+    sigma_hat <- t(X)%*%X / n
   }
 
-  res <- gforce.FORCE(D,K,force_opts = force_opts, X0 = X0, E = E)
+  res <- gforce.FORCE(D,K,D_Kmeans = sigma_hat, force_opts = force_opts, X0 = X0, E = E)
   res$D <- D
   return(res)
 }
-
 
 #' Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
 #' @param d dimension of random vector or number of datapoints.

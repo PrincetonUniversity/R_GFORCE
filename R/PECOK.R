@@ -1,8 +1,16 @@
 
-# returns diagonalized gamma_hat used in PECOK
+#' Estimates \eqn{\Gamma} for the PECOK SDP.
+#' 
+#' In particular, it returns in diagonal form the estimator
+#' \eqn{\Gamma} used to construct the PECOK penalized covariance estimator.
+#' @param X \eqn{n x d} matrix. Each row represents a realization of a
+#' \eqn{d} dimensional random vector.
+#' @param par logical expression. If \code{par == TRUE}, then a multi-threaded version
+#' of the function is called. If \code{par == FALSE}, a single-threaded version is called.
 #' @useDynLib GFORCE v_measure
 #' @useDynLib GFORCE v_measure_par
-gamma_hat <- function(X,par=FALSE){
+#' @export
+gforce.Gamma <- function(X,par=FALSE){
   dims <- dim(X)
   n <- dims[1]
   d <- dims[2]

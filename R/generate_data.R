@@ -1,4 +1,30 @@
-# Generate random data
+# GENERATE RANDOM DATA ACCORDING TO A G-BLOCK LATENT VARIABLE MODEL
+
+#' Data generator.
+#' 
+#' Generates \eqn{n} random samples from a \eqn{G}-Latent Variable Model. The
+#' caller can specify the graph structure on the latent variables via
+#' several parameters. The magnitude of the non-zero entries in the population
+#' precision matrix can also be specified. Observed variables are assigned
+#' uniformly at random to \eqn{K} groups with minimum size \eqn{m}.
+#'
+#' @param K number of clusters.
+#' @param n number of samples.
+#' @param d dimension of the observed random vector.
+#' @param m minimal group size.
+#' @param graph latent graph structure. Can be 'scalefree', 'hub', 'band' or 'DeltaC'.
+#' @param num_hubs number of hubs in the latent graph. Ignored unless \code{graph == 'hub'}.
+#' @param cov_gap_mult scales the size of \eqn{\delta C}. Ignored unless \code{graph == 'DeltaC'}.
+#' @param error_base minimum variance of \eqn{E_i}.
+#' @param error_add size of range of possible variances for \eqn{E_i}.
+#' @param corr_value size of off diagonal entries in latent precision matrix.
+#' 
+#' @export
+gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, cov_gap_mult=1.0, 
+                            error_base = 0.25, error_add = 0.25, corr_value = 0.3) {
+
+}
+
 
 generate_glatent <- function(Cstar,gammastar,group_assignments,n) {
   require(MASS)

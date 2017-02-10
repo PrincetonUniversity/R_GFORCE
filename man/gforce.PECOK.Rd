@@ -4,8 +4,8 @@
 \alias{gforce.PECOK}
 \title{Uses the FORCE algorithm to solve the PECOK SDP.}
 \usage{
-gforce.PECOK(K, X = NULL, D = NULL, force_opts = NULL, X0 = NULL,
-  E = NULL)
+gforce.PECOK(K, X = NULL, D = NULL, sigma_hat = NULL, force_opts = NULL,
+  X0 = NULL, E = NULL, gamma_par = FALSE)
 }
 \arguments{
 \item{K}{number of clusters.}
@@ -14,11 +14,18 @@ gforce.PECOK(K, X = NULL, D = NULL, force_opts = NULL, X0 = NULL,
 
 \item{D}{\eqn{d x d} matrix. Either this or \code{X} must be specified.}
 
+\item{sigma_hat}{\eqn{d x d} matrix. If \code{D} is specified, this argument should be the
+estimated covariance matrix. It is not strictly necessary to provide it, but it should be for
+optimal performance. If \code{X} is specified, it will be ignored.}
+
 \item{force_opts}{tuning parameters. \code{NULL} signifies defaults will be used.}
 
 \item{X0}{initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.}
 
 \item{E}{strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.}
+
+\item{gamma_par}{logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed, 
+a multi-threaded method is called, otherwise a single-threaded method is called.}
 }
 \description{
 Uses the FORCE algorithm to solve the PECOK SDP.

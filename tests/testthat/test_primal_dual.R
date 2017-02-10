@@ -1,7 +1,5 @@
 context('Test Primal Dual Algorithm')
 
-# TEST FORM - test_that("NAME",{  })
-
 #' @useDynLib GFORCE test_smoothed_gradient_S_base
 test_that("GS_t Base",{
 
@@ -37,7 +35,7 @@ test_that("GX_t Base",{
     d <- 20
     dat <- generate_glatent_dc(K,d,d,3,4)
     sh <- t(dat$X)%*%dat$X / d
-    gh <- gamma_hat(dat$X)
+    gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
@@ -77,7 +75,7 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     d <- 20
     dat <- generate_glatent_dc(K,d,d,3,4)
     sh <- t(dat$X)%*%dat$X / d
-    gh <- gamma_hat(dat$X)
+    gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
@@ -119,7 +117,7 @@ test_that("Projection onto C Perpendicular",{
     d <- 20
     dat <- generate_glatent_dc(K,d,d,3,4)
     sh <- t(dat$X)%*%dat$X / d
-    gh <- gamma_hat(dat$X)
+    gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
@@ -157,7 +155,7 @@ test_that("Projection Onto PSD Cone Border",{
     d <- 20
     dat <- generate_glatent_dc(K,d,d,3,4)
     sh <- t(dat$X)%*%dat$X / d
-    gh <- gamma_hat(dat$X)
+    gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
@@ -194,7 +192,7 @@ test_that("Smoothed Objective",{
     d <- 20
     dat <- generate_glatent_dc(K,d,d,3,4)
     sh <- t(dat$X)%*%dat$X / d
-    gh <- gamma_hat(dat$X)
+    gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
@@ -235,7 +233,7 @@ test_that("Smoothed Objective",{
 #     d <- 20
 #     dat <- generate_glatent_dc(K,d,d,3,4)
 #     sh <- t(dat$X)%*%dat$X / d
-#     gh <- gamma_hat(dat$X)
+#     gh <- gforce.Gamma(dat$X)
 #     diff <- diag(gh) - sh
 #     initial_mixing <- 2/d
 #     km_res <- kmeanspp(-sh,K)
@@ -298,7 +296,7 @@ test_that("K-Means Objective Value",{
                  K = as.integer(K),
                  clusters = as.integer(dat$group_assignments),
                  opt_val = as.double(opt_val_r))
-    
+
     opt_val <- sum(sh*B_hat(dat$group_assignments))
     expect_equal(opt_val,result$opt_val)
     })

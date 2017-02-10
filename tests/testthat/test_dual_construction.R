@@ -6,7 +6,7 @@ context('Test Dual Construction')
 test_that("Dual Construction",{
     set.seed(12345) #need to set seed bc doesnt always exist
     dat <- generate_glatent_dc(5,20,20,3,4)
-    gh <- gamma_hat(dat$X)
+    gh <- gforce.Gamma(dat$X)
     sh <- t(dat$X)%*%dat$X / 20
     diff <- sh - diag(gh)
     diff <- -1*diff
