@@ -14,58 +14,92 @@
 #' @param m minimal group size.
 #' @param graph latent graph structure. Can be 'scalefree', 'hub', 'band' or 'DeltaC'.
 #' @param num_hubs number of hubs in the latent graph. Ignored unless \code{graph == 'hub'}.
+#' @param band_size size of bands in the latent graph. Ignored unless \code{graph=='band'}.
 #' @param cov_gap_mult scales the size of \eqn{\delta C}. Ignored unless \code{graph == 'DeltaC'}.
 #' @param error_base minimum variance of \eqn{E_i}.
 #' @param error_add size of range of possible variances for \eqn{E_i}.
 #' @param corr_value size of off diagonal entries in latent precision matrix.
+#' @param normalize logical. If \code{normalize == TRUE}, the covariance matrix for the latent graph
+#' will be normalized so that it is also a correlation matrix.
 #' 
 #' @export
-gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, cov_gap_mult=1.0, 
-                            error_base = 0.25, error_add = 0.25, corr_value = 0.3) {
-
-}
-
-
-generate_glatent <- function(Cstar,gammastar,group_assignments,n) {
-  require(MASS)
-  d <- length(group_assignments)
-  K <- dim(Cstar)[1]
-  dat <- NULL
-  dat$E <- mvrnorm(n,rep(0,d),diag(gammastar))
-  dat$Z <- mvrnorm(n,rep(0,K),Cstar)
-  dat$X <- matrix(rep(0,d*n),nrow=n)
-  for(i in 1:K) {
-    group_idx = which(group_assignments == i)
-    dat$X[,group_idx] = dat$E[,group_idx] + dat$Z[,i]
-  }
-  return(dat)
-}
-
-generate_glatent_dc <- function(K,d,n,m,cov_gap_mult=1.0) {
+gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size = 3, cov_gap_mult=1.0, 
+                            error_base = 0.25, error_add = 0.25, corr_value = 0.3, normalize = TRUE) {
   require(MASS)
   res <- NULL
-  
-  # generate error variances
-  gamma_star <- runif(d)
-  res$gamma_star <- gamma_star + 0.5
-  
-  # generate group assignment
-  group_assignments <- generate_random_partition(K,d,m)
-  res$group_assignments <- group_assignments
-  
-  # generate Cstar, E
-  res$E <- mvrnorm(n,rep(0,d),diag(res$gamma_star))
-  #gamma_inf = max(max(abs(cov(res$E))))
-  gamma_inf <- max(res$gamma_star)
-  inter <- sqrt(log(d)/(m*n)) + sqrt(d / (n*m^2)) + log(d)/n + d/(m*n)
-  zeta <- cov_gap_mult*gamma_inf*inter
-  res$Cstar <- random_covariance(K,zeta)
 
-  #generate data
+  # generate error variances
+  gamma_star <- runif(d,max=error_add)
+  res$gamma_star <- gamma_star + error_base
+
+  # build latent covariance structure
+  if(graph == 'DeltaC'){
+    gamma_inf <- max(res$gamma_star)
+    inter <- sqrt(log(d)/(m*n)) + sqrt(d / (n*m^2)) + log(d)/n + d/(m*n)
+    zeta <- cov_gap_mult*gamma_inf*inter
+    res$Cstar <- random_covariance(K,zeta)
+    res$Theta_star <- solve(res$Cstar)
+
+  } else if(graph == 'scalefree') {
+    A <- matrix(rep(0,K^2), nrow=K)
+    A[1,2] <- 0.3
+    A[2,1] <- 0.3
+    for(i in 3:K){
+      # get current probability distribution
+      probd <- colSums(A)
+      probd <- probd / sum(probd)
+      
+      #add new edge and node
+      ne <- sample(x = 1:K, 1, replace = T, prob = probd)
+      A[i,ne] <- 0.3
+      A[ne,i] <- 0.3
+    }
+    res$Theta_star <- A + (abs(min(eigen(A)$values)) + 0.2)*diag(K)
+
+  } else if(graph == 'band') {
+    A <- matrix(rep(0,K^2), nrow=K)
+    for(i in 1:band_size){
+      diag(A[1:(K-i),(1+i):K]) <- corr_value
+      diag(A[(1+i):K,1:(K-1)]) <- corr_value
+    }
+    res$Theta_star <- A + (abs(min(eigen(A)$values)) + 0.2)*diag(K)
+
+  } else if(graph == 'hub') {
+    if(K %% num_hubs != 0){
+      stop('Number of Hubs must divide K')
+    }
+    A <- matrix(rep(0,K^2), nrow=K)
+    group_size <- K / num_hubs
+    for(i in 1:num_hubs){
+      cur_hub <- ((i-1)*group_size + 1):(i*group_size)
+      hub_center <- cur_hub[1]
+      A[cur_hub[-1],hub_center] = corr_value
+      A[hub_center,cur_hub[-1]] = corr_value
+    }
+    res$Theta_star <- A + (abs(min(eigen(A)$values)) + 0.2)*diag(K)
+
+  } else {
+    stop(sprintf('gforce.generator -- Graph type %c not supported.',graph))
+  }
+
+  if(graph != 'DeltaC'){
+    if(normalize){
+      res$Cstar <- cov2cor(solve(res$Theta_star))
+      res$Theta_star <- solve(res$Cstar)
+    } else {
+      res$Cstar <- solve(res$Theta_star)
+    }
+  }
+
+  #group assignments
+  res$group_assignments <- generate_random_partition(K,d,m)
+
+  # Generate Data
+  res$E <- mvrnorm(n,rep(0,d),diag(res$gamma_star))
   res$Z <- mvrnorm(n,rep(0,K),res$Cstar)
   res$X <- matrix(rep(0,d*n),nrow=n)
   for(i in 1:K) {
-    group_idx = which(group_assignments == i)
+    group_idx = which(res$group_assignments == i)
     res$X[,group_idx] = res$E[,group_idx] + res$Z[,i]
   }
   
@@ -86,7 +120,6 @@ delta_c <- function(CS) {
 }
 
 random_covariance <- function(K,zeta) {
-  require(MASS)
   min_eig <- 0
   dc <- 0
   tries <- 0
@@ -106,47 +139,6 @@ random_covariance <- function(K,zeta) {
   return(C)
 }
 
-generate_glatent_scalefree <- function(K,d,n,m,error_base = 0.25,error_add = 0.25) {
-  require(MASS)
-  res <- NULL
-  A <- matrix(rep(0,K^2), nrow=K)
-  A[1,2] <- 0.3
-  A[2,1] <- 0.3
-  for(i in 3:K){
-    # get current probability distribution
-    probd <- colSums(A)
-    probd <- probd / sum(probd)
-    
-    #add new edge and node
-    ne <- sample(x = 1:K, 1, replace = T, prob = probd)
-    A[i,ne] <- 0.3
-    A[ne,i] <- 0.3
-  }
-  
-  # Covariance for latent variables
-  theta <- A + (abs(min(eigen(A)$values)) + 0.2)*diag(K)
-
-  #normalize
-  res$Cstar <- cov2cor(solve(theta))
-  res$Theta_star <- solve(res$Cstar)
-
-  
-  #group assignments
-  res$group_assignments <- generate_random_partition(K,d,m)
-  
-  # Generate Data
-  gamma_star <- runif(d,max=error_add)
-  res$gamma_star <- gamma_star + error_base
-  #res$E <- matrix(rep(0,d*n),nrow=n)
-  res$E <- mvrnorm(n,rep(0,d),diag(res$gamma_star))
-  res$Z <- mvrnorm(n,rep(0,K),res$Cstar)
-  res$X <- matrix(rep(0,d*n),nrow=n)
-  for(i in 1:K) {
-    group_idx = which(res$group_assignments == i)
-    res$X[,group_idx] = res$E[,group_idx] + res$Z[,i]
-  }
-  return(res)
-}
 
 generate_random_partition <- function(K,d,m){
   group_sum <- 0
@@ -175,76 +167,4 @@ generate_random_partition <- function(K,d,m){
     }
   }
   return(group_assignments)
-}
-
-generate_glatent_hub <- function(K,d,n,m,num_hubs,error_base = 0.25,error_add = 0.25,corr_value = 0.3) {
-  require(MASS)
-  if(K %% num_hubs != 0){
-    stop('Number of Hubs must divide K')
-  }
-
-  res <- NULL
-  A <- matrix(rep(0,K^2), nrow=K)
-  group_size <- K / num_hubs
-  for(i in 1:num_hubs){
-    cur_hub <- ((i-1)*group_size + 1):(i*group_size)
-    hub_center <- cur_hub[1]
-    A[cur_hub[-1],hub_center] = corr_value
-    A[hub_center,cur_hub[-1]] = corr_value
-  }
-  
-  # Covariance for latent variables
-  theta <- A + (abs(min(eigen(A)$values)) + 0.2)*diag(K)
-
-  #normalize
-  res$Cstar <- cov2cor(solve(theta))
-  res$Theta_star <- solve(res$Cstar)
-
-  #group assignments
-  res$group_assignments <- generate_random_partition(K,d,m)
-  
-  # Generate Data
-  gamma_star <- runif(d,max=error_add)
-  res$gamma_star <- gamma_star + error_base
-  res$E <- mvrnorm(n,rep(0,d),diag(res$gamma_star))
-  res$Z <- mvrnorm(n,rep(0,K),res$Cstar)
-  res$X <- matrix(rep(0,d*n),nrow=n)
-  for(i in 1:K) {
-    group_idx = which(res$group_assignments == i)
-    res$X[,group_idx] = res$E[,group_idx] + res$Z[,i]
-  }
-  return(res)
-}
-
-generate_glatent_band <- function(K,d,n,m,error_base = 0.25,error_add = 0.25,band_size = 3,corr_value = 0.3) {
-  require(MASS)
-
-  res <- NULL
-  A <- matrix(rep(0,K^2), nrow=K)
-  for(i in 1:band_size){
-    diag(A[1:(K-i),(1+i):K]) = corr_value
-    diag(A[(1+i):K,1:(K-1)]) = corr_value
-  }
-  
-  # Covariance for latent variables
-  theta <- A + (abs(min(eigen(A)$values)) + 0.2)*diag(K)
-
-  #normalize
-  res$Cstar <- cov2cor(solve(theta))
-  res$Theta_star <- solve(res$Cstar)
-
-  #group assignments
-  res$group_assignments <- generate_random_partition(K,d,m)
-  
-  # Generate Data
-  gamma_star <- runif(d,max=error_add)
-  res$gamma_star <- gamma_star + error_base
-  res$E <- mvrnorm(n,rep(0,d),diag(res$gamma_star))
-  res$Z <- mvrnorm(n,rep(0,K),res$Cstar)
-  res$X <- matrix(rep(0,d*n),nrow=n)
-  for(i in 1:K) {
-    group_idx = which(res$group_assignments == i)
-    res$X[,group_idx] = res$E[,group_idx] + res$Z[,i]
-  }
-  return(res)
 }

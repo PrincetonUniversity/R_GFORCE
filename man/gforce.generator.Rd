@@ -5,8 +5,8 @@
 \title{Data generator.}
 \usage{
 gforce.generator(K, d, n, m, graph = "DeltaC", num_hubs = NULL,
-  cov_gap_mult = 1, error_base = 0.25, error_add = 0.25,
-  corr_value = 0.3)
+  band_size = 3, cov_gap_mult = 1, error_base = 0.25, error_add = 0.25,
+  corr_value = 0.3, normalize = TRUE)
 }
 \arguments{
 \item{K}{number of clusters.}
@@ -21,6 +21,8 @@ gforce.generator(K, d, n, m, graph = "DeltaC", num_hubs = NULL,
 
 \item{num_hubs}{number of hubs in the latent graph. Ignored unless \code{graph == 'hub'}.}
 
+\item{band_size}{size of bands in the latent graph. Ignored unless \code{graph=='band'}.}
+
 \item{cov_gap_mult}{scales the size of \eqn{\delta C}. Ignored unless \code{graph == 'DeltaC'}.}
 
 \item{error_base}{minimum variance of \eqn{E_i}.}
@@ -28,6 +30,9 @@ gforce.generator(K, d, n, m, graph = "DeltaC", num_hubs = NULL,
 \item{error_add}{size of range of possible variances for \eqn{E_i}.}
 
 \item{corr_value}{size of off diagonal entries in latent precision matrix.}
+
+\item{normalize}{logical. If \code{normalize == TRUE}, the covariance matrix for the latent graph
+will be normalized so that it is also a correlation matrix.}
 }
 \description{
 Generates \eqn{n} random samples from a \eqn{G}-Latent Variable Model. The
