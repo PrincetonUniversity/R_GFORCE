@@ -5,7 +5,7 @@ context('Test PECOK Estimators')
 test_that("Test V Measures",{
   K <- 5
   d <- 20
-  dat <- generate_glatent_dc(K,d,d,3,4)
+  dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
   gh1 <- gforce.Gamma(dat$X,par=TRUE)
   gh2 <- gforce.Gamma(dat$X,par=FALSE)
 

@@ -1,16 +1,54 @@
 # FUNCTIONS TO CONSTRUCT OPTIMALITY CERTIFICATES FOR THE 
 # K-MEANS SDP
 
+#' K-means optimality certificate.
+#' 
+#' Given a proposed integer solution to the \eqn{K}-means SDP relaxation, this
+#' function attempts to construct a solution to the dual problem with matching
+#' objective value.
+#' @param sol vector of length \eqn{d}. This contains the assignment of variables or
+#' points to clusters.
+#' @param D \eqn{d x d} matrix.
+#' @param eps1 a scalar. It controls the stopping condition for the dual solution search.
+#' @param eps2 a scalar. It controls the infeasibility tolerance for the dual solution to allow for numerical imprecision.
+#' @param Y_T_min a scalar. THe smallest \eqn{Y_T} that the function can return. Must be greater than 0. 
+#'
+#' @useDynLib GFORCE kmeans_dual_solution_primal_min_R
+#' @export
+gforce.certify <- function(sol,D,eps1 = 0.01,eps2 = 10^-7,Y_T_min = 0.01) {
+  # check inputs
+  Y_T_min <- as.double(Y_T_min)
+  eps1 <- as.double(eps1)
+  eps2 <- as.double(eps2)
+  if(Y_T_min <= 0){
+    stop('gforce.certify -- Y_T_min must be greater than 0.')
+  }
+  if(eps1 <= 0){
+    stop('gforce.certify -- eps1 must be greater than 0.')
+  }
+  if(eps2 < 0){
+    stop('gforce.certify -- eps1 must be greater than or equal to 0.')
+  }
 
-
-
-
-
-
-
-
-
-
+  K <- length(unique(sol))
+  d <- dim(D)[1]
+  C_result <- .C(kmeans_dual_solution_primal_min_R,
+               sol=as.integer(sol),
+               D=as.double(D),
+               K= as.integer(K),
+               dimension=as.integer(d),
+               eps1 = eps1,
+               eps2 = eps2,
+               Y_T_min = Y_T_min,
+               Y_a = numeric(d),
+               Y_T = as.double(0),
+               feasible = as.integer(0))
+  res <- NULL
+  res$Y_T <- C_result$Y_T
+  res$Y_a <- C_result$Y_a
+  res$feasible <- C_result$feasible
+  return(res)
+}
 
 
 # This function is used now for testing the C implementation
@@ -19,9 +57,6 @@
 # D -- objective value function in **maximization** version of the relaxation
 dual_solution <- function(ga_hat,D,eps = 0.01,eps2 = 10^-7,Y_T_min = 0.01){
 
-  # initialization and pre-processing
-  # source(paste(DIR_CONVEX_KMEANS,'constraint_matrices.R',sep='/'))
-  # source(paste(DIR_CONVEX_KMEANS,'B_hat.R',sep='/'))
   return_dual <- NULL
   group_ids <- unique(ga_hat)
   K <- length(group_ids)

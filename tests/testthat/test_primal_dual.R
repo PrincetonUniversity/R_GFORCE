@@ -5,7 +5,7 @@ test_that("GS_t Base",{
 
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
@@ -33,7 +33,7 @@ test_that("GS_t Base",{
 test_that("GX_t Base",{
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
@@ -73,7 +73,7 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     set.seed(12345)
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
@@ -115,7 +115,7 @@ test_that("Projection onto C Perpendicular",{
     set.seed(12345)
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
@@ -153,7 +153,7 @@ test_that("Projection onto C Perpendicular",{
 test_that("Projection Onto PSD Cone Border",{
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
@@ -190,7 +190,7 @@ test_that("Smoothed Objective",{
     set.seed(12345)
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
@@ -287,7 +287,7 @@ test_that("K-Means Objective Value",{
 
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     opt_val_r <- 0
     result <- .C(test_clust_to_opt_val,

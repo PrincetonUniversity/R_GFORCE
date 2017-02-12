@@ -8,7 +8,7 @@ test_that("GS_t Base",{
 
     K <- 5
     d <- 20
-    dat <- generate_glatent_dc(K,d,d,3,4)
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
@@ -42,7 +42,7 @@ test_that("K-means++",{
     total_purity <- 0
 
     for(i in 1:num_random_exps){
-        dat <- generate_glatent_dc(K,d,d,3,4)
+        dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
         sh <- t(dat$X)%*%dat$X / 20
         result <- .C(kmeans_pp_R,
                      D=as.double(sh),

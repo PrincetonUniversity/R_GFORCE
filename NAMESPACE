@@ -3,6 +3,7 @@
 export(gforce.FORCE)
 export(gforce.Gamma)
 export(gforce.PECOK)
+export(gforce.certify)
 export(gforce.defaults)
 export(gforce.generator)
 export(gforce.metrics)
