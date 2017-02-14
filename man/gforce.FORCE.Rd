@@ -5,7 +5,7 @@
 \title{Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm.}
 \usage{
 gforce.FORCE(D, K, force_opts = NULL, D_Kmeans = NULL, X0 = NULL,
-  E = NULL)
+  E = NULL, R_only = FALSE)
 }
 \arguments{
 \item{D}{a matrix \eqn{D} as defined above.}
@@ -19,6 +19,9 @@ gforce.FORCE(D, K, force_opts = NULL, D_Kmeans = NULL, X0 = NULL,
 \item{X0}{initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.}
 
 \item{E}{strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.}
+
+\item{R_only}{logical expression. If \code{R_only == FALSE}, then the included
+native code implementation will be used. Otherwise, an R implementation is used.}
 }
 \description{
 Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm.

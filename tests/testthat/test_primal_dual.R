@@ -242,7 +242,8 @@ test_that("Smoothed Objective",{
 #     gh <- gforce.Gamma(dat$X)
 #     diff <- diag(gh) - sh
 #     initial_mixing <- 2/d
-#     km_res <- kmeanspp(-sh,K)
+#     km_res <- gforce.kmeans(-D_Kmeans,K)
+#     km_res <- km_res$clusters
 #     km_sol <- gforce.clust2mat(km_res)
 
 #     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
