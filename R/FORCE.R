@@ -21,7 +21,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     d <- ncol(D)
 
     if(is.null(force_opts)){
-        force_opts <- geforce.defaults(d,K)
+        force_opts <- gforce.defaults(d,K)
     }
 
     if(is.null(D_Kmeans)) {
@@ -69,20 +69,20 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
             Z_T_lmin = as.double(1.0),
             Z_best = numeric(d^2),
             B_Z_best = numeric(d^2),
-            Z_best_lmin = as.double(1.0),
-            B_Z_T_opt_val = as.double(1.0),
-            B_Z_best_opt_val = as.double(1.0),
-            km_opt_val = as.double(1.0),
-            km_best = as.integer(1:d),
-            km_best_time = as.integer(1),
-            km_iter_best = as.integer(1),
-            km_iter_total = as.integer(1),
-            dc = as.integer(1),
-            dc_time = as.integer(1),
-            dc_grad_iter = as.integer(1),
-            grad_iter_best = as.integer(1),
-            grad_iter_best_time = as.integer(1),
-            total_time = as.integer(1))
+            Z_best_lmin = as.double(2.0),
+            B_Z_T_opt_val = as.double(3.0),
+            B_Z_best_opt_val = as.double(4.0),
+            km_opt_val = as.double(5.0),
+            km_best = as.integer(numeric(d)),
+            km_best_time = as.double(6.0),
+            km_iter_best = as.integer(7),
+            km_iter_total = as.integer(8),
+            dc = as.integer(9),
+            dc_time = as.double(10.0),
+            dc_grad_iter = as.integer(11),
+            grad_iter_best = as.integer(12),
+            grad_iter_best_time = as.double(13.0),
+            total_time = as.double(14))
 
     # Build Result
     res <- NULL
@@ -102,6 +102,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     res$km_iter_total <- C_result$km_iter_total
     res$dual_certified <- C_result$dc
     res$dual_certified_grad_iter <- C_result$dc_grad_iter
+    res$dual_certified_time <- C_result$dc_time
     res$grad_iter_best <- C_result$grad_iter_best
     res$grad_iter_best_time <- C_result$grad_iter_best_time
     res$total_time <- C_result$total_time

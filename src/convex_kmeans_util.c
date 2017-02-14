@@ -1,5 +1,6 @@
 #include "float.h"
 #include "math.h"
+#include "time.h"
 #include "R.h"
 #include "R_ext/BLAS.h"
 #include "R_ext/Lapack.h"
@@ -213,4 +214,11 @@ void dxpyez(int d, double* restrict X, double* restrict Y, double* restrict Z){
         Y++;
         Z++;
     }
+}
+
+double time_difference_ms(clock_t start, clock_t end){
+    double diff;
+    int msec_diff = end-start;
+    diff = (((double) msec_diff))/CLOCKS_PER_SEC;
+    return diff; 
 }

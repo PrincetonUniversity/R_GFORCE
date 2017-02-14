@@ -1,6 +1,8 @@
 #ifndef CONVEX_KMEANS_UTIL_H
 #define CONVEX_KMEANS_UTIL_H
 
+#include "time.h"
+
 // CONSTANTS
 extern const double DUAL_EPS1_DEFAULT, DUAL_EPS2_DEFAULT, DUAL_Y_T_MIN_DEFAULT;
 
@@ -45,6 +47,7 @@ void mem_pool_insert(mem_pool* pool, void* mem_ptr);
 void allocate_workspace_pd(int d, int K, workspace* work);
 void initialize_problem_instance(double* D, double* E, double* ESI, double mu,
                                 int d,int K, problem_instance* prob);
+double time_difference_ms(clock_t start, clock_t end);
 
 // VECTOR, MATRIX OPS
 // Computes A = A + c, where A is a vector of length d, c is scalar
@@ -68,13 +71,13 @@ void dxpyez(int d, double* restrict X, double* restrict Y, double* restrict Z);
 
 // PGD HELPERS
 double clust_to_opt_val(problem_instance* prob, int* ga_hat, workspace* work);
-void smoothed_gradient(problem_instance* prob, double* X, double* GX_t, double* GS_t, 
+void smoothed_gradient(problem_instance* prob, double* X, double* GX_t, double* GS_t,
                         workspace* work);
 void smoothed_objective(problem_instance* prob, double* X, double* lambda_min,
                         double* obj_val, workspace* work);
 void C_perp_update(problem_instance* prob, double alpha, double* X_t, double* GX_t,
                     double* GS_t, workspace*work);
-void kmeans_dual_solution_impl(int* ga_hat, problem_instance* prob, double eps1, double eps2, 
+void kmeans_dual_solution_impl(int* ga_hat, problem_instance* prob, double eps1, double eps2,
                                 double Y_T_min, double* Y_a_r, double* Y_T_r, int* feasible_r,
                                 workspace* work);
 void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,

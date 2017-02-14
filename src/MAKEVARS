@@ -1,4 +1,4 @@
 CXXFLAGS = -O0 -Wall
-CFLAGS = -O3 -std=c99
+CFLAGS = -g -std=c99
 PKG_CFLAGS=-fopenmp
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lgomp
