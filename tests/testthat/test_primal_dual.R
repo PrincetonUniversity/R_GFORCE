@@ -8,7 +8,8 @@ test_that("GS_t Base",{
     dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
     sh <- t(dat$X)%*%dat$X / d
     initial_mixing <- 2/d
-    km_res <- kmeanspp(-sh,K)
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
 
     ren_start_res <- renegar_start(-sh,K,initial_mixing,km_res)
     X <- ren_start_res$X1
@@ -38,7 +39,8 @@ test_that("GX_t Base",{
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
-    km_res <- kmeanspp(-sh,K)
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
@@ -78,7 +80,8 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
-    km_res <- kmeanspp(-sh,K)
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
@@ -120,7 +123,8 @@ test_that("Projection onto C Perpendicular",{
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
-    km_res <- kmeanspp(-sh,K)
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
@@ -158,7 +162,8 @@ test_that("Projection Onto PSD Cone Border",{
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
-    km_res <- kmeanspp(-sh,K)
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
@@ -195,7 +200,8 @@ test_that("Smoothed Objective",{
     gh <- gforce.Gamma(dat$X)
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
-    km_res <- kmeanspp(-sh,K)
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)

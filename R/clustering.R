@@ -82,23 +82,6 @@ purity_measure <- function(ga,ga_hat){
   return(p)
 }
 
-# R implementation of K-means++ for test comparison
-kmeanspp <- function(D, K) {
-  d <- dim(D)[1]
-  centers <- rep(0,K)
-  distances <- matrix(rep(0,d *(K - 1)), ncol = K - 1)
-
-  prob_dist <- rep(1, d)
-  for (i in 1:(K - 1)) {
-    centers[i] <- sample.int(d, 1, prob = prob_dist)
-    distances[, i] <- colSums((t(D) - D[centers[i], ])^2)
-    prob_dist <- distances[cbind(1:d, max.col(-distances[, 1:i, drop = FALSE]))]
-  }
-  centers[K] <- sample.int(d, 1, prob = prob_dist)
-  res <- kmeans(D, D[centers, ])
-  return(res$cluster)
-}
-
 misclassified_points <- function(ga,ga_hat){
   group_ids_ga <- unique(ga)
   group_ids_ga_hat <- unique(ga_hat)
