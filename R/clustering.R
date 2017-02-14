@@ -126,7 +126,6 @@ misclassified_points <- function(ga,ga_hat){
 }
 
 kmeans_repeater <- function(sig,num_repeat,ga){
-  source(paste(DIR_CONVEX_KMEANS,'clustering.R',sep='/'))
   av_purity <- 0
   percent_perfect <- 0
   K <- length(unique(ga))

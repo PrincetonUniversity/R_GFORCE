@@ -15,22 +15,3 @@ R_a <- function(d,a) {
   Ra <- ea%*%t(j) + j%*%t(ea)
   return(Ra)
 }
-
-# construct solution to kmeans relaxation from group assignment vector
-B_hat <- function(ga) {
-  d <- length(ga)
-  group_names <- unique(ga)
-  K <- length(group_names)
-  Bhat <- matrix(rep(0,d^2),ncol=d)
-  
-  for(k in 1:K){
-    idx <- which(ga == group_names[k])
-    group_size <- length(idx)
-    for(a in idx){
-      for(b in idx){
-        Bhat[a,b] <- 1/group_size
-      }
-    }
-  }
-  return(Bhat)
-}

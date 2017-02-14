@@ -39,7 +39,7 @@ test_that("GX_t Base",{
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
-    km_sol <- B_hat(km_res)
+    km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
     X <- ren_start_res$X1
@@ -79,7 +79,7 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
-    km_sol <- B_hat(km_res)
+    km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
     X <- ren_start_res$X1
@@ -121,7 +121,7 @@ test_that("Projection onto C Perpendicular",{
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
-    km_sol <- B_hat(km_res)
+    km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
     X <- ren_start_res$X1
@@ -159,7 +159,7 @@ test_that("Projection Onto PSD Cone Border",{
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
-    km_sol <- B_hat(km_res)
+    km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
     X <- ren_start_res$X1
@@ -196,7 +196,7 @@ test_that("Smoothed Objective",{
     diff <- diag(gh) - sh
     initial_mixing <- 2/d
     km_res <- kmeanspp(-sh,K)
-    km_sol <- B_hat(km_res)
+    km_sol <- gforce.clust2mat(km_res)
 
     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
     X <- ren_start_res$X1
@@ -237,7 +237,7 @@ test_that("Smoothed Objective",{
 #     diff <- diag(gh) - sh
 #     initial_mixing <- 2/d
 #     km_res <- kmeanspp(-sh,K)
-#     km_sol <- B_hat(km_res)
+#     km_sol <- gforce.clust2mat(km_res)
 
 #     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
 #     X <- ren_start_res$X1
@@ -297,6 +297,6 @@ test_that("K-Means Objective Value",{
                  clusters = as.integer(dat$group_assignments),
                  opt_val = as.double(opt_val_r))
 
-    opt_val <- sum(sh*B_hat(dat$group_assignments))
+    opt_val <- sum(sh*gforce.clust2mat(dat$group_assignments))
     expect_equal(opt_val,result$opt_val)
     })

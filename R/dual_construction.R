@@ -72,7 +72,7 @@ dual_solution <- function(ga_hat,D,eps = 0.01,eps2 = 10^-7,Y_T_min = 0.01){
   }
   
   # get primal optimal
-  B_opt <- B_hat(ga_hat)
+  B_opt <- gforce.clust2mat(ga_hat)
   primal_value <- sum(D*B_opt)
   
   # construct dual optimal solution by binary search

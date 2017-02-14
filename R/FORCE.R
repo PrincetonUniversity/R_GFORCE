@@ -29,7 +29,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     }
 
     km_res <- kmeanspp(-D_Kmeans,K)
-    km_sol <- B_hat(km_res)
+    km_sol <- gforce.clust2mat(km_res)
 
     if(is.null(X0) && is.null(E)){
         ren_start_res <- renegar_start(D,K,force_opts$initial_mixing,km_sol)
@@ -96,7 +96,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     res$B_Z_best_opt_val <- C_result$B_Z_best_opt_val
     res$km_best <- C_result$km_best
     res$km_opt_val <- C_result$km_opt_val
-    res$B_km <- B_hat(res$km_best)
+    res$B_km <- gforce.clust2mat(res$km_best)
     res$km_best_time <- C_result$km_best_time
     res$km_iter_best <- C_result$km_iter_best
     res$km_iter_total <- C_result$km_iter_total
