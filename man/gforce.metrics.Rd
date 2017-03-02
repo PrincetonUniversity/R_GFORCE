@@ -16,8 +16,16 @@ estimated clustering.}
 \item{method}{the method used to evaluate the quality of the clustering solution \code{est_clust}.
 The three options are \code{'purity'}, \code{'perfect'}, \code{'misclassified-points'}.}
 }
+\value{
+Returns a numeric that represents the value of the chosen metric on the two clusterings \code{true_clust} and \code{est_clust}.
+}
 \description{
 This can be used for either data or variable clustering. Cluster names
 can be either strings or numbers. Arbitrary data types cannot be used.
+}
+\examples{
+clust1 <- c(1,1,1,2,2,2,3,3,3)
+clust2 <- c(1,1,2,1,2,2,3,3,3)
+gforce.metrics(clust1,clust2,method='purity')
 }
 

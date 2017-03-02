@@ -2,7 +2,7 @@
 % Please edit documentation in R/FORCE.R
 \name{gforce.PECOK}
 \alias{gforce.PECOK}
-\title{Uses the FORCE algorithm to solve the PECOK SDP.}
+\title{Solve PECOK with FORCE.}
 \usage{
 gforce.PECOK(K, X = NULL, D = NULL, sigma_hat = NULL, force_opts = NULL,
   X0 = NULL, E = NULL, gamma_par = FALSE)

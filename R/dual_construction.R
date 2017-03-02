@@ -13,6 +13,23 @@
 #' @param eps2 a scalar. It controls the infeasibility tolerance for the dual solution to allow for numerical imprecision.
 #' @param Y_T_min a scalar. THe smallest \eqn{Y_T} that the function can return. Must be greater than 0. 
 #'
+#' @return An object with the following components:
+#' \describe{
+#' \item{\code{Y_T}}{ a numeric. The value of the variable \code{Y_T} in the dual solution found.}
+#' \item{\code{Y_a}}{ a \eqn{d} dimensional numeric vector. The value of the variable \code{Y_a} in the dual solution found.}
+#' \item{\code{feasible}}{an integer. 1 signifies that \code{sol} is optimal, 0 otherwise.}
+#' }
+#'
+#' @examples
+#' K <- 5
+#' n <- 50 
+#' d <- 50
+#' dat <- gforce.generator(K,d,n,3,graph='scalefree')
+#' sig_hat <- (1/n)*t(dat$X)%*%dat$X
+#' gam_hat <- gforce.Gamma(dat$X)
+#' D <- diag(gam_hat) - sig_hat
+#' dual_cert <- gforce.certify(dat$group_assignments,D)
+#' 
 #' @useDynLib GFORCE kmeans_dual_solution_primal_min_R
 #' @export
 gforce.certify <- function(sol,D,eps1 = 0.01,eps2 = 10^-7,Y_T_min = 0.01) {

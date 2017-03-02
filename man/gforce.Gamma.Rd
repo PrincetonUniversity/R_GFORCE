@@ -13,8 +13,16 @@ gforce.Gamma(X, par = FALSE)
 \item{par}{logical expression. If \code{par == TRUE}, then a multi-threaded version
 of the function is called. If \code{par == FALSE}, a single-threaded version is called.}
 }
+\value{
+The estimator \eqn{\Gamma} as a \eqn{d} dimensional numeric vector.
+}
 \description{
 In particular, it returns in diagonal form the estimator
 \eqn{\Gamma} used to construct the PECOK penalized covariance estimator.
+}
+\examples{
+dat <- gforce.generator(5,20,20,3)
+gam_hat <- gforce.Gamma(dat$X)
+
 }
 

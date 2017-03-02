@@ -14,8 +14,22 @@ gforce.kmeans(X, K, R_only = FALSE)
 \item{R_only}{logical expression. If \code{R_only == FALSE}, then the included
 native code implementation will be used. Otherwise, an R implementation is used.}
 }
+\value{
+Returns an object with the components:
+\describe{
+\item{\code{clusters}}{a \eqn{n} dimensional integer vector. Entry \eqn{i} to the cluster assignment of the data point given by row \eqn{i} of \code{X}.}
+\item{\code{centers}}{a \eqn{K x m} numeric matrix. Row \eqn{i} corresponds to the center of cluster \eqn{i}.}
+}
+}
 \description{
 Solves the K-means problem using kmeans++ for the initialization and then 
 runs Lloyd's algorithm.
+}
+\examples{
+m <- 10 
+n <- 10
+X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
+km_res <- gforce.kmeans(X,3)
+
 }
 

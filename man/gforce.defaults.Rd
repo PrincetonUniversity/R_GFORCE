@@ -2,7 +2,7 @@
 % Please edit documentation in R/FORCE.R
 \name{gforce.defaults}
 \alias{gforce.defaults}
-\title{Provides the default tuning parameters for \code{\link{gforce.FORCE}}.}
+\title{FORCE default tuning parameters.}
 \usage{
 gforce.defaults(d, K)
 }
@@ -11,7 +11,25 @@ gforce.defaults(d, K)
 
 \item{K}{number of clusters.}
 }
+\value{
+An object with following components
+\describe{
+\item{\code{alpha}}{a numeric. Gives the step size for the projected gradient descent updates.}
+\item{\code{dual_frequency}}{an integer. Specifies how many gradient updates to perform between searches for a dual certificate. }
+\item{\code{duality_gap}}{a numeric. If the duality gap can be shown to be less than \code{duality_gap}, the FORCE algorithm terminates.}
+\item{\code{eps_obj}}{a numeric. Specifies the precision required of the optimal solution to the eigenvalue maximization problem.}
+\item{\code{finish_pgd}}{an integer. If \code{finish_pgd} is 1, then other stopping criteria are ignored and FORCE performs \code{max_iter} gradient updates.}
+\item{\code{initial_mixing}}{a numeric between 0 and 1. Specifies how to construct the initial strictly feasible solution to the SDP relaxation.}
+\item{\code{kmeans_iter}}{an integer. The number of times to run a \eqn{K}-means solver during each search for an optimal clustering and dual certificate.}
+\item{\code{max_iter}}{an integer. The maximum number of gradient updates to perform.}
+\item{\code{restarts}}{a vector of integers. This specifies the iterations at which to take the projection of the current iterate and restart the algorithm with that as the initial solution.}
+\item{\code{verbose}}{an integer. Specifies the level of verbosity requested from gforce.FORCE.}
+}
+}
 \description{
 Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
+}
+\examples{
+opts <- gforce.defaults(20,5)
 }
 

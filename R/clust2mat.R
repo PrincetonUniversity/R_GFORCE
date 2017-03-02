@@ -4,6 +4,11 @@
 #' 
 #' @param clusters length \eqn{d} vector. Assigns each variable or data point to a cluster. Cluster names
 #' can be numbers or strings.
+#' @return a \eqn{d x d} numeric array that contains the partnership matrix corresponding to \code{clusters}.
+#'
+#' @examples
+#' clusters <- c(1,1,1,2,2,2,3,3)
+#' B_clust <- gforce.clust2mat(clusters)
 #' @export
 gforce.clust2mat <- function(clusters) {
   d <- length(clusters)

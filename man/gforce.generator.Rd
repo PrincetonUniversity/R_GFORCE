@@ -23,16 +23,19 @@ gforce.generator(K, d, n, m, graph = "DeltaC", num_hubs = NULL,
 
 \item{band_size}{size of bands in the latent graph. Ignored unless \code{graph=='band'}.}
 
-\item{cov_gap_mult}{scales the size of \eqn{\delta C}. Ignored unless \code{graph == 'DeltaC'}.}
+\item{cov_gap_mult}{scales the size of \eqn{\Delta C}. Ignored unless \code{graph == 'DeltaC'}.}
 
-\item{error_base}{minimum variance of \eqn{E_i}.}
+\item{error_base}{minimum variance of errors.}
 
-\item{error_add}{size of range of possible variances for \eqn{E_i}.}
+\item{error_add}{size of range of possible variances for errors.}
 
 \item{corr_value}{size of off diagonal entries in latent precision matrix.}
 
 \item{normalize}{logical. If \code{normalize == TRUE}, the covariance matrix for the latent graph
 will be normalized so that it is also a correlation matrix.}
+}
+\value{
+An S3 object with the slots Z,E,X,group_assignments,CStar,Theta_Star
 }
 \description{
 Generates \eqn{n} random samples from a \eqn{G}-Latent Variable Model. The
@@ -40,5 +43,10 @@ caller can specify the graph structure on the latent variables via
 several parameters. The magnitude of the non-zero entries in the population
 precision matrix can also be specified. Observed variables are assigned
 uniformly at random to \eqn{K} groups with minimum size \eqn{m}.
+}
+\examples{
+dat <- gforce.generator(5,20,20,3)
+dat <- gforce.generator(10,100,100,3,graph='hub',num_hubs=2)
+dat <- gforce.generator(10,100,100,3,graph='band',band_size=3)
 }
 

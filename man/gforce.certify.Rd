@@ -18,9 +18,28 @@ points to clusters.}
 
 \item{Y_T_min}{a scalar. THe smallest \eqn{Y_T} that the function can return. Must be greater than 0.}
 }
+\value{
+An object with the following components:
+\describe{
+\item{\code{Y_T}}{ a numeric. The value of the variable \code{Y_T} in the dual solution found.}
+\item{\code{Y_a}}{ a \eqn{d} dimensional numeric vector. The value of the variable \code{Y_a} in the dual solution found.}
+\item{\code{feasible}}{an integer. 1 signifies that \code{sol} is optimal, 0 otherwise.}
+}
+}
 \description{
 Given a proposed integer solution to the \eqn{K}-means SDP relaxation, this
 function attempts to construct a solution to the dual problem with matching
 objective value.
+}
+\examples{
+K <- 5
+n <- 50 
+d <- 50
+dat <- gforce.generator(K,d,n,3,graph='scalefree')
+sig_hat <- (1/n)*t(dat$X)\%*\%dat$X
+gam_hat <- gforce.Gamma(dat$X)
+D <- diag(gam_hat) - sig_hat
+dual_cert <- gforce.certify(dat$group_assignments,D)
+
 }
 

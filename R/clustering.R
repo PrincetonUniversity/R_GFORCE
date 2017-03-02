@@ -10,6 +10,11 @@
 #' estimated clustering.
 #' @param method the method used to evaluate the quality of the clustering solution \code{est_clust}.
 #' The three options are \code{'purity'}, \code{'perfect'}, \code{'misclassified-points'}.
+#' @return Returns a numeric that represents the value of the chosen metric on the two clusterings \code{true_clust} and \code{est_clust}.
+#' @examples
+#' clust1 <- c(1,1,1,2,2,2,3,3,3)
+#' clust2 <- c(1,1,2,1,2,2,3,3,3)
+#' gforce.metrics(clust1,clust2,method='purity')
 #' @export
 gforce.metrics <- function(true_clust,est_clust,method='purity') {
   if(method=='purity'){
@@ -23,6 +28,7 @@ gforce.metrics <- function(true_clust,est_clust,method='purity') {
   } else {
     stop("gforce.metrics -- Need to specify either 'purity', 'perfect' or 'misclassified-points' as method.")
   }
+  return(res)
 }
 
 check_perfect_recovery <- function(original,recovered){

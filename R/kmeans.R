@@ -10,6 +10,18 @@
 #' @param K integer. The number of clusters to group the data into.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
 #' native code implementation will be used. Otherwise, an R implementation is used.
+#' @return Returns an object with the components:
+#' \describe{
+#' \item{\code{clusters}}{a \eqn{n} dimensional integer vector. Entry \eqn{i} to the cluster assignment of the data point given by row \eqn{i} of \code{X}.}
+#' \item{\code{centers}}{a \eqn{K x m} numeric matrix. Row \eqn{i} corresponds to the center of cluster \eqn{i}.}
+#' }
+#'
+#' @examples
+#' m <- 10 
+#' n <- 10
+#' X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
+#' km_res <- gforce.kmeans(X,3)
+#'
 #' @useDynLib GFORCE kmeans_pp_R
 gforce.kmeans <- function(X,K,R_only=FALSE){
   res <- NULL

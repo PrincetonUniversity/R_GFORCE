@@ -2,7 +2,7 @@
 % Please edit documentation in R/FORCE.R
 \name{gforce.FORCE}
 \alias{gforce.FORCE}
-\title{Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm.}
+\title{FORCE \eqn{K}-means solver.}
 \usage{
 gforce.FORCE(D, K, force_opts = NULL, D_Kmeans = NULL, X0 = NULL,
   E = NULL, R_only = FALSE)
@@ -23,7 +23,44 @@ gforce.FORCE(D, K, force_opts = NULL, D_Kmeans = NULL, X0 = NULL,
 \item{R_only}{logical expression. If \code{R_only == FALSE}, then the included
 native code implementation will be used. Otherwise, an R implementation is used.}
 }
+\value{
+An object with following components
+\describe{
+\item{\code{Z_T}}{Final iterate of the projected gradient descent algorithm run on the smoothed eigenvalue problem.}
+\item{\code{B_Z_T}}{Projection of \code{Z_T} to the border of the positive semi-definite cone.}
+\item{\code{B_Z_T_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
+\item{\code{Z_best}}{Iterate with best objective value found during projected gradient descent on the smoothed eigenvalue problem.}
+\item{\code{B_Z_best}}{Projection of \code{Z_best} to the border of the positive semi-definite cone.}
+\item{\code{B_Z_best_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
+\item{\code{km_best}}{Best clustering in terms of objective value of the SDP relaxation. This is found by running Lloyd's algorithm on the rows of \code{D_kmeans_matrix}.}
+\item{\code{B_km}}{Partnership matrix corresponding to \code{km_best}.}
+\item{\code{km_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_km}.}
+\item{\code{km_best_time}}{Time elapsed (in seconds) until \code{km_best} was found.}
+\item{\code{km_iter_best}}{Number of times a \eqn{K}-means algorithm was run before \code{km_best} was found.}
+\item{\code{km_iter_total}}{Total number of calls to a \eqn{K}-means solver (such as Lloyd's algorithm).}
+\item{\code{dual_certified}}{1 if a dual certificate was found, and 0 otherwise.}
+\item{\code{dual_certified_grad_iter}}{Number of gradient updates performed before a dual certificate was found.}
+\item{\code{dual_certified_time}}{Time elapsed (in seconds) until dual certificate was found for \code{B_km}.}
+\item{\code{grad_iter_best}}{Gradient iteration where \code{Z_best} was computed.}
+\item{\code{grad_iter_best_time}}{Time elapsed (in seconds) when the update \code{grad_iter_best} was performed.}
+\item{\code{total_time}}{Total time elapsed (in seconds) during call to \code{gforce.FORCE}.}
+}
+}
 \description{
 Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm.
+}
+\examples{
+K <- 5
+n <- 50 
+d <- 50
+dat <- gforce.generator(K,d,n,3,graph='scalefree')
+sig_hat <- (1/n)*t(dat$X)\%*\%dat$X
+gam_hat <- gforce.Gamma(dat$X)
+D <- diag(gam_hat) - sig_hat
+res <- gforce.FORCE(D,K)
+
+}
+\seealso{
+\code{\link{gforce.defaults}}
 }
 

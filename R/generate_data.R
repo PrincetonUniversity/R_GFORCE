@@ -15,13 +15,18 @@
 #' @param graph latent graph structure. Can be 'scalefree', 'hub', 'band' or 'DeltaC'.
 #' @param num_hubs number of hubs in the latent graph. Ignored unless \code{graph == 'hub'}.
 #' @param band_size size of bands in the latent graph. Ignored unless \code{graph=='band'}.
-#' @param cov_gap_mult scales the size of \eqn{\delta C}. Ignored unless \code{graph == 'DeltaC'}.
-#' @param error_base minimum variance of \eqn{E_i}.
-#' @param error_add size of range of possible variances for \eqn{E_i}.
+#' @param cov_gap_mult scales the size of \eqn{\Delta C}. Ignored unless \code{graph == 'DeltaC'}.
+#' @param error_base minimum variance of errors.
+#' @param error_add size of range of possible variances for errors.
 #' @param corr_value size of off diagonal entries in latent precision matrix.
 #' @param normalize logical. If \code{normalize == TRUE}, the covariance matrix for the latent graph
 #' will be normalized so that it is also a correlation matrix.
-#' 
+#' @return An S3 object with the slots Z,E,X,group_assignments,CStar,Theta_Star
+#'
+#' @examples
+#' dat <- gforce.generator(5,20,20,3)
+#' dat <- gforce.generator(10,100,100,3,graph='hub',num_hubs=2)
+#' dat <- gforce.generator(10,100,100,3,graph='band',band_size=3)
 #' @export
 gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size = 3, cov_gap_mult=1.0, 
                             error_base = 0.25, error_add = 0.25, corr_value = 0.3, normalize = TRUE) {

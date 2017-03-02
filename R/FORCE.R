@@ -7,6 +7,8 @@
 # OUTPUTS: 
 
 
+#' FORCE \eqn{K}-means solver.
+#' 
 #' Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm.
 #' 
 #' @param D a matrix \eqn{D} as defined above.
@@ -17,6 +19,40 @@
 #' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
 #' native code implementation will be used. Otherwise, an R implementation is used.
+#' 
+#' @return An object with following components
+#' \describe{
+#' \item{\code{Z_T}}{Final iterate of the projected gradient descent algorithm run on the smoothed eigenvalue problem.}
+#' \item{\code{B_Z_T}}{Projection of \code{Z_T} to the border of the positive semi-definite cone.}
+#' \item{\code{B_Z_T_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
+#' \item{\code{Z_best}}{Iterate with best objective value found during projected gradient descent on the smoothed eigenvalue problem.}
+#' \item{\code{B_Z_best}}{Projection of \code{Z_best} to the border of the positive semi-definite cone.}
+#' \item{\code{B_Z_best_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
+#' \item{\code{km_best}}{Best clustering in terms of objective value of the SDP relaxation. This is found by running Lloyd's algorithm on the rows of \code{D_kmeans_matrix}.}
+#' \item{\code{B_km}}{Partnership matrix corresponding to \code{km_best}.}
+#' \item{\code{km_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_km}.}
+#' \item{\code{km_best_time}}{Time elapsed (in seconds) until \code{km_best} was found.}
+#' \item{\code{km_iter_best}}{Number of times a \eqn{K}-means algorithm was run before \code{km_best} was found.}
+#' \item{\code{km_iter_total}}{Total number of calls to a \eqn{K}-means solver (such as Lloyd's algorithm).}
+#' \item{\code{dual_certified}}{1 if a dual certificate was found, and 0 otherwise.}
+#' \item{\code{dual_certified_grad_iter}}{Number of gradient updates performed before a dual certificate was found.}
+#' \item{\code{dual_certified_time}}{Time elapsed (in seconds) until dual certificate was found for \code{B_km}.}
+#' \item{\code{grad_iter_best}}{Gradient iteration where \code{Z_best} was computed.}
+#' \item{\code{grad_iter_best_time}}{Time elapsed (in seconds) when the update \code{grad_iter_best} was performed.}
+#' \item{\code{total_time}}{Total time elapsed (in seconds) during call to \code{gforce.FORCE}.}
+#' }
+#'
+#' @examples
+#' K <- 5
+#' n <- 50 
+#' d <- 50
+#' dat <- gforce.generator(K,d,n,3,graph='scalefree')
+#' sig_hat <- (1/n)*t(dat$X)%*%dat$X
+#' gam_hat <- gforce.Gamma(dat$X)
+#' D <- diag(gam_hat) - sig_hat
+#' res <- gforce.FORCE(D,K)
+#'
+#' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE primal_dual_adar_R
 #' @export
 gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = NULL, R_only = FALSE) {
@@ -120,6 +156,8 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     return(res)
 }
 
+#' Solve PECOK with FORCE.
+#'
 #' Uses the FORCE algorithm to solve the PECOK SDP.
 #' 
 #' @param K number of clusters.
@@ -150,9 +188,28 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
   return(res)
 }
 
+#' FORCE default tuning parameters.
+#'
 #' Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
 #' @param d dimension of random vector or number of datapoints.
 #' @param K number of clusters.
+#'
+#' @return An object with following components
+#' \describe{
+#' \item{\code{alpha}}{a numeric. Gives the step size for the projected gradient descent updates.}
+#' \item{\code{dual_frequency}}{an integer. Specifies how many gradient updates to perform between searches for a dual certificate. }
+#' \item{\code{duality_gap}}{a numeric. If the duality gap can be shown to be less than \code{duality_gap}, the FORCE algorithm terminates.}
+#' \item{\code{eps_obj}}{a numeric. Specifies the precision required of the optimal solution to the eigenvalue maximization problem.}
+#' \item{\code{finish_pgd}}{an integer. If \code{finish_pgd} is 1, then other stopping criteria are ignored and FORCE performs \code{max_iter} gradient updates.}
+#' \item{\code{initial_mixing}}{a numeric between 0 and 1. Specifies how to construct the initial strictly feasible solution to the SDP relaxation.}
+#' \item{\code{kmeans_iter}}{an integer. The number of times to run a \eqn{K}-means solver during each search for an optimal clustering and dual certificate.}
+#' \item{\code{max_iter}}{an integer. The maximum number of gradient updates to perform.}
+#' \item{\code{restarts}}{a vector of integers. This specifies the iterations at which to take the projection of the current iterate and restart the algorithm with that as the initial solution.}
+#' \item{\code{verbose}}{an integer. Specifies the level of verbosity requested from gforce.FORCE.}
+#' }
+#' 
+#' @examples
+#' opts <- gforce.defaults(20,5)
 #' @export
 gforce.defaults <- function(d,K){
   options <- NULL

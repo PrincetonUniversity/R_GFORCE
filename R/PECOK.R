@@ -7,6 +7,12 @@
 #' \eqn{d} dimensional random vector.
 #' @param par logical expression. If \code{par == TRUE}, then a multi-threaded version
 #' of the function is called. If \code{par == FALSE}, a single-threaded version is called.
+#' @return The estimator \eqn{\Gamma} as a \eqn{d} dimensional numeric vector.
+#'
+#' @examples
+#' dat <- gforce.generator(5,20,20,3)
+#' gam_hat <- gforce.Gamma(dat$X)
+#'
 #' @useDynLib GFORCE v_measure
 #' @useDynLib GFORCE v_measure_par
 #' @export
