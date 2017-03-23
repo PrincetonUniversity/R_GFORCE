@@ -38,6 +38,7 @@ typedef struct {
 
 
 // C Access points
+void kmeans(double* D, int K, int n, int m, int* centers_init, int* cluster_assignment_r, double* centers_r);
 void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r);
 void kmeans_dual_solution_primal_min(int* ga_hat, double* D, int K, int d, double eps1, 
                                         double eps2, double Y_T_min, double* Y_a_r,

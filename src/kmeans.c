@@ -1,7 +1,14 @@
 #include "math.h"
+#include "string.h"
 #include "R.h"
 #include "convex_kmeans.h"
 #include "convex_kmeans_util.h"
+
+// Local Constant Strings
+static const char* RANDOM_INIT = "random";
+// static const char* RANDOM = "random";
+static const char* KMEANS_PP_INIT = "kmeans++";
+static const char* GIVEN_INIT = "kmeans++";
 
 // Function prototypes
 void lloyd_update_centers(double* D, double* centers, int* cluster_assignment, int n, int m, int K, int* iwork);
@@ -10,6 +17,27 @@ int sample_discrete_distribution(double* prob_dist,int n);
 void update_min_distance(double* D, double* min_center_distance, int new_center_idx, int n, int m);
 void min_distance_to_probability(double* min_distances, double* prob_dist, int n);
 double euclidean_distance(double* p1, double* p2, int m);
+
+
+// // Generic Kmeans -- specify initialization method
+// void kmeans(double* D, int K, int n, int m, const char* init_mode,int* centers_init, int* cluster_assignment_r, double* centers_r){
+//     if(strcmp(KMEANS_PP_INIT,init_mode)){
+//         ;
+//     } else if(strcmp(RANDOM_INIT,init_mode)){
+//         ;
+//     } else if(strcmp(GIVEN_INIT,init_mode)) {
+//         ;
+//     } else{
+//         ;
+//     }
+
+// }
+
+
+
+
+
+
 
 // R ACCESS POINT
 void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r){
@@ -26,6 +54,11 @@ void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double
     work.iwork = (int *) R_alloc(K+n,sizeof(int));
     kmeans_pp_impl(D,K,n,m,cluster_assignment_r,centers_r,&work);
 }
+
+
+// void kmeans_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
+//                     double* centers_r, workspace* work) 
+
 
 // INTERNAL ACCESS POINT
 // Column major matrix layouts. Each column is a different data point.
