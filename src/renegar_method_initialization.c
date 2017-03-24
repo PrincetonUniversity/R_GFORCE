@@ -26,7 +26,7 @@ void full_rank_feasible(int d, int K, double* E) {
         int end_1_groups_idx = (i+1)*(K-1) - 1;
         for(int j=0; j < K-1; j++){
             itmp1 = start_1_groups_idx + j; //which diagonal element to choose
-            itmp2 = itmp1*d + d; //index of E_(itmp1,itmp1)
+            itmp2 = itmp1*d + itmp1; //index of E_(itmp1,itmp1)
             E[itmp2]++;
         }
         // iterate over all pairs of indices within the big group
@@ -55,7 +55,7 @@ void full_rank_feasible(int d, int K, double* E) {
        int end_1_groups_idx = d-1;
        for(int j=0; j < K-1; j++){
            itmp1 = start_1_groups_idx + j; //which diagonal element to choose
-           itmp2 = itmp1*d + d; //index of E_(itmp1,itmp1)
+           itmp2 = itmp1*d + itmp1; //index of E_(itmp1,itmp1)
            E[itmp2]++;
        }
        // iterate over all pairs of indices within the big group
