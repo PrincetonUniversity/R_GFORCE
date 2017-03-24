@@ -231,63 +231,6 @@ test_that("Smoothed Objective",{
     expect_equal(comp_result$objective_value,result$obj_val)
     })
 
-
-# test_that("FORCE Main Loop",{
-#     set.seed(12345)
-#     K <- 5
-#     d <- 20
-#     dat <- generate_glatent_dc(K,d,d,3,4)
-#     sh <- t(dat$X)%*%dat$X / d
-#     gh <- gforce.Gamma(dat$X)
-#     diff <- diag(gh) - sh
-#     initial_mixing <- 2/d
-#     km_res <- gforce.kmeans(-D_Kmeans,K)
-#     km_res <- km_res$clusters
-#     km_sol <- gforce.clust2mat(km_res)
-
-#     ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
-#     X <- ren_start_res$X1
-#     E <- ren_start_res$E
-
-#     E_EVEV <- eigen(E)
-#     V <- E_EVEV$vectors
-#     D <- diag(E_EVEV$values)
-#     E_sqrt <- V%*%(D^(0.5))%*%t(V)
-#     ESI <- solve(E_sqrt)
-
-#     mu <- 0.5*0.01/log(d)
-#     comp_result <- smoothed_objective(X,E,ESI,mu)
-
-#     result <- .C("primal_dual_adar_R",
-#                 D = as.double(diff),
-#                 sh = as.double(sh),
-#                 E = as.double(E),
-#                 ESI = as.double(ESI),
-#                 X= as.double(X),
-#                 d = as.integer(d),
-#                 K = as.integer(K),
-#                 verbosity = as.integer(1),
-#                 kmeans_iter = as.integer(10),
-#                 max_iter = as.integer(200),
-#                 finish_pgd = as.integer(1),
-#                 number_restarts = as.integer(1),
-#                 restarts = as.integer(50),
-#                 alpha = as.double(0.001),
-#                 Z_T = numeric(d^2),
-#                 Z_best = numeric(d^2),
-#                 km_best = as.integer(1:d),
-#                 km_best_time = as.integer(1),
-#                 km_iter_best = as.integer(1),
-#                 km_iter_total = as.integer(1),
-#                 dc = as.integer(1),
-#                 dc_time = as.integer(1),
-#                 dc_grad_iter = as.integer(1),
-#                 grad_iter_best = as.integer(1),
-#                 grad_iter_best_time = as.integer(1))
-
-#     expect_equal(1,1)
-#     })
-
 #' @useDynLib GFORCE test_clust_to_opt_val
 test_that("K-Means Objective Value",{
 

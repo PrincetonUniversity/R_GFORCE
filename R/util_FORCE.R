@@ -1,7 +1,7 @@
 # HELPFUL FUNCTIONS FOR FORCE.R AND TESTS of FORCE ALGORITHM
 
 # get strictly feasible start to transformed problem
-renegar_start <- function(diff,K,s,opt_estimate,R_only=TRUE) {
+renegar_start <- function(diff,K,s,opt_estimate,R_only=FALSE) {
     d <- dim(diff)[1]
     i <- 0
     full_rank_base <- gforce.full_rank_feasible(d,K,R_only)

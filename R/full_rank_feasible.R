@@ -18,16 +18,15 @@
 #'
 #' @useDynLib GFORCE full_rank_feasible_R
 #' @export
-
-
 gforce.full_rank_feasible <- function(d,K,R_only=FALSE) {
   if(!R_only){
     result <- .C("full_rank_feasible_R",
                  d=as.integer(d),
                  K=as.integer(K),
                  E=numeric(d^2))
-
-    return(result$E)
+    E <- result$E
+    dim(E) <- c(d,d)
+    return(E)
   } else {
     c <- floor(d/(K-1))
     E <- matrix(rep(0,d^2),ncol=d)
