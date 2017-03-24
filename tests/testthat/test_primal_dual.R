@@ -10,7 +10,6 @@ test_that("GS_t Base",{
     initial_mixing <- 2/d
     km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
     km_res <- km_res$clusters
-
     ren_start_res <- renegar_start(-sh,K,initial_mixing,km_res)
     X <- ren_start_res$X1
     E <- ren_start_res$E

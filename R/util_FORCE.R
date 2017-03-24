@@ -1,11 +1,10 @@
 # HELPFUL FUNCTIONS FOR FORCE.R AND TESTS of FORCE ALGORITHM
 
 # get strictly feasible start to transformed problem
-renegar_start <- function(diff,K,s,opt_estimate) {
+renegar_start <- function(diff,K,s,opt_estimate,R_only=TRUE) {
     d <- dim(diff)[1]
     i <- 0
-    full_rank_base <- full_rank(d,K)
-
+    full_rank_base <- gforce.full_rank_feasible(d,K,R_only)
     E <- matrix(rep(0,d^2),ncol=d)
     while(i < d){
         rotation <- sample(d)
@@ -42,42 +41,6 @@ renegar_start <- function(diff,K,s,opt_estimate) {
     res$X1 <- (1-s)*X1 + s*opt_estimate
     res$X1_val <- sum(diff*X1)
     return(res)
-}
-
-full_rank <- function(d,K) {
-  c <- floor(d/(K-1))
-  E <- matrix(rep(0,d^2),ncol=d)
-  for(i in 1:c){
-    for(j in 1:(K-1)){
-      p <- (i-1)*(K-1) + j
-      E[p,p] <- E[p,p] + 1
-    }
-    ind_groups <- ((K-1)*(i-1) + 1):((K-1)*i)
-    idx <- 1:d
-    idx <- setdiff(idx,ind_groups)
-    for(a in 1:(d-K+1)){
-      for(b in 1:(d-K+1)){
-        E[idx[a],idx[b]]<- E[idx[a],idx[b]] + 1/(d-K+1)
-      }
-    }
-  }
-
-  if((c - d/(K-1)) < 0){
-    for(j in 0:(K-2)){
-      p <- d-j
-      E[p,p] <- E[p,p] + 1
-    }
-    ind_groups <- (d-K+2):d
-    idx <- 1:d
-    idx <- setdiff(idx,ind_groups)
-    for(a in 1:(d-K+1)){
-      for(b in 1:(d-K+1)){
-        E[idx[a],idx[b]] <- E[idx[a],idx[b]] + 1/(d-K+1)
-      }
-    }
-  }
-  E <- E / ceiling(d/(K-1))
-  return(E)
 }
 
 

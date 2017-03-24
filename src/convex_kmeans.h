@@ -49,6 +49,7 @@ void gamma_alternative_estimator(double* restrict IPS,double* restrict ips_diag_
                                 int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas);
 void gamma_alternative_estimator_par(double* restrict IPS,double* restrict ips_diag_sqrt, int d, double scaling,
                                         int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas,int* restrict par_idxs);
+void full_rank_feasible(int d, int K, double* E);
 
 
 // R Access Points
@@ -69,6 +70,6 @@ void gamma_alternative_estimator_R(double* restrict IPS,double* restrict ips_dia
                                     double* scaling, int* restrict nes, double* restrict gamma_hat);
 void gamma_alternative_estimator_par_R(double* restrict IPS,double* restrict ips_diag_sqrt, int* dimension, 
                                         double* scaling, int* restrict nes, double* restrict gamma_hat);
-
+void full_rank_feasible_R(int* d, int* K, double* E);
 
 #endif
