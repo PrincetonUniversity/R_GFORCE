@@ -23,6 +23,7 @@
 #' km_res <- gforce.kmeans(X,3)
 #'
 #' @useDynLib GFORCE kmeans_pp_R
+#' @export
 gforce.kmeans <- function(X,K,R_only=FALSE){
   res <- NULL
   if(!R_only){

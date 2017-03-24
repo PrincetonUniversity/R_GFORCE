@@ -45,6 +45,10 @@ void kmeans_dual_solution_primal_min(int* ga_hat, double* D, int K, int d, doubl
                                         double* Y_T_r, int* feasible_r);
 void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, double* X0, 
                         int d, int K, pgd_opts* opts, pgd_results* results);
+void gamma_alternative_estimator(double* restrict IPS,double* restrict ips_diag_sqrt, int d, double scaling,
+                                int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas);
+void gamma_alternative_estimator_par(double* restrict IPS,double* restrict ips_diag_sqrt, int d, double scaling,
+                                        int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas,int* restrict par_idxs);
 
 
 // R Access Points
@@ -61,5 +65,10 @@ void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *di
                                         double* Y_a_r, double* Y_T_r, int* feasible_r);
 void v_measure(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);
 void v_measure_par(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);
+void gamma_alternative_estimator_R(double* restrict IPS,double* restrict ips_diag_sqrt, int* dimension,
+                                    double* scaling, int* restrict nes, double* restrict gamma_hat);
+void gamma_alternative_estimator_par_R(double* restrict IPS,double* restrict ips_diag_sqrt, int* dimension, 
+                                        double* scaling, int* restrict nes, double* restrict gamma_hat);
+
 
 #endif

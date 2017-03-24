@@ -4,7 +4,7 @@
 \alias{gforce.Gamma}
 \title{Estimates \eqn{\Gamma} for the PECOK SDP.}
 \usage{
-gforce.Gamma(X, par = FALSE)
+gforce.Gamma(X, par = FALSE, alt_estimator = FALSE, R_only = FALSE)
 }
 \arguments{
 \item{X}{\eqn{n x d} matrix. Each row represents a realization of a
@@ -12,6 +12,12 @@ gforce.Gamma(X, par = FALSE)
 
 \item{par}{logical expression. If \code{par == TRUE}, then a multi-threaded version
 of the function is called. If \code{par == FALSE}, a single-threaded version is called.}
+
+\item{alt_estimator}{logical expression. If \code{alt_estimator == TRUE}, then the alternative
+estimator for \eqn{\hat \Gamma} is used.}
+
+\item{R_only}{logical expression. If \code{R_only == TRUE}, then no native code is run. If 
+\code{alt_estimator != TRUE} this is ignored.}
 }
 \value{
 The estimator \eqn{\Gamma} as a \eqn{d} dimensional numeric vector.
