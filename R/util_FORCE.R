@@ -1,48 +1,5 @@
+# util_FORCE.R --- INTERNAL FUNCTIONS ONLY
 # HELPFUL FUNCTIONS FOR FORCE.R AND TESTS of FORCE ALGORITHM
-
-# get strictly feasible start to transformed problem
-renegar_start <- function(diff,K,s,opt_estimate,R_only=FALSE) {
-    d <- dim(diff)[1]
-    i <- 0
-    full_rank_base <- gforce.full_rank_feasible(d,K,R_only)
-    E <- matrix(rep(0,d^2),ncol=d)
-    while(i < d){
-        rotation <- sample(d)
-        E <- E + full_rank_base[rotation,rotation]
-        i <- i+1
-    }
-
-    E <- E / d
-    E_val <- sum(diff*E)
-
-    i <- 0
-    M2 <- matrix(rep(0,d^2),ncol=d)
-    while(i < d) {
-        rotation <- sample(d)
-        M2 <- M2 + full_rank_base[rotation,rotation]
-        i <- i+1
-    }
-
-    M2 <- M2 / d
-    M2_val <- sum(diff*M2)
-
-    if(M2_val > E_val){
-        X1 <- E
-        X1_val <- E_val
-        E <- M2
-        E_val <- M2_val
-    } else{
-        X1 <- M2
-        X1_val <- M2_val
-    }
-    res <- NULL
-    res$E <- E
-    res$E_val <- E_val
-    res$X1 <- (1-s)*X1 + s*opt_estimate
-    res$X1_val <- sum(diff*X1)
-    return(res)
-}
-
 
 # Gradient of Smoothed Objective Function (See Paper)
 smoothed_gradient <- function(X,E,ESI,mu){

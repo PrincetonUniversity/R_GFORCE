@@ -5,7 +5,7 @@
 #note - D is the D in the minimization form...not the same as D in
 #PECOK SDP
 
-primal_dual_smoothed_adar <- function(D,sigma,K,options,X1,E,ESI){
+primal_dual_smoothed_adar <- function(D,sigma,K,options,X0,E,ESI){
   if(options$verbose > -1){
     cat(sprintf("\tSolving K-Means SDP with FORCE\r\n"))
     cat(sprintf("\t\tOptions -- Verbosity: %d\r\n",options$verbose))
@@ -67,9 +67,9 @@ primal_dual_smoothed_adar <- function(D,sigma,K,options,X1,E,ESI){
   results$grad_iter_best <- grad_iter_total
   results$grad_iter_best_time <- proc.time() - start_time
   outer_iterations <- 0
-  X_tp1 <- X1 # == y_1 == z_1
-  Z_tp1 <- X1 # == y_1 == z_1
-  Z_best <- X1
+  X_tp1 <- X0 # == y_1 == z_1
+  Z_tp1 <- X0 # == y_1 == z_1
+  Z_best <- X0
   lambda_t <- 0 #initialized to lambda_t <- lambda_0
   lambda_tp1 <- 1 #initialized to lambda_{t+1} <- lambda_1
   s_res <- smoothed_objective(Z_tp1,E,ESI,mu)

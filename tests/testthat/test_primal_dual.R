@@ -10,8 +10,8 @@ test_that("GS_t Base",{
     initial_mixing <- 2/d
     km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
     km_res <- km_res$clusters
-    ren_start_res <- renegar_start(-sh,K,initial_mixing,km_res)
-    X <- ren_start_res$X1
+    ren_start_res <- gforce.FORCE.init(-sh,K,initial_mixing,km_res)
+    X <- ren_start_res$X0
     E <- ren_start_res$E
     S_min_r <- 0
 
@@ -42,8 +42,8 @@ test_that("GX_t Base",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X1
+    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
+    X <- ren_start_res$X0
     E <- ren_start_res$E
 
     E_EVEV <- eigen(E)
@@ -83,8 +83,8 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X1
+    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
+    X <- ren_start_res$X0
     E <- ren_start_res$E
 
     E_EVEV <- eigen(E)
@@ -126,8 +126,8 @@ test_that("Projection onto C Perpendicular",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X1
+    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
+    X <- ren_start_res$X0
     E <- ren_start_res$E
 
     E_EVEV <- eigen(E)
@@ -165,8 +165,8 @@ test_that("Projection Onto PSD Cone Border",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X1
+    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
+    X <- ren_start_res$X0
     E <- ren_start_res$E
 
     E_EVEV <- eigen(E)
@@ -203,8 +203,8 @@ test_that("Smoothed Objective",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- renegar_start(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X1
+    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
+    X <- ren_start_res$X0
     E <- ren_start_res$E
 
     E_EVEV <- eigen(E)

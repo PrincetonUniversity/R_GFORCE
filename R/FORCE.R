@@ -71,7 +71,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
     km_sol <- gforce.clust2mat(km_res)
 
     if(is.null(X0) && is.null(E)){
-        ren_start_res <- renegar_start(D,K,force_opts$initial_mixing,km_sol)
+        ren_start_res <- gforce.FORCE.init(D,K,force_opts$initial_mixing,km_sol)
         X0 <- ren_start_res$X1
         E <- ren_start_res$E 
     } else if(is.null(X0)){
