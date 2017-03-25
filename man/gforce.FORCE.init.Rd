@@ -4,16 +4,16 @@
 \alias{gforce.FORCE.init}
 \title{Generate Random Initial Iterate and Values for FORCE Algorithm.}
 \usage{
-gforce.FORCE.init(diff, K, s, opt_estimate, R_only = TRUE)
+gforce.FORCE.init(D, K, s, opt_estimate, R_only = TRUE)
 }
 \arguments{
+\item{D}{\eqn{d x d} numeric array. Specifies the objective function of the \eqn{K}-means SDP.}
+
 \item{K}{number of groups.}
 
 \item{s}{numeric value. Indicates the initial mixing of \code{opt_estimate} and a random full rank solution.}
 
 \item{opt_estimate}{\eqn{d x d} numeric array. Specifies a guess of a feasible solution and is used to construct the initial feasible solution.}
-
-\item{D}{\eqn{d x d} numeric array. Specifies the objective function of the \eqn{K}-means SDP.}
 }
 \value{
 An object with following components

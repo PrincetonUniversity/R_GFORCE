@@ -39,7 +39,7 @@ void add_random_shuffle(int d, int num_shuffles, double* E, double* fr_base, int
         }
     }
 
-    // rescale all entries by 1/d
+    //rescale all entries by 1/d
     for(int i=0; i < d*d; i++){
         E[i] = E[i] / d;
     }

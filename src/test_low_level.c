@@ -14,6 +14,11 @@ void test_smoothed_gradient_S_base(double* X, double* E,double* GS_t, int* d, do
     smoothed_gradient_S_base(X, E, GS_t, d0, S_min_r);
 }
 
+void test_random_shuffle(int* n,int* shuffled){
+    int n0 = *n;
+    random_shuffle(n0,shuffled);
+}
+
 void test_smoothed_gradient_X_base(double* X, double* ESI, double* GX_t, int* d0, int* K0, double* eig_vals){
     workspace work;
     int d = *d0;

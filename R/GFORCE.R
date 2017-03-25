@@ -22,4 +22,5 @@
 #' @useDynLib GFORCE test_smoothed_gradient
 #' @useDynLib GFORCE test_smoothed_gradient_X_base
 #' @useDynLib GFORCE test_smoothed_gradient_S_base
+#' @useDynLib GFORCE test_random_shuffle
 dummy_load_function <- function(){;}

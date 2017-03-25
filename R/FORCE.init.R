@@ -34,7 +34,7 @@
 #'
 #' @useDynLib GFORCE FORCE_initialization_R
 #' @export
-gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=TRUE) {
+gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=FALSE) {
   res <- NULL
   if(!R_only){
     d <- dim(D)[1]
@@ -54,8 +54,8 @@ gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=TRUE) {
     dim(X0) <- c(d,d)
     res$E <- E
     res$X0 <- X0
-    res$E_val <- C_result$E_val
-    res$X0_val <- C_result$X0_val
+    res$E_val <- C_result$E_obj
+    res$X0_val <- C_result$X0_obj
   } else{
     res <- renegar_start(D,K,s,opt_estimate)
   }

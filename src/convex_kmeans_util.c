@@ -54,7 +54,7 @@ void random_shuffle(int n,int* shuffled){
     GetRNGstate();
     for(int i=0; i < n; i++){
         dtmp1 = unif_rand();
-        dtmp1 = dtmp1*n  - 0.49;
+        dtmp1 = dtmp1*(n-0.02)  - 0.49;
         itmp1 = round(dtmp1);
         itmp2 = shuffled[i];
         shuffled[i] = shuffled[itmp1];

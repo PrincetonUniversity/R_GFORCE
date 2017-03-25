@@ -24,6 +24,7 @@ void test_dsumv(double* A, int* d, double* sum_r);
 void test_dtrace(double* A, int* d, double* trace_r);
 void test_dcsum(double* A, int* d, double* A_csums);
 void test_dxpyez(int* d, double* X, double* Y, double* Z);
+void test_random_shuffle(int* n,int* shuffled);
 
 // // renegar_method_initialization.c
 // void test_full_rank_feasible(int* d, int* K, double* E);
