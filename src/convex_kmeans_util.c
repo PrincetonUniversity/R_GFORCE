@@ -44,6 +44,28 @@ void* mem_pool_remove(mem_pool* pool){
     return mem_ptr;
 }
 
+void random_shuffle(int n,int* shuffled){
+    int itmp1,itmp2;
+    double dtmp1;
+
+    for(int i=0; i<n; i++) {
+        shuffled[i] = i;
+    }
+    GetRNGstate();
+    for(int i=0; i < n; i++){
+        dtmp1 = unif_rand();
+        dtmp1 = dtmp1*n  - 0.49;
+        itmp1 = round(dtmp1);
+        itmp2 = shuffled[i];
+        shuffled[i] = shuffled[itmp1];
+        shuffled[itmp1] = itmp2;
+    }
+
+    PutRNGstate();
+}
+
+
+
 
 // Allocates properly sized workspace for primal_dual_adar
 void allocate_workspace_pd(int d, int K, workspace* work){
@@ -141,6 +163,17 @@ void daps(double* restrict A, int inc_A, double c, int d){
             *A = dtmp;
             A = A + inc_A;
         }
+    }
+}
+
+// performs y = a*x + b*y
+void daxpby(double a, double* restrict X, double b, double* restrict Y, int d){
+    double dtmp1;
+    for(int i=0; i < d; i++){
+        dtmp1 = a * (*X) + b * (*Y);
+        *Y = dtmp1;
+        X++;
+        Y++;
     }
 }
 

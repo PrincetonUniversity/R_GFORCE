@@ -48,6 +48,7 @@ void allocate_workspace_pd(int d, int K, workspace* work);
 void initialize_problem_instance(double* D, double* E, double* ESI, double mu,
                                 int d,int K, problem_instance* prob);
 double time_difference_ms(clock_t start, clock_t end);
+void random_shuffle(int n,int* shuffled);
 
 // VECTOR, MATRIX OPS
 // Computes A = A + c, where A is a vector of length d, c is scalar
@@ -67,7 +68,8 @@ double dtrace(double* restrict A, int d);
 void dcsum(double* restrict A, int d, double* restrict A_rsums);
 // Compute X + Y and store in Z
 void dxpyez(int d, double* restrict X, double* restrict Y, double* restrict Z);
-
+// Compute y = a*x + b*y
+void daxpby(double a, double* restrict X, double b, double* restrict Y, int d);
 
 // PGD HELPERS
 double clust_to_opt_val(problem_instance* prob, int* ga_hat, workspace* work);
