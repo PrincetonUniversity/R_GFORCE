@@ -9,6 +9,10 @@
 #' @param K number of groups.
 #' @param s numeric value. Indicates the initial mixing of \code{opt_estimate} and a random full rank solution.
 #' @param opt_estimate \eqn{d x d} numeric array. Specifies a guess of a feasible solution and is used to construct the initial feasible solution.
+#' @param R_only logical expression. If \code{R_only == FALSE}, then the included
+#' native code implementation will be used. Otherwise, an R implementation is used.
+#' @param cluster_representation logical expression. If \code{cluster_representation == FALSE}, then \code{opt_estimate} is assumed to
+#' be a length \eqn{d} array with the values \eqn{0,...,K-1}, indicating cluster assignments.
 #' @return An object with following components
 #' \describe{
 #' \item{\code{E}}{Strictly feasible solution.}
@@ -34,7 +38,7 @@
 #'
 #' @useDynLib GFORCE FORCE_initialization_R
 #' @export
-gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=FALSE) {
+gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=FALSE,cluster_representation=FALSE) {
   res <- NULL
   if(!R_only){
     d <- dim(D)[1]
@@ -44,6 +48,8 @@ gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=FALSE) {
                  d=as.integer(d),
                  K=as.integer(K),
                  opt_estimate=as.double(opt_estimate),
+                 clusters=as.integer(opt_estimate),
+                 cluster_representation=as.integer(cluster_representation),
                  E=numeric(d^2),
                  X0=numeric(d^2),
                  E_obj=as.double(0.0),

@@ -4,7 +4,8 @@
 \alias{gforce.FORCE.init}
 \title{Generate Random Initial Iterate and Values for FORCE Algorithm.}
 \usage{
-gforce.FORCE.init(D, K, s, opt_estimate, R_only = TRUE)
+gforce.FORCE.init(D, K, s, opt_estimate, R_only = FALSE,
+  cluster_representation = FALSE)
 }
 \arguments{
 \item{D}{\eqn{d x d} numeric array. Specifies the objective function of the \eqn{K}-means SDP.}
@@ -14,6 +15,12 @@ gforce.FORCE.init(D, K, s, opt_estimate, R_only = TRUE)
 \item{s}{numeric value. Indicates the initial mixing of \code{opt_estimate} and a random full rank solution.}
 
 \item{opt_estimate}{\eqn{d x d} numeric array. Specifies a guess of a feasible solution and is used to construct the initial feasible solution.}
+
+\item{R_only}{logical expression. If \code{R_only == FALSE}, then the included
+native code implementation will be used. Otherwise, an R implementation is used.}
+
+\item{cluster_representation}{logical expression. If \code{cluster_representation == FALSE}, then \code{opt_estimate} is assumed to
+be a length \eqn{d} array with the values \eqn{0,...,K-1}, indicating cluster assignments.}
 }
 \value{
 An object with following components

@@ -9,12 +9,12 @@ static const int INC1 = 1;
 
 
 // R Entrypoint
-void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_estimate,
+void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
                                         double* E, double* X0, double* E_obj, double* X0_obj) {
     int d0 = *d;
     int* iwork = (int *) R_alloc(d0,sizeof(int));
     double* dwork = (double *) R_alloc(d0*d0,sizeof(double));
-    FORCE_initialization(D,*s,d0,*K,opt_estimate,E,X0,E_obj,X0_obj,dwork,iwork);
+    FORCE_initialization(D,*s,d0,*K,opt_estimate,clusters,*cluster_representation,E,X0,E_obj,X0_obj,dwork,iwork);
 }
 
 
@@ -50,7 +50,7 @@ void add_random_shuffle(int d, int num_shuffles, double* E, double* fr_base, int
 /* Return Values are Matrices E, X0 and their objective values */
 // iwork should have length d
 // fr_base must be at least length d^2
-void FORCE_initialization(double* D, double s, int d, int K, double* opt_estimate,
+void FORCE_initialization(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
                             double* E, double* X0, double* E_obj, double* X0_obj, double* fr_base, int* iwork) {
     double X0_obj_l, E_obj_l, dtmp1;
     int d2 = d*d;
@@ -80,10 +80,57 @@ void FORCE_initialization(double* D, double s, int d, int K, double* opt_estimat
     }
 
     // mix with opt_estimate
-    daxpby(s,opt_estimate,1-s,X0,d2);
+    if(cluster_representation == 0){
+        daxpby(s,opt_estimate,1-s,X0,d2);
+    } else {
+        dgxpby(s,clusters,K,1-s,X0,d,iwork);
+    }
+    
     X0_obj_l = F77_NAME(ddot)(&d2,D,&INC1,X0,&INC1);
 
     // Copy return objective values
     *X0_obj = X0_obj_l;
     *E_obj = E_obj_l;
+}
+
+
+// add matrices with B(G) given as G
+// d signifies dimension of matrices X and Y
+// X is given in cluster representation form
+// Y = a*B(G) + b*Y
+// iwork needs length at least K+1
+// clusters are numbered either 1..K or 0..K-1
+void dgxpby(double a, int* restrict G, int K, double b, double* restrict Y, int d, int* group_sizes) {
+    // get group sizes
+    // Local Vars
+    int itmp1,itmp2,itmp3;
+    double dtmp1;
+
+    // Zero out
+    for(int i=0; i < K+1; i++){
+        group_sizes[i] = 0;
+    }
+
+    // Group Sizes
+    for(int i=0; i < d; i++){
+        itmp1 = G[i];
+        group_sizes[itmp1] = group_sizes[itmp1] + 1;
+    }
+
+    //update Y
+    for(int j=0; j < d; j++){
+        for(int i=0; i < d; i++){
+            itmp1 = G[i];
+            itmp2 = G[j];
+            if(itmp1 == itmp2){
+                itmp3 = group_sizes[itmp1];
+                dtmp1 = a/itmp3 + b * (*Y);
+            } else {
+                dtmp1 = b * (*Y);
+            }
+            *Y = dtmp1;
+
+            Y++;
+        }
+    }
 }

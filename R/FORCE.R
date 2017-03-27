@@ -56,104 +56,103 @@
 #' @useDynLib GFORCE primal_dual_adar_R
 #' @export
 gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = NULL, R_only = FALSE) {
-    d <- ncol(D)
+  d <- ncol(D)
 
-    if(is.null(force_opts)){
-        force_opts <- gforce.defaults(d,K)
-    }
+  if(is.null(force_opts)){
+      force_opts <- gforce.defaults(d,K)
+  }
 
-    if(is.null(D_Kmeans)) {
-        D_Kmeans <- D
-    }
+  if(is.null(D_Kmeans)) {
+      D_Kmeans <- D
+  }
 
+  if(is.null(X0) && is.null(E)){
     km_res <- gforce.kmeans(-D_Kmeans,K,R_only)
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
+    ren_start_res <- gforce.FORCE.init(D,K,force_opts$initial_mixing,km_sol)
+    X0 <- ren_start_res$X1
+    E <- ren_start_res$E 
+  } else if(is.null(X0)){
+    stop('FORCE -- Either specify both X0 and E or neither\r\n')
+  } else if(is.null(E)){
+    stop('FORCE -- Either specify both X0 and E or neither\r\n')
+  }
 
-    if(is.null(X0) && is.null(E)){
-        ren_start_res <- gforce.FORCE.init(D,K,force_opts$initial_mixing,km_sol)
-        X0 <- ren_start_res$X1
-        E <- ren_start_res$E 
-    } else if(is.null(X0)){
-        stop('FORCE -- Either specify both X0 and E or neither\r\n')
-    } else if(is.null(E)){
-        stop('FORCE -- Either specify both X0 and E or neither\r\n')
-    }
+  E_EVEV <- eigen(E)
+  E_V <- E_EVEV$vectors
+  E_D <- diag(E_EVEV$values)
+  E_sqrt <- E_V%*%(E_D^(0.5))%*%t(E_V)
+  ESI <- solve(E_sqrt)
 
-    E_EVEV <- eigen(E)
-    E_V <- E_EVEV$vectors
-    E_D <- diag(E_EVEV$values)
-    E_sqrt <- E_V%*%(E_D^(0.5))%*%t(E_V)
-    ESI <- solve(E_sqrt)
+  res <- NULL
 
-    res <- NULL
+  if(!R_only){
+    C_result <- .C(primal_dual_adar_R,
+            D = as.double(D),
+            D_Kmeans = as.double(D_Kmeans),
+            E = as.double(E),
+            ESI = as.double(ESI),
+            X0 = as.double(X0),
+            d = as.integer(d),
+            K = as.integer(K),
+            verbosity = as.integer(force_opts$verbose),
+            kmeans_iter = as.integer(force_opts$kmeans_iter),
+            dual_frequency = as.integer(force_opts$dual_frequency),
+            max_iter = as.integer(force_opts$max_iter),
+            finish_pgd = as.integer(force_opts$finish_pgd),
+            number_restarts = as.integer(length(force_opts$restarts)),
+            restarts = as.integer(force_opts$restarts),
+            alpha = as.double(force_opts$alpha),
+            eps_obj = as.double(force_opts$eps_obj),
+            Z_T = numeric(d^2),
+            B_Z_T = numeric(d^2),
+            Z_T_lmin = as.double(1.0),
+            Z_best = numeric(d^2),
+            B_Z_best = numeric(d^2),
+            Z_best_lmin = as.double(2.0),
+            B_Z_T_opt_val = as.double(3.0),
+            B_Z_best_opt_val = as.double(4.0),
+            km_opt_val = as.double(5.0),
+            km_best = as.integer(numeric(d)),
+            km_best_time = as.double(6.0),
+            km_iter_best = as.integer(7),
+            km_iter_total = as.integer(8),
+            dc = as.integer(9),
+            dc_time = as.double(10.0),
+            dc_grad_iter = as.integer(11),
+            grad_iter_best = as.integer(12),
+            grad_iter_best_time = as.double(13.0),
+            total_time = as.double(14))
 
-    if(!R_only){
-      C_result <- .C(primal_dual_adar_R,
-              D = as.double(D),
-              D_Kmeans = as.double(D_Kmeans),
-              E = as.double(E),
-              ESI = as.double(ESI),
-              X0 = as.double(X0),
-              d = as.integer(d),
-              K = as.integer(K),
-              verbosity = as.integer(force_opts$verbose),
-              kmeans_iter = as.integer(force_opts$kmeans_iter),
-              dual_frequency = as.integer(force_opts$dual_frequency),
-              max_iter = as.integer(force_opts$max_iter),
-              finish_pgd = as.integer(force_opts$finish_pgd),
-              number_restarts = as.integer(length(force_opts$restarts)),
-              restarts = as.integer(force_opts$restarts),
-              alpha = as.double(force_opts$alpha),
-              eps_obj = as.double(force_opts$eps_obj),
-              Z_T = numeric(d^2),
-              B_Z_T = numeric(d^2),
-              Z_T_lmin = as.double(1.0),
-              Z_best = numeric(d^2),
-              B_Z_best = numeric(d^2),
-              Z_best_lmin = as.double(2.0),
-              B_Z_T_opt_val = as.double(3.0),
-              B_Z_best_opt_val = as.double(4.0),
-              km_opt_val = as.double(5.0),
-              km_best = as.integer(numeric(d)),
-              km_best_time = as.double(6.0),
-              km_iter_best = as.integer(7),
-              km_iter_total = as.integer(8),
-              dc = as.integer(9),
-              dc_time = as.double(10.0),
-              dc_grad_iter = as.integer(11),
-              grad_iter_best = as.integer(12),
-              grad_iter_best_time = as.double(13.0),
-              total_time = as.double(14))
-
-      # Build Result
-      res$Z_T <- matrix(C_result$Z_T,ncol=d)
-      res$B_Z_T <- matrix(C_result$B_Z_T,ncol=d)
-      res$B_Z_T_opt_val <- C_result$B_Z_T_opt_val
-      res$Z_best <- matrix(C_result$Z_best,ncol=d)
-      res$B_Z_best <- matrix(C_result$B_Z_best,ncol=d)
-      res$B_Z_best_opt_val <- C_result$B_Z_best_opt_val
-      res$km_best <- C_result$km_best
-      res$B_km <- gforce.clust2mat(res$km_best)
-      res$km_opt_val <- C_result$km_opt_val
-      res$km_best_time <- C_result$km_best_time
-      res$km_iter_best <- C_result$km_iter_best
-      res$km_iter_total <- C_result$km_iter_total
-      res$dual_certified <- C_result$dc
-      res$dual_certified_grad_iter <- C_result$dc_grad_iter
-      res$dual_certified_time <- C_result$dc_time
-      res$grad_iter_best <- C_result$grad_iter_best
-      res$grad_iter_best_time <- C_result$grad_iter_best_time
-      res$total_time <- C_result$total_time
-    } else {
-      res <- primal_dual_smoothed_adar(D,D_Kmeans,K,force_opts,X0,E,ESI)
-      cat("RETURNED TO FORCE")
-    }
-    res$X0 <- X0
-    res$E <- E
-    res <- res[sort(names(res))]
-    
-    return(res)
+    # Build Result
+    res$Z_T <- matrix(C_result$Z_T,ncol=d)
+    res$B_Z_T <- matrix(C_result$B_Z_T,ncol=d)
+    res$B_Z_T_opt_val <- C_result$B_Z_T_opt_val
+    res$Z_best <- matrix(C_result$Z_best,ncol=d)
+    res$B_Z_best <- matrix(C_result$B_Z_best,ncol=d)
+    res$B_Z_best_opt_val <- C_result$B_Z_best_opt_val
+    res$km_best <- C_result$km_best
+    res$B_km <- gforce.clust2mat(res$km_best)
+    res$km_opt_val <- C_result$km_opt_val
+    res$km_best_time <- C_result$km_best_time
+    res$km_iter_best <- C_result$km_iter_best
+    res$km_iter_total <- C_result$km_iter_total
+    res$dual_certified <- C_result$dc
+    res$dual_certified_grad_iter <- C_result$dc_grad_iter
+    res$dual_certified_time <- C_result$dc_time
+    res$grad_iter_best <- C_result$grad_iter_best
+    res$grad_iter_best_time <- C_result$grad_iter_best_time
+    res$total_time <- C_result$total_time
+  } else {
+    res <- primal_dual_smoothed_adar(D,D_Kmeans,K,force_opts,X0,E,ESI)
+    cat("RETURNED TO FORCE")
+  }
+  res$X0 <- X0
+  res$E <- E
+  res <- res[sort(names(res))]
+  
+  return(res)
 }
 
 #' Solve PECOK with FORCE.
