@@ -34,11 +34,6 @@ double euclidean_distance(double* p1, double* p2, int m);
 // }
 
 
-
-
-
-
-
 // R ACCESS POINT
 void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r){
     int K = *K0;
