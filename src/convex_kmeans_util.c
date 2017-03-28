@@ -72,7 +72,7 @@ void random_shuffle_threadsafe(int n,int* shuffled,threadsafe_rng tsrng){
     }
     for(int i=0; i < n; i++){
         dtmp1 = threadsafe_rng_next(tsrng);
-        Rprintf('Next Number -- %d\n',dtmp1);
+        // Rprintf("Next Number -- %f\n",dtmp1);
         dtmp1 = dtmp1*(n-0.02)  - 0.49;
         itmp1 = round(dtmp1);
         itmp2 = shuffled[i];
