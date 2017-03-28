@@ -9,9 +9,9 @@ typedef struct threadsafe_rng{
     void* local_uniform;
 } threadsafe_rng;
 
-threadsafe_rng create_uniform_01_threadsafe();
+threadsafe_rng create_threadsafe_rng();
 
-void delete_uniform_01_threadsafe(threadsafe_rng del_tsrng);
+void delete_threadsafe_rng(threadsafe_rng del_tsrng);
 
 double threadsafe_rng_next(threadsafe_rng tsrng);
 

@@ -64,10 +64,14 @@ void add_random_shuffle(const int d, const int num_shuffles, double* const restr
 void add_random_shuffle_par(const int d,const int num_shuffles, double* const restrict E,
                             double* const restrict fr_base, int* const restrict all_shuffles){
     const int d2 = d*d;
-    precompute_all_shuffles(d,num_shuffles,all_shuffles);
+    //precompute_all_shuffles(d,num_shuffles,all_shuffles);
 
     //split the matrix by columns
-    #pragma omp parallel for
+    #pragma omp parallel
+    {
+    threadsafe_rng this_thread_rng = create_threadsafe_rng(); //make local rng
+
+    #pragma omp for
     for(int b=0; b < d; b++){
         double* const restrict E_col = E + b*d;
 
@@ -75,6 +79,7 @@ void add_random_shuffle_par(const int d,const int num_shuffles, double* const re
         //SIMD instructions for whole column updates
         for(int i=0; i < num_shuffles; i++){
             int* const restrict shuffled = all_shuffles + i*d;
+            random_shuffle_threadsafe(d,shuffled,this_thread_rng);
 
             //iterate over entries in column
             //these can be done simultaneously
@@ -97,7 +102,8 @@ void add_random_shuffle_par(const int d,const int num_shuffles, double* const re
                 *E_entry = dtmp1;
             }
         }
-
+    }
+    delete_threadsafe_rng(this_thread_rng);
     }
 
     #pragma omp parallel for
@@ -120,6 +126,13 @@ void precompute_all_shuffles(const int d, const int num_shuffles, int* restrict 
     }
 }
 
+// // get all shuffles
+// void precompute_all_shuffles_par(const int d, const int num_shuffles, int* restrict shuffles){
+//     for(int i=0; i < num_shuffles; i++){
+//         random_shuffle(d,shuffles);
+//         shuffles = shuffles + d;
+//     }
+// }
 
 /* Return Values are Matrices E, X0 and their objective values */
 // iwork should have length d

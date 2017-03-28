@@ -65,13 +65,14 @@ void random_shuffle(int n,int* shuffled){
 
 void random_shuffle_threadsafe(int n,int* shuffled,threadsafe_rng tsrng){
     int itmp1,itmp2;
-    double dtmp1;
+    double dtmp1 = 0;
 
     for(int i=0; i<n; i++) {
         shuffled[i] = i;
     }
     for(int i=0; i < n; i++){
         dtmp1 = threadsafe_rng_next(tsrng);
+        Rprintf('Next Number -- %d\n',dtmp1);
         dtmp1 = dtmp1*(n-0.02)  - 0.49;
         itmp1 = round(dtmp1);
         itmp2 = shuffled[i];
