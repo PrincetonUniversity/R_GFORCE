@@ -29,7 +29,8 @@ void FORCE_initialization_par_R(double* D, double* s, int* d, int* K, double* op
 
 // average random permutations of fr_base
 // assumes initialization of E to zero
-void add_random_shuffle(int d, int num_shuffles, double* E, double* fr_base, int* shuffled){
+void add_random_shuffle(int d, int num_shuffles, double* const restrict E, 
+                        double* const restrict fr_base, int* const restrict shuffled){
     double dtmp1;
     int itmp1, itmp2;
 
@@ -56,30 +57,39 @@ void add_random_shuffle(int d, int num_shuffles, double* E, double* fr_base, int
 
 // average random permutations of fr_base
 // assumes initialization of E to zero
-void add_random_shuffle_par(int d, int num_shuffles, double* E, double* fr_base, int* shuffled){
+void add_random_shuffle_par(int d, int num_shuffles, double* const restrict E,
+                            double* const restrict fr_base, int* const restrict shuffled){
     double dtmp1;
     int itmp1, itmp2;
-    int d2 = d*d;
+    const int d2 = d*d;
+    int i;
+    int j;
 
-    for(int i=0; i < num_shuffles; i++){
-        random_shuffle(d,shuffled);
+    // #pragma omp parallel
+    {
+        for(i=0; i < num_shuffles; i++){
+            random_shuffle(d,shuffled);
 
-        #pragma omp parallel for
-        for(int j=0; j < d2; j++) {
-            itmp1 = j % d;
-            itmp2 = j / d;
-            itmp1 = shuffled[itmp1];
-            itmp2 = shuffled[itmp2];
-            itmp1 = itmp2*d + itmp1;
-            dtmp1 = fr_base[itmp1] + E[j];
-            E[j] = dtmp1;
+            #pragma omp parallel for private(j)
+            for(j=0; j < d2; j++) {
+            //     double dtmp1;
+            //     int itmp1, itmp2;
+                itmp1 = j % d;
+                itmp2 = j / d;
+                itmp1 = shuffled[itmp1];
+                itmp2 = shuffled[itmp2];
+                itmp1 = itmp2*d + itmp1;
+                dtmp1 = fr_base[itmp1];
+                dtmp1 = dtmp1 + E[j];
+                E[j] = dtmp1;
+            }
         }
-    }
 
-    //rescale all entries by 1/d
-    #pragma omp parallel for
-    for(int i=0; i < d2; i++){
-        E[i] = E[i] / d;
+        //rescale all entries by 1/d
+        #pragma omp parallel for private(i)
+        for(i=0; i < d2; i++){
+            E[i] = E[i] / d;
+        }
     }
 }
 
