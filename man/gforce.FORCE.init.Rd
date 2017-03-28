@@ -5,7 +5,7 @@
 \title{Generate Random Initial Iterate and Values for FORCE Algorithm.}
 \usage{
 gforce.FORCE.init(D, K, s, opt_estimate, R_only = FALSE,
-  cluster_representation = FALSE)
+  cluster_representation = FALSE, par = FALSE)
 }
 \arguments{
 \item{D}{\eqn{d x d} numeric array. Specifies the objective function of the \eqn{K}-means SDP.}
@@ -21,6 +21,9 @@ native code implementation will be used. Otherwise, an R implementation is used.
 
 \item{cluster_representation}{logical expression. If \code{cluster_representation == FALSE}, then \code{opt_estimate} is assumed to
 be a length \eqn{d} array with the values \eqn{0,...,K-1}, indicating cluster assignments.}
+
+\item{par}{logical expression. If \code{par == TRUE}, then a multi-threaded version
+of the function is called. If \code{par == FALSE}, a single-threaded version is called.}
 }
 \value{
 An object with following components

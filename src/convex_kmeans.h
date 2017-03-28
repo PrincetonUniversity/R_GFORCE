@@ -52,6 +52,8 @@ void gamma_alternative_estimator_par(double* restrict IPS,double* restrict ips_d
 void full_rank_feasible(int d, int K, double* E);
 void FORCE_initialization(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
                             double* E, double* X0, double* E_obj, double* X0_obj, double* fr_base, int* iwork);
+void FORCE_initialization_par(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
+                            double* E, double* X0, double* E_obj, double* X0_obj, double* fr_base, int* iwork);
 
 
 // R Access Points
@@ -74,6 +76,8 @@ void gamma_alternative_estimator_par_R(double* restrict IPS,double* restrict ips
                                         double* scaling, int* restrict nes, double* restrict gamma_hat);
 void full_rank_feasible_R(int* d, int* K, double* E);
 void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_estimate, int* clusters, int* cluster_representation,
+                                        double* E, double* X0, double* E_obj, double* X0_obj);
+void FORCE_initialization_par_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
                                         double* E, double* X0, double* E_obj, double* X0_obj);
 
 #endif

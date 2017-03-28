@@ -13,6 +13,8 @@
 #' native code implementation will be used. Otherwise, an R implementation is used.
 #' @param cluster_representation logical expression. If \code{cluster_representation == FALSE}, then \code{opt_estimate} is assumed to
 #' be a length \eqn{d} array with the values \eqn{0,...,K-1}, indicating cluster assignments.
+#' @param par logical expression. If \code{par == TRUE}, then a multi-threaded version
+#' of the function is called. If \code{par == FALSE}, a single-threaded version is called.
 #' @return An object with following components
 #' \describe{
 #' \item{\code{E}}{Strictly feasible solution.}
@@ -37,23 +39,40 @@
 #'
 #'
 #' @useDynLib GFORCE FORCE_initialization_R
+#' @useDynLib GFORCE FORCE_initialization_par_R
 #' @export
-gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=FALSE,cluster_representation=FALSE) {
+gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=FALSE,cluster_representation=FALSE,par=FALSE) {
   res <- NULL
   if(!R_only){
     d <- dim(D)[1]
-    C_result <- .C("FORCE_initialization_R",
-                 D=as.double(D),
-                 s=as.double(s),
-                 d=as.integer(d),
-                 K=as.integer(K),
-                 opt_estimate=as.double(opt_estimate),
-                 clusters=as.integer(opt_estimate),
-                 cluster_representation=as.integer(cluster_representation),
-                 E=numeric(d^2),
-                 X0=numeric(d^2),
-                 E_obj=as.double(0.0),
-                 X0_obj=as.double(0.0))
+    C_result <- NULL
+    if(par){
+      C_result <- .C("FORCE_initialization_par_R",
+                   D=as.double(D),
+                   s=as.double(s),
+                   d=as.integer(d),
+                   K=as.integer(K),
+                   opt_estimate=as.double(opt_estimate),
+                   clusters=as.integer(opt_estimate),
+                   cluster_representation=as.integer(cluster_representation),
+                   E=numeric(d^2),
+                   X0=numeric(d^2),
+                   E_obj=as.double(0.0),
+                   X0_obj=as.double(0.0))
+    } else{
+      C_result <- .C("FORCE_initialization_R",
+                   D=as.double(D),
+                   s=as.double(s),
+                   d=as.integer(d),
+                   K=as.integer(K),
+                   opt_estimate=as.double(opt_estimate),
+                   clusters=as.integer(opt_estimate),
+                   cluster_representation=as.integer(cluster_representation),
+                   E=numeric(d^2),
+                   X0=numeric(d^2),
+                   E_obj=as.double(0.0),
+                   X0_obj=as.double(0.0))
+    }
     X0 <- C_result$X0
     E <- C_result$E
     dim(E) <- c(d,d)
