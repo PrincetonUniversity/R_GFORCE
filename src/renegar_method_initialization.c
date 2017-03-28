@@ -60,40 +60,52 @@ void add_random_shuffle(const int d, const int num_shuffles, double* const restr
 void add_random_shuffle_par(const int d,const int num_shuffles, double* const restrict E,
                             double* const restrict fr_base, int* const restrict all_shuffles){
     const int d2 = d*d;
-    int* shuffled;
-    // int i;
-    // int j;
-
     precompute_all_shuffles(d,num_shuffles,all_shuffles);
 
-    // #pragma omp parallel
-    {
-        for(int i=0; i < num_shuffles; i++){
-            int* shuffled = all_shuffles + i*d;
+    //split the matrix by columns
+    #pragma omp parallel for
+    for(int b=0; b < d; b++){
+        double* const restrict E_col = E + b*d;
 
-            #pragma omp for
-            for(int j=0; j < d2; j++) {
+        //iterate over shuffles, hopefully can use
+        //SIMD instructions for whole column updates
+        for(int i=0; i < num_shuffles; i++){
+            int* const restrict shuffled = all_shuffles + i*d;
+
+            //iterate over entries in column
+            //these can be done simultaneously
+            #pragma omp simd
+            for(int a=0; a < d; a++) {
+                double* const restrict E_entry = E_col + a;
                 double dtmp1;
                 int itmp1, itmp2;
-                itmp1 = j % d;
-                itmp2 = j / d;
-                itmp1 = shuffled[itmp1];
-                itmp2 = shuffled[itmp2];
+
+                //find shuffle indices
+                itmp1 = shuffled[a];
+                itmp2 = shuffled[b];
                 itmp1 = itmp2*d + itmp1;
                 dtmp1 = fr_base[itmp1];
-                dtmp1 = dtmp1 + E[j];
-                E[j] = dtmp1;
+
+                //compute new entry, access shared memory
+                dtmp1 = dtmp1 + *E_entry;
+
+                //write back update to shared memory
+                *E_entry = dtmp1;
             }
-
-            #
         }
 
-        //rescale all entries by 1/d
-        #pragma omp parallel for
-        for(int i=0; i < d2; i++){
-            E[i] = E[i] / d;
-        }
     }
+
+    #pragma omp parallel for
+    for(int b=0; b < d; b++){
+        double* const restrict E_col = E + b*d;
+        #pragma omp simd
+        for(int a=0; a < d; a++){
+            E_col[a] = E_col[a] / d;
+        }   
+    }
+
+
 }
 
 // get all shuffles
