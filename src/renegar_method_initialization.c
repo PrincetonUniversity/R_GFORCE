@@ -69,9 +69,9 @@ void add_random_shuffle_par(const int d,const int num_shuffles, double* const re
     // #pragma omp parallel
     {
         for(int i=0; i < num_shuffles; i++){
-            shuffled = all_shuffles + i*d;
+            int* shuffled = all_shuffles + i*d;
 
-            #pragma omp parallel for
+            #pragma omp for
             for(int j=0; j < d2; j++) {
                 double dtmp1;
                 int itmp1, itmp2;
@@ -84,6 +84,8 @@ void add_random_shuffle_par(const int d,const int num_shuffles, double* const re
                 dtmp1 = dtmp1 + E[j];
                 E[j] = dtmp1;
             }
+
+            #
         }
 
         //rescale all entries by 1/d
