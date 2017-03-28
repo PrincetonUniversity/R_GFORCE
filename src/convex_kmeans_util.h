@@ -1,6 +1,7 @@
 #ifndef CONVEX_KMEANS_UTIL_H
 #define CONVEX_KMEANS_UTIL_H
 
+#include "parallel_rng.h"
 #include "time.h"
 
 // CONSTANTS
@@ -39,6 +40,8 @@ typedef struct problem_instance {
     int K;
 } problem_instance;
 
+// External Functions
+
 
 // GENERAL UTILITIES, MEMORY MANAGEMENT
 double min_array(int d,double* V);
@@ -49,6 +52,7 @@ void initialize_problem_instance(double* D, double* E, double* ESI, double mu,
                                 int d,int K, problem_instance* prob);
 double time_difference_ms(clock_t start, clock_t end);
 void random_shuffle(int n,int* shuffled);
+void random_shuffle_threadsafe(int n,int* shuffled,threadsafe_rng rng_func);
 
 // VECTOR, MATRIX OPS
 // Computes A = A + c, where A is a vector of length d, c is scalar

@@ -17,7 +17,6 @@ static const char UPLO = 'U';
 static const int INC1 = 1;
 
 
-
 // GENERAL UTILITIES, MEMORY MANAGEMENT
 double min_array(int n, double* V){
     double min_val = DBL_MAX;
@@ -64,8 +63,22 @@ void random_shuffle(int n,int* shuffled){
     PutRNGstate();
 }
 
+void random_shuffle_threadsafe(int n,int* shuffled,threadsafe_rng tsrng){
+    int itmp1,itmp2;
+    double dtmp1;
 
-
+    for(int i=0; i<n; i++) {
+        shuffled[i] = i;
+    }
+    for(int i=0; i < n; i++){
+        dtmp1 = threadsafe_rng_next(tsrng);
+        dtmp1 = dtmp1*(n-0.02)  - 0.49;
+        itmp1 = round(dtmp1);
+        itmp2 = shuffled[i];
+        shuffled[i] = shuffled[itmp1];
+        shuffled[itmp1] = itmp2;
+    }
+}
 
 // Allocates properly sized workspace for primal_dual_adar
 void allocate_workspace_pd(int d, int K, workspace* work){

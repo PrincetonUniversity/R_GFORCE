@@ -8,6 +8,8 @@
 // CONSTANTS
 static const int INC1 = 1;
 
+//external functions
+extern void do_nothing();
 
 // R Entrypoints
 void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
@@ -15,6 +17,7 @@ void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_es
     int d0 = *d;
     int* iwork = (int *) R_alloc(d0,sizeof(int));
     double* dwork = (double *) R_alloc(d0*d0,sizeof(double));
+    do_nothing();
     FORCE_initialization(D,*s,d0,*K,opt_estimate,clusters,*cluster_representation,E,X0,E_obj,X0_obj,dwork,iwork);
 }
 
@@ -23,6 +26,7 @@ void FORCE_initialization_par_R(double* D, double* s, int* d, int* K, double* op
     int d0 = *d;
     int* iwork = (int *) R_alloc(d0*d0,sizeof(int));
     double* dwork = (double *) R_alloc(d0*d0,sizeof(double));
+    do_nothing();
     FORCE_initialization_par(D,*s,d0,*K,opt_estimate,clusters,*cluster_representation,E,X0,E_obj,X0_obj,dwork,iwork);
 }
 
