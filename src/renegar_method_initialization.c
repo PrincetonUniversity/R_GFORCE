@@ -21,7 +21,7 @@ void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_es
 void FORCE_initialization_par_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
                                         double* E, double* X0, double* E_obj, double* X0_obj) {
     int d0 = *d;
-    int* iwork = (int *) R_alloc(d0,sizeof(int));
+    int* iwork = (int *) R_alloc(d0*d0,sizeof(int));
     double* dwork = (double *) R_alloc(d0*d0,sizeof(double));
     FORCE_initialization_par(D,*s,d0,*K,opt_estimate,clusters,*cluster_representation,E,X0,E_obj,X0_obj,dwork,iwork);
 }
@@ -58,15 +58,18 @@ void add_random_shuffle(const int d, const int num_shuffles, double* const restr
 // average random permutations of fr_base
 // assumes initialization of E to zero
 void add_random_shuffle_par(const int d,const int num_shuffles, double* const restrict E,
-                            double* const restrict fr_base, int* const restrict shuffled){
+                            double* const restrict fr_base, int* const restrict all_shuffles){
     const int d2 = d*d;
+    int* shuffled;
     // int i;
     // int j;
+
+    precompute_all_shuffles(d,num_shuffles,all_shuffles);
 
     // #pragma omp parallel
     {
         for(int i=0; i < num_shuffles; i++){
-            random_shuffle(d,shuffled);
+            shuffled = all_shuffles + i*d;
 
             #pragma omp parallel for
             for(int j=0; j < d2; j++) {
@@ -88,6 +91,14 @@ void add_random_shuffle_par(const int d,const int num_shuffles, double* const re
         for(int i=0; i < d2; i++){
             E[i] = E[i] / d;
         }
+    }
+}
+
+// get all shuffles
+void precompute_all_shuffles(const int d, const int num_shuffles, int* restrict shuffles){
+    for(int i=0; i < num_shuffles; i++){
+        random_shuffle(d,shuffles);
+        shuffles = shuffles + d;
     }
 }
 
