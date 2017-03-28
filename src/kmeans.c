@@ -1,6 +1,7 @@
 #include "math.h"
 #include "string.h"
 #include "R.h"
+#include "omp.h"
 #include "convex_kmeans.h"
 #include "convex_kmeans_util.h"
 
@@ -212,9 +213,11 @@ void update_min_distance(double* D, double* min_center_distance, int new_center_
 void min_distance_to_probability(double* min_distances, double* prob_dist, int n) {
     double tmp1;
     double dist_sum = 0.0;
+    // #pragma omp parallel for
     for(int i = 0; i < n; i++){
         dist_sum = dist_sum + min_distances[i];
     }
+    // #pragma omp parallel for
     for(int i=0; i < n; i++){
         tmp1 = min_distances[i] / dist_sum;
         prob_dist[i] = tmp1;
@@ -225,11 +228,10 @@ double euclidean_distance(double* p1, double* p2, int m) {
     double acc = 0.0;
     double dtmp1;
 
+    // #pragma omp simd
     for(int i=0; i < m; i++) {
-        dtmp1 = (*p1) - (*p2);
+        dtmp1 = p1[i] - p2[i];
         acc = acc + dtmp1*dtmp1;
-        p1++;
-        p2++;
     }
 
     return acc;
