@@ -49,7 +49,7 @@ void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r
 // C ACCESS POINT
 void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r) {
     workspace work;
-    work.dwork = (double *) R_alloc(2*n + m*K,sizeof(double));
+    work.dwork = (double *) R_alloc(2*n + m*(K+1),sizeof(double));
     work.iwork = (int *) R_alloc(K+n,sizeof(int));
     kmeans_pp_impl(D,K,n,m,cluster_assignment_r,centers_r,&work);
 }
@@ -237,10 +237,13 @@ double euclidean_distance(double* restrict p1, double* restrict p2, int m, doubl
 
     #pragma omp simd
     for(int i=0; i < m; i++) {
-        dtmp1 = p1[i] - p2[i];
-        acc = acc + dtmp1*dtmp1;
+        euclidean_distance_tmp[i] = p1[i] - p2[i];
+    }
+
+    #pragma omp simd
+    for(int i=0; i < m; i++) {
+        acc = acc + euclidean_distance_tmp[i];
     }
 
     return acc;
 }
-
