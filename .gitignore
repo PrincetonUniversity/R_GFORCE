@@ -4,4 +4,4 @@
 .Ruserdata
 *.so
 *.o
-inst/*
+local/*
