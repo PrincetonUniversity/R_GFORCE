@@ -12,12 +12,15 @@ static const char* KMEANS_PP_INIT = "kmeans++";
 static const char* GIVEN_INIT = "kmeans++";
 
 // Function prototypes
-void lloyd_update_centers(double* D, double* centers, int* cluster_assignment, int n, int m, int K, int* iwork);
-int lloyd_update_clusters(double* D, double* centers, int* cluster_assignment, int n, int m, int K);
-int sample_discrete_distribution(double* prob_dist,int n);
-void update_min_distance(double* D, double* min_center_distance, int new_center_idx, int n, int m);
-void min_distance_to_probability(double* min_distances, double* prob_dist, int n);
-double euclidean_distance(double* p1, double* p2, int m);
+void lloyd_update_centers(double* restrict D, double* restrict centers, int* restrict cluster_assignment,
+                            int n, int m, int K, int* restrict iwork);
+int lloyd_update_clusters(double* restrict D, double* restrict centers, int* restrict cluster_assignment,
+                            int n, int m, int K, double* restrict euclidean_distance_tmp);
+int sample_discrete_distribution(double* restrict prob_dist,int n);
+void update_min_distance(double* restrict D, double* restrict min_center_distance, int new_center_idx,
+                            int n, int m, double* restrict euclidean_distance_tmp);
+void min_distance_to_probability(double* restrict min_distances, double* restrict prob_dist, int n);
+double euclidean_distance(double* restrict p1, double* restrict p2, int m,double* restrict euclidean_distance_tmp);
 
 
 // // Generic Kmeans -- specify initialization method
@@ -61,17 +64,20 @@ void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double
 // The matrix D should be m0 \times \n0 dimensional.
 // NOT THREAD SAFE -- USES R INTERNALS RNG
 // REQUIRES K+n length iwork
-// REQUIRES 2n+ mK length dwork
-void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
-                    double* centers_r, workspace* work) {
+// REQUIRES 2n (prob dist,min_center_distance) + mK (centers) + m (euclidean_distance_tmp) = 2n + (K+1)m length dwork
+void kmeans_pp_impl(double* restrict D, int K, int n, int m, int* restrict cluster_assignment_r,
+                    double* restrict centers_r, workspace* work) {
     GetRNGstate();
 
     //////////////////////////////////////
     //// STEP 1 - K-means++ Initialization
     //////////////////////////////////////
-    double* prob_dist = work -> dwork;
-    double* min_center_distance = prob_dist + n;
-    int* initial_centers = work -> iwork;
+    double* restrict prob_dist = work -> dwork;
+    double* restrict min_center_distance = prob_dist + n;
+    double* restrict centers = min_center_distance + n;
+    double* restrict euclidean_distance_tmp = centers + m*K;
+    int* restrict initial_centers = work -> iwork;
+    int* restrict cluster_assignment = initial_centers + K;
     int tmp1;
     
     //choose first center
@@ -80,7 +86,7 @@ void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
     initial_centers[0] = c_idx;
     for(int i= 0; i < n; i++){
         if(i != c_idx){
-            min_center_distance[i] = euclidean_distance(D+m*i,D+m*c_idx,m);
+            min_center_distance[i] = euclidean_distance(D+m*i,D+m*c_idx,m,euclidean_distance_tmp);
         } else {
             min_center_distance[i] = 0.0;
         }
@@ -91,7 +97,7 @@ void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
     for(int i=1; i < K-1; i++){
         tmp1 = sample_discrete_distribution(prob_dist,n);
         initial_centers[i] = tmp1;
-        update_min_distance(D,min_center_distance,tmp1,n,m);
+        update_min_distance(D,min_center_distance,tmp1,n,m,euclidean_distance_tmp);
         min_distance_to_probability(min_center_distance,prob_dist,n);
     }
     // get last center (idx K-1)
@@ -100,8 +106,6 @@ void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
     ///////////////////////////////////
     //// STEP 2 - K-means Clustering (Lloyd's Algorithm)
     ///////////////////////////////////
-    double* centers = min_center_distance + n;
-    int* cluster_assignment = initial_centers + K;
     int unchanged = 0;
 
     // initial clustering, zeros assignment to clusters, guarantees change in first iteration
@@ -114,7 +118,7 @@ void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
     // iterate
     while(!unchanged){
         // 1. Update Clusters
-        unchanged = lloyd_update_clusters(D,centers,cluster_assignment,n,m,K);
+        unchanged = lloyd_update_clusters(D,centers,cluster_assignment,n,m,K,euclidean_distance_tmp);
 
         // 2. Update Centroids
         lloyd_update_centers(D,centers,cluster_assignment,n,m,K,initial_centers);
@@ -130,12 +134,13 @@ void kmeans_pp_impl(double* D, int K, int n, int m, int* cluster_assignment_r,
 }
 
 // REQUIRES iwork of length K
-void lloyd_update_centers(double* D, double* centers, int* cluster_assignment, int n, int m, int K, int* iwork){
+void lloyd_update_centers(double* restrict D, double* restrict centers, int* restrict cluster_assignment, 
+                            int n, int m, int K, int* restrict iwork){
     int tmp1;
     double dtmp1;
-    double* tmp_ptr1;
-    double* tmp_ptr2;
-    int* cluster_sizes;
+    double* restrict tmp_ptr1;
+    double* restrict tmp_ptr2;
+    int* restrict cluster_sizes;
     cluster_sizes = iwork;
 
     // zero out current cluster centers, sizes
@@ -165,15 +170,16 @@ void lloyd_update_centers(double* D, double* centers, int* cluster_assignment, i
     }
 }
 
-int lloyd_update_clusters(double* D, double* centers, int* cluster_assignment, int n, int m, int K){
+int lloyd_update_clusters(double* restrict D, double* restrict centers, int* restrict cluster_assignment,
+                            int n, int m, int K, double* restrict euclidean_distance_tmp){
     double dtmp1;
     int unchanged = 1;
     for(int i=0; i < n; i++) {
         int k=0;
-        double min_dist = euclidean_distance(D + i*m,centers + k*m,m);
+        double min_dist = euclidean_distance(D + i*m,centers + k*m,m,euclidean_distance_tmp);
         int min_dist_idx = k;
         for(k = 1; k < K; k++){
-            dtmp1 = euclidean_distance(D + i*m,centers + k*m,m);
+            dtmp1 = euclidean_distance(D + i*m,centers + k*m,m,euclidean_distance_tmp);
             if(dtmp1 < min_dist){
                 min_dist = dtmp1;
                 min_dist_idx = k;
@@ -188,7 +194,7 @@ int lloyd_update_clusters(double* D, double* centers, int* cluster_assignment, i
 }
 
 // MUST BE CALLED FROM WITHIN GetRNGState, PutRNGState PAIR
-int sample_discrete_distribution(double* prob_dist,int n){
+int sample_discrete_distribution(double* restrict prob_dist,int n){
     double q = unif_rand();
     int cur_idx = 0;
     double total = 0.0;
@@ -199,18 +205,19 @@ int sample_discrete_distribution(double* prob_dist,int n){
     return cur_idx;
 }
 
-void update_min_distance(double* D, double* min_center_distance, int new_center_idx, int n, int m){
+void update_min_distance(double* restrict D, double* restrict min_center_distance,
+                            int new_center_idx, int n, int m,double* restrict euclidean_distance_tmp) {
     double dtmp1;
     for(int i=0; i < n; i++){
         //only update if non-zero
         if(min_center_distance[i] > 0.0){
-            dtmp1 = euclidean_distance(D+i*m,D+new_center_idx*m,m);
+            dtmp1 = euclidean_distance(D+i*m,D+new_center_idx*m,m,euclidean_distance_tmp);
             min_center_distance[i] = min_center_distance[i] > dtmp1 ? dtmp1 : min_center_distance[i];
         }
     }
 }
 
-void min_distance_to_probability(double* min_distances, double* prob_dist, int n) {
+void min_distance_to_probability(double* restrict min_distances, double* restrict prob_dist, int n) {
     double tmp1;
     double dist_sum = 0.0;
     // #pragma omp parallel for
@@ -224,11 +231,11 @@ void min_distance_to_probability(double* min_distances, double* prob_dist, int n
     }
 }
 
-double euclidean_distance(double* p1, double* p2, int m) {
+double euclidean_distance(double* restrict p1, double* restrict p2, int m, double* restrict euclidean_distance_tmp) {
     double acc = 0.0;
     double dtmp1;
 
-    // #pragma omp simd
+    #pragma omp simd
     for(int i=0; i < m; i++) {
         dtmp1 = p1[i] - p2[i];
         acc = acc + dtmp1*dtmp1;
