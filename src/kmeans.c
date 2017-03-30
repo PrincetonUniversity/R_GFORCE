@@ -12,12 +12,12 @@ static const char* KMEANS_PP_INIT = "kmeans++";
 static const char* GIVEN_INIT = "kmeans++";
 
 // Function prototypes
-void lloyd_update_centers(double* restrict D, double* restrict centers, int* restrict cluster_assignment,
+void lloyd_update_centers(double const* restrict D, double* restrict centers, int* restrict cluster_assignment,
                             int n, int m, int K, int* restrict iwork);
-int lloyd_update_clusters(double* restrict D, double* restrict centers, int* restrict cluster_assignment,
+int lloyd_update_clusters(double const* restrict D, double* restrict centers, int* restrict cluster_assignment,
                             int n, int m, int K, double* restrict euclidean_distance_tmp);
 int sample_discrete_distribution(double* restrict prob_dist,int n);
-void update_min_distance(double* restrict D, double* restrict min_center_distance, int new_center_idx,
+void update_min_distance(double const* restrict D, double* restrict min_center_distance, int new_center_idx,
                             int n, int m, double* restrict euclidean_distance_tmp);
 void min_distance_to_probability(double* restrict min_distances, double* restrict prob_dist, int n);
 double euclidean_distance(double* restrict p1, double* restrict p2, int m,double* restrict euclidean_distance_tmp);
@@ -65,7 +65,7 @@ void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double
 // NOT THREAD SAFE -- USES R INTERNALS RNG
 // REQUIRES K+n length iwork
 // REQUIRES 2n (prob dist,min_center_distance) + mK (centers) + m (euclidean_distance_tmp) = 2n + (K+1)m length dwork
-void kmeans_pp_impl(double* restrict D, int K, int n, int m, int* restrict cluster_assignment_r,
+void kmeans_pp_impl(double const* restrict D, int K, int n, int m, int* restrict cluster_assignment_r,
                     double* restrict centers_r, workspace* work) {
     GetRNGstate();
 
@@ -134,7 +134,7 @@ void kmeans_pp_impl(double* restrict D, int K, int n, int m, int* restrict clust
 }
 
 // REQUIRES iwork of length K
-void lloyd_update_centers(double* restrict D, double* restrict centers, int* restrict cluster_assignment, 
+void lloyd_update_centers(double const* restrict D, double* restrict centers, int* restrict cluster_assignment, 
                             int n, int m, int K, int* restrict iwork){
     int tmp1;
     double dtmp1;
@@ -170,10 +170,12 @@ void lloyd_update_centers(double* restrict D, double* restrict centers, int* res
     }
 }
 
-int lloyd_update_clusters(double* restrict D, double* restrict centers, int* restrict cluster_assignment,
+int lloyd_update_clusters(double const* restrict D, double* restrict centers, int* restrict cluster_assignment,
                             int n, int m, int K, double* restrict euclidean_distance_tmp){
     double dtmp1;
     int unchanged = 1;
+
+    #pragma omp parallel for shared(unchanged)
     for(int i=0; i < n; i++) {
         int k=0;
         double min_dist = euclidean_distance(D + i*m,centers + k*m,m,euclidean_distance_tmp);
@@ -205,9 +207,11 @@ int sample_discrete_distribution(double* restrict prob_dist,int n){
     return cur_idx;
 }
 
-void update_min_distance(double* restrict D, double* restrict min_center_distance,
+void update_min_distance(double const* restrict D, double* restrict min_center_distance,
                             int new_center_idx, int n, int m,double* restrict euclidean_distance_tmp) {
     double dtmp1;
+
+    #pragma omp parallel for
     for(int i=0; i < n; i++){
         //only update if non-zero
         if(min_center_distance[i] > 0.0){
@@ -220,11 +224,12 @@ void update_min_distance(double* restrict D, double* restrict min_center_distanc
 void min_distance_to_probability(double* restrict min_distances, double* restrict prob_dist, int n) {
     double tmp1;
     double dist_sum = 0.0;
-    // #pragma omp parallel for
+
     for(int i = 0; i < n; i++){
         dist_sum = dist_sum + min_distances[i];
     }
-    // #pragma omp parallel for
+
+    #pragma omp simd
     for(int i=0; i < n; i++){
         tmp1 = min_distances[i] / dist_sum;
         prob_dist[i] = tmp1;
@@ -236,14 +241,11 @@ double euclidean_distance(double* restrict p1, double* restrict p2, int m, doubl
     double dtmp1;
 
     #pragma omp simd
-    for(int i=0; i < m; i++) {
+    for(int i=0; i < m; i++){
+        //it seems to vectorize better this way...
         euclidean_distance_tmp[i] = p1[i] - p2[i];
-    }
-
-    #pragma omp simd
-    for(int i=0; i < m; i++) {
-        acc = acc + euclidean_distance_tmp[i];
-    }
+        acc = acc + euclidean_distance_tmp[i] * euclidean_distance_tmp[i] ;
+    } 
 
     return acc;
 }
