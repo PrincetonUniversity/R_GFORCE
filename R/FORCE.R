@@ -69,9 +69,9 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
   if(is.null(X0) && is.null(E)){
     km_res <- gforce.kmeans(-D_Kmeans,K,R_only)
     km_res <- km_res$clusters
-    km_sol <- gforce.clust2mat(km_res)
-    ren_start_res <- gforce.FORCE.init(D,K,force_opts$initial_mixing,km_sol)
-    X0 <- ren_start_res$X1
+    # km_sol <- gforce.clust2mat(km_res)
+    ren_start_res <- gforce.FORCE.init(D,K,force_opts$initial_mixing,km_res,cluster_representation=TRUE)
+    X0 <- ren_start_res$X0
     E <- ren_start_res$E 
   } else if(is.null(X0)){
     stop('FORCE -- Either specify both X0 and E or neither\r\n')
