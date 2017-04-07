@@ -290,8 +290,9 @@ void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, doubl
 
         // STEP 3B -- Dual Certificate Search
         new_best_km = 0;
+        project_E(&prob,Z_best,lambda_min_best,results->B_Z_best);
         for(int i=0; i < km_rep; i++){
-            kmeans_pp_impl(D_kmeans,K,d,d,km_clusters_new,km_centers_new,&work);
+            kmeans_pp_impl(results->B_Z_best,K,d,d,km_clusters_new,km_centers_new,&work);
             km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
             km_iter_total++;
             if(km_val_new < km_val_best) {
