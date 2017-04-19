@@ -19,6 +19,8 @@ Returns an object with the components:
 \describe{
 \item{\code{clusters}}{a \eqn{n} dimensional integer vector. Entry \eqn{i} to the cluster assignment of the data point given by row \eqn{i} of \code{X}.}
 \item{\code{centers}}{a \eqn{K x m} numeric matrix. Row \eqn{i} corresponds to the center of cluster \eqn{i}.}
+\item{\code{num_iters}}{an integer. Number of iterations of Lloyd's Algorithm.}
+\item{\code{time}}{a numeric. Runtime of Lloyd's Algorithm.}
 }
 }
 \description{

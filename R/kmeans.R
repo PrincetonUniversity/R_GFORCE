@@ -14,6 +14,8 @@
 #' \describe{
 #' \item{\code{clusters}}{a \eqn{n} dimensional integer vector. Entry \eqn{i} to the cluster assignment of the data point given by row \eqn{i} of \code{X}.}
 #' \item{\code{centers}}{a \eqn{K x m} numeric matrix. Row \eqn{i} corresponds to the center of cluster \eqn{i}.}
+#' \item{\code{num_iters}}{an integer. Number of iterations of Lloyd's Algorithm.}
+#' \item{\code{time}}{a numeric. Runtime of Lloyd's Algorithm.}
 #' }
 #'
 #' @examples
@@ -36,13 +38,19 @@ gforce.kmeans <- function(X,K,R_only=FALSE){
                  n = as.integer(n),
                  m = as.integer(m),
                  group_assignments = as.integer(rep(0,n)),
-                 centers = numeric(K*m))
+                 centers = numeric(K*m),
+                 num_iters = as.integer(0),
+                 run_time = as.double(0))
     res$clusters <- result$group_assignments
     res$centers <- matrix(result$centers,ncol=K)
+    res$num_iters <- result$num_iters
+    res$time <- result$run_time
   } else{
     R_res <- kmeanspp(X,K)
     res$clusters <- R_res$cluster
     res$centers <- R_res$centers
+    res$num_iters <- 0
+    res$time <- 0.0
   }
   return(res)
 }

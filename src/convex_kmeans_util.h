@@ -87,7 +87,7 @@ void kmeans_dual_solution_impl(int* ga_hat, problem_instance* prob, double eps1,
                                 double Y_T_min, double* Y_a_r, double* Y_T_r, int* feasible_r,
                                 workspace* work);
 void kmeans_pp_impl(double const* D, int K, int n, int m, int* cluster_assignment_r,
-                        double* centers_r, workspace* work);
+                        double* centers_r, int* num_iters_R, double* time_R, workspace* work);
 void project_E(problem_instance* prob, double* Z, double lmin, double* Z_proj);
 
 #endif

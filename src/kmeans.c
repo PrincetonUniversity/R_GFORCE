@@ -1,5 +1,6 @@
 #include "math.h"
 #include "string.h"
+#include "time.h"
 #include "R.h"
 #include "omp.h"
 #include "convex_kmeans.h"
@@ -39,19 +40,19 @@ double euclidean_distance(double* restrict p1, double* restrict p2, int m,double
 
 
 // R ACCESS POINT
-void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r){
+void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R){
     int K = *K0;
     int n = *n0;
     int m = *m0;
-    kmeans_pp(D,K,n,m,cluster_assignment_r,centers_r);
+    kmeans_pp(D,K,n,m,cluster_assignment_r,centers_r, num_iters_R, time_R);
 }
 
 // C ACCESS POINT
-void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r) {
+void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R) {
     workspace work;
     work.dwork = (double *) R_alloc(2*n + m*(K+1),sizeof(double));
     work.iwork = (int *) R_alloc(K+n,sizeof(int));
-    kmeans_pp_impl(D,K,n,m,cluster_assignment_r,centers_r,&work);
+    kmeans_pp_impl(D,K,n,m,cluster_assignment_r,centers_r,num_iters_R,time_R,&work);
 }
 
 
@@ -66,7 +67,7 @@ void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double
 // REQUIRES K+n length iwork
 // REQUIRES 2n (prob dist,min_center_distance) + mK (centers) + m (euclidean_distance_tmp) = 2n + (K+1)m length dwork
 void kmeans_pp_impl(double const* restrict D, int K, int n, int m, int* restrict cluster_assignment_r,
-                    double* restrict centers_r, workspace* work) {
+                    double* restrict centers_r,int* num_iters_R, double* time_R, workspace* work) {
     GetRNGstate();
 
     //////////////////////////////////////
@@ -79,6 +80,10 @@ void kmeans_pp_impl(double const* restrict D, int K, int n, int m, int* restrict
     int* restrict initial_centers = work -> iwork;
     int* restrict cluster_assignment = initial_centers + K;
     int tmp1;
+    int num_iter = 0;
+    double run_time = 0.0;
+    clock_t start_time = clock();
+    clock_t cur_time;
     
     //choose first center
     double q = unif_rand(); // random U[0,1]
@@ -122,6 +127,7 @@ void kmeans_pp_impl(double const* restrict D, int K, int n, int m, int* restrict
 
         // 2. Update Centroids
         lloyd_update_centers(D,centers,cluster_assignment,n,m,K,initial_centers);
+        num_iter++;
     }
 
     ///////////////////////////////////
@@ -131,6 +137,10 @@ void kmeans_pp_impl(double const* restrict D, int K, int n, int m, int* restrict
     PutRNGstate();
     memcpy(centers_r,centers,K*m*sizeof(double));
     memcpy(cluster_assignment_r,cluster_assignment,n*sizeof(int));
+    cur_time = clock();
+    run_time = time_difference_ms(start_time,cur_time);
+    *time_R = run_time;
+    *num_iters_R = num_iter;
 }
 
 // REQUIRES iwork of length K

@@ -24,6 +24,8 @@ void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, doubl
     double* ptmp1;
     int d2 = d*d;
     double eps_obj = opts -> eps_obj;
+    int lloyds_updates = 0;
+    double lloyds_runtime = 0.0;
 
     // Create Workspace, Initialize Problem Instance, Allocate Memory Pool
     problem_instance prob;
@@ -112,12 +114,12 @@ void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, doubl
     ////////////////////////////////////////////////////////////
     //// STEP 2 - Initial K-means Solution, Certificate
     ////////////////////////////////////////////////////////////
-    kmeans_pp_impl(D_kmeans,K,d,d,km_clusters_best,km_centers_new,&work);
+    kmeans_pp_impl(D_kmeans,K,d,d,km_clusters_best,km_centers_new,&lloyds_updates,&lloyds_runtime,&work);
     km_val_best = clust_to_opt_val(&prob,km_clusters_best,&work);
     cur_time = clock();
     km_best_time = time_difference_ms(start_time,cur_time);
     for(int i=0; i < km_rep - 1; i++){
-        kmeans_pp_impl(D_kmeans,K,d,d,km_clusters_new,km_centers_new,&work);
+        kmeans_pp_impl(D_kmeans,K,d,d,km_clusters_new,km_centers_new,&lloyds_updates,&lloyds_runtime,&work);
         km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
         km_iter_total++;
         if(km_val_new < km_val_best) {
@@ -292,7 +294,7 @@ void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, doubl
         new_best_km = 0;
         project_E(&prob,Z_best,lambda_min_best,results->B_Z_best);
         for(int i=0; i < km_rep; i++){
-            kmeans_pp_impl(results->B_Z_best,K,d,d,km_clusters_new,km_centers_new,&work);
+            kmeans_pp_impl(results->B_Z_best,K,d,d,km_clusters_new,km_centers_new,&lloyds_updates,&lloyds_runtime,&work);
             km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
             km_iter_total++;
             if(km_val_new < km_val_best) {

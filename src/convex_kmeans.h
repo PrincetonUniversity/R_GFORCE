@@ -38,8 +38,8 @@ typedef struct {
 
 
 // C Access points
-void kmeans(double* D, int K, int n, int m, int* centers_init, int* cluster_assignment_r, double* centers_r);
-void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r);
+void kmeans(double* D, int K, int n, int m, int* centers_init, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
+void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
 void kmeans_dual_solution_primal_min(int* ga_hat, double* D, int K, int d, double eps1, 
                                         double eps2, double Y_T_min, double* Y_a_r,
                                         double* Y_T_r, int* feasible_r);
@@ -57,7 +57,7 @@ void FORCE_initialization_par(double* D, double s, int d, int K, double* opt_est
 
 
 // R Access Points
-void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r);
+void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
 void primal_dual_adar_R(double* D, double* D_kmeans, double* E, double* ESI, double* X0, int* d, int* K, 
     int* in_verbosity, int* in_kmeans_iter, int* in_dual_frequency, int* in_max_iter,
     int* in_finish_pgd, int* in_number_restarts, int* in_restarts, double* in_alpha, double* in_eps_obj,
