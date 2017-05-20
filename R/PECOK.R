@@ -7,10 +7,10 @@
 #' \eqn{d} dimensional random vector.
 #' @param par logical expression. If \code{par == TRUE}, then a multi-threaded version
 #' of the function is called. If \code{par == FALSE}, a single-threaded version is called.
-#' @param alt_estimator logical expression. If \code{alt_estimator == TRUE}, then the alternative
+#' @param fast_estimator logical expression. If \code{fast_estimator == TRUE}, then the alternative
 #' estimator for \eqn{\hat \Gamma} is used.
 #' @param R_only logical expression. If \code{R_only == TRUE}, then no native code is run. If 
-#' \code{alt_estimator != TRUE} this is ignored.
+#' \code{fast_estimator != TRUE} this is ignored.
 #' @return The estimator \eqn{\Gamma} as a \eqn{d} dimensional numeric vector.
 #'
 #' @examples
@@ -22,7 +22,7 @@
 #' @useDynLib GFORCE gamma_alternative_estimator_R
 #' @useDynLib GFORCE gamma_alternative_estimator_par_R
 #' @export
-gforce.Gamma <- function(X,par = FALSE,alt_estimator = FALSE,R_only=FALSE){
+gforce.Gamma <- function(X,par = FALSE,fast_estimator = FALSE,R_only=FALSE){
   dims <- dim(X)
   n <- dims[1]
   d <- dims[2]
@@ -32,7 +32,7 @@ gforce.Gamma <- function(X,par = FALSE,alt_estimator = FALSE,R_only=FALSE){
   ips_diag <- matrix(diag(ips),ncol=1)
 
   # use original or alternative estimator from PECOK paper
-  if(!alt_estimator){
+  if(!fast_estimator){
     ones_d <- matrix(rep(1,d),ncol=1)
     n_xc_xd <- (ones_d%*%t(ips_diag) + ips_diag%*%t(ones_d) - 2*ips)^0.5
     

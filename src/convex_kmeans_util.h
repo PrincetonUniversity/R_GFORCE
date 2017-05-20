@@ -79,15 +79,24 @@ void daxpby(double a, double* restrict X, double b, double* restrict Y, int d);
 double clust_to_opt_val(problem_instance* prob, int* ga_hat, workspace* work);
 void smoothed_gradient(problem_instance* prob, double* X, double* GX_t, double* GS_t,
                         workspace* work);
+void smoothed_gradient_nok(problem_instance* prob, double* X, double* GX_t, double* GS_t,
+                        workspace* work);
 void smoothed_objective(problem_instance* prob, double* X, double* lambda_min,
                         double* obj_val, workspace* work);
+void smoothed_objective_nok(problem_instance* prob, double* X, double* lambda_min,
+                        double* obj_val, workspace* work);
 void C_perp_update(problem_instance* prob, double alpha, double* X_t, double* GX_t,
+                    double* GS_t, workspace* work);
+void C_perp_update_nok(problem_instance* prob, double alpha, double* X_t, double* GX_t,
                     double* GS_t, workspace*work);
+void project_E(problem_instance* prob, double* Z, double lmin, double* Z_proj);
+
+
+// KMEANS 
 void kmeans_dual_solution_impl(int* ga_hat, problem_instance* prob, double eps1, double eps2,
                                 double Y_T_min, double* Y_a_r, double* Y_T_r, int* feasible_r,
                                 workspace* work);
 void kmeans_pp_impl(double const* D, int K, int n, int m, int* cluster_assignment_r,
                         double* centers_r, int* num_iters_R, double* time_R, workspace* work);
-void project_E(problem_instance* prob, double* Z, double lmin, double* Z_proj);
 
 #endif

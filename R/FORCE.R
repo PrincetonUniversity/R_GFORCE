@@ -55,7 +55,8 @@
 #' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE primal_dual_adar_R
 #' @export
-gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = NULL, R_only = FALSE) {
+gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, 
+                         E = NULL, R_only = FALSE) {
   d <- ncol(D)
 
   if(is.null(force_opts)){
@@ -154,6 +155,136 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, E = N
   
   return(res)
 }
+
+
+#' FORCE \eqn{K}-means solver.
+#' 
+#' Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm when \eqn{K} is unknown.
+#' 
+#' @param D a matrix \eqn{D} as defined above.
+#' @param force_opts tuning parameters. \code{NULL} signifies defaults will be used.
+#' @param D_Kmeans matrix to be used for initial integer solution. \code{NULL} signifies that \code{D} will be used.
+#' @param X0 initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.
+#' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
+#' @param R_only logical expression. If \code{R_only == FALSE}, then the included
+#' native code implementation will be used. Otherwise, an R implementation is used.
+#' 
+#' @return An object with following components
+#' \describe{
+#' \item{\code{Z_T}}{Final iterate of the projected gradient descent algorithm run on the smoothed eigenvalue problem.}
+#' \item{\code{B_Z_T}}{Projection of \code{Z_T} to the border of the positive semi-definite cone.}
+#' \item{\code{B_Z_T_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
+#' \item{\code{Z_best}}{Iterate with best objective value found during projected gradient descent on the smoothed eigenvalue problem.}
+#' \item{\code{B_Z_best}}{Projection of \code{Z_best} to the border of the positive semi-definite cone.}
+#' \item{\code{B_Z_best_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
+#' \item{\code{km_best}}{Best clustering in terms of objective value of the SDP relaxation. This is found by running Lloyd's algorithm on the rows of \code{D_kmeans_matrix}.}
+#' \item{\code{B_km}}{Partnership matrix corresponding to \code{km_best}.}
+#' \item{\code{km_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_km}.}
+#' \item{\code{km_best_time}}{Time elapsed (in seconds) until \code{km_best} was found.}
+#' \item{\code{km_iter_best}}{Number of times a \eqn{K}-means algorithm was run before \code{km_best} was found.}
+#' \item{\code{km_iter_total}}{Total number of calls to a \eqn{K}-means solver (such as Lloyd's algorithm).}
+#' \item{\code{dual_certified}}{1 if a dual certificate was found, and 0 otherwise.}
+#' \item{\code{dual_certified_grad_iter}}{Number of gradient updates performed before a dual certificate was found.}
+#' \item{\code{dual_certified_time}}{Time elapsed (in seconds) until dual certificate was found for \code{B_km}.}
+#' \item{\code{grad_iter_best}}{Gradient iteration where \code{Z_best} was computed.}
+#' \item{\code{grad_iter_best_time}}{Time elapsed (in seconds) when the update \code{grad_iter_best} was performed.}
+#' \item{\code{total_time}}{Total time elapsed (in seconds) during call to \code{gforce.FORCE}.}
+#' }
+#'
+#'
+#' @seealso \code{\link{gforce.defaults}}
+#' @useDynLib GFORCE primal_dual_adar_R
+#' @export
+gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, R_only = FALSE) {
+  d <- ncol(D)
+
+  if(is.null(force_opts)){
+      force_opts <- gforce.defaults(d,K)
+  }
+
+  if(is.null(D_Kmeans)) {
+      D_Kmeans <- D
+  }
+
+  res <- NULL
+
+  C_result <- .C(primal_dual_adar_nok_R,
+          D = as.double(D),
+          D_Kmeans = as.double(D_Kmeans),
+          X0 = as.double(X0),
+          d = as.integer(d),
+          K = as.integer(K),
+          verbosity = as.integer(force_opts$verbose),
+          kmeans_iter = as.integer(force_opts$kmeans_iter),
+          dual_frequency = as.integer(force_opts$dual_frequency),
+          max_iter = as.integer(force_opts$max_iter),
+          finish_pgd = as.integer(force_opts$finish_pgd),
+          number_restarts = as.integer(length(force_opts$restarts)),
+          restarts = as.integer(force_opts$restarts),
+          alpha = as.double(force_opts$alpha),
+          eps_obj = as.double(force_opts$eps_obj),
+          Z_T = numeric(d^2),
+          B_Z_T = numeric(d^2),
+          Z_T_lmin = as.double(1.0),
+          Z_best = numeric(d^2),
+          B_Z_best = numeric(d^2),
+          Z_best_lmin = as.double(2.0),
+          B_Z_T_opt_val = as.double(3.0),
+          B_Z_best_opt_val = as.double(4.0),
+          km_opt_val = as.double(5.0),
+          km_best = as.integer(numeric(d)),
+          km_best_time = as.double(6.0),
+          km_iter_best = as.integer(7),
+          km_iter_total = as.integer(8),
+          dc = as.integer(9),
+          dc_time = as.double(10.0),
+          dc_grad_iter = as.integer(11),
+          grad_iter_best = as.integer(12),
+          grad_iter_best_time = as.double(13.0),
+          total_time = as.double(14))
+
+  # Build Result
+  res$Z_T <- matrix(C_result$Z_T,ncol=d)
+  res$B_Z_T <- matrix(C_result$B_Z_T,ncol=d)
+  res$B_Z_T_opt_val <- C_result$B_Z_T_opt_val
+  res$Z_best <- matrix(C_result$Z_best,ncol=d)
+  res$B_Z_best <- matrix(C_result$B_Z_best,ncol=d)
+  res$B_Z_best_opt_val <- C_result$B_Z_best_opt_val
+  res$km_best <- C_result$km_best
+  res$B_km <- gforce.clust2mat(res$km_best)
+  res$km_opt_val <- C_result$km_opt_val
+  res$km_best_time <- C_result$km_best_time
+  res$km_iter_best <- C_result$km_iter_best
+  res$km_iter_total <- C_result$km_iter_total
+  res$dual_certified <- C_result$dc
+  res$dual_certified_grad_iter <- C_result$dc_grad_iter
+  res$dual_certified_time <- C_result$dc_time
+  res$grad_iter_best <- C_result$grad_iter_best
+  res$grad_iter_best_time <- C_result$grad_iter_best_time
+  res$total_time <- C_result$total_time
+  res <- res[sort(names(res))]
+  
+  return(res)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #' Solve PECOK with FORCE.
 #'
