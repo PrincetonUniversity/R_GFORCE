@@ -53,6 +53,7 @@ void initialize_problem_instance(double* D, double* E, double* ESI, double mu,
 double time_difference_ms(clock_t start, clock_t end);
 void random_shuffle(int n,int* shuffled);
 void random_shuffle_threadsafe(int n,int* shuffled,threadsafe_rng rng_func);
+void initialize_identity_matrix(double* restrict I, int d);
 
 // VECTOR, MATRIX OPS
 // Computes A = A + c, where A is a vector of length d, c is scalar

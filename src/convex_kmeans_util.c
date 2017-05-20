@@ -163,6 +163,20 @@ void initialize_problem_instance(double* D, double* E, double* ESI, double mu, i
     prob -> DTD = F77_NAME(ddot)(&d2,D,&INC1,D,&INC1);
 }
 
+void initialize_identity_matrix(double* restrict I,int d){
+    int d2 = d*d;
+    int dp1 = d+1;
+    double* ptmp1 = I;
+    for (int i=0; i < d2; i++){
+        *ptmp1 = 0;
+        ptmp1++;
+    }
+    ptmp1 = I;
+    for(int i=0; i < d; i++){
+        *ptmp1 = 1;
+        ptmp1 = ptmp1 + dp1;
+    }
+}
 
 // VECTOR, MATRIX OPS
 void daps(double* restrict A, int inc_A, double c, int d){
