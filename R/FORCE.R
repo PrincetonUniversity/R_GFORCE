@@ -193,9 +193,9 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #'
 #'
 #' @seealso \code{\link{gforce.defaults}}
-#' @useDynLib GFORCE primal_dual_adar_R
+#' @useDynLib GFORCE primal_dual_adar_nok_R
 #' @export
-gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, R_only = FALSE) {
+gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_only = FALSE) {
   d <- ncol(D)
 
   if(is.null(force_opts)){
@@ -205,6 +205,10 @@ gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, R_only = FALSE
   if(is.null(D_Kmeans)) {
       D_Kmeans <- D
   }
+  if(is.null(X0)){
+    X0 <- 1
+    # TODO - CREATE GOOD INITIALIZATION SCHEME
+  }
 
   res <- NULL
 
@@ -213,7 +217,6 @@ gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, R_only = FALSE
           D_Kmeans = as.double(D_Kmeans),
           X0 = as.double(X0),
           d = as.integer(d),
-          K = as.integer(K),
           verbosity = as.integer(force_opts$verbose),
           kmeans_iter = as.integer(force_opts$kmeans_iter),
           dual_frequency = as.integer(force_opts$dual_frequency),
@@ -250,12 +253,12 @@ gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, R_only = FALSE
   res$Z_best <- matrix(C_result$Z_best,ncol=d)
   res$B_Z_best <- matrix(C_result$B_Z_best,ncol=d)
   res$B_Z_best_opt_val <- C_result$B_Z_best_opt_val
-  res$km_best <- C_result$km_best
-  res$B_km <- gforce.clust2mat(res$km_best)
-  res$km_opt_val <- C_result$km_opt_val
-  res$km_best_time <- C_result$km_best_time
-  res$km_iter_best <- C_result$km_iter_best
-  res$km_iter_total <- C_result$km_iter_total
+  # res$km_best <- C_result$km_best
+  # res$B_km <- gforce.clust2mat(res$km_best)
+  # res$km_opt_val <- C_result$km_opt_val
+  # res$km_best_time <- C_result$km_best_time
+  # res$km_iter_best <- C_result$km_iter_best
+  # res$km_iter_total <- C_result$km_iter_total
   res$dual_certified <- C_result$dc
   res$dual_certified_grad_iter <- C_result$dc_grad_iter
   res$dual_certified_time <- C_result$dc_time

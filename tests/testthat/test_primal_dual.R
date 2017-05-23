@@ -231,6 +231,39 @@ test_that("Smoothed Objective",{
     expect_equal(comp_result$objective_value,result$obj_val)
     })
 
+#' @useDynLib GFORCE test_smoothed_objective_nok
+test_that("Smoothed Objective (Unknown K)",{
+    set.seed(12345)
+    K <- 5
+    d <- 20
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
+    sh <- t(dat$X)%*%dat$X / d
+    gh <- gforce.Gamma(dat$X)
+    diff <- diag(gh) - sh
+    initial_mixing <- 2/d
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
+    km_sol <- gforce.clust2mat(km_res)
+
+    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
+    X <- ren_start_res$X0
+
+    mu <- 0.5*0.01/log(d)
+    I_d <- diag(d)
+    comp_result <- smoothed_objective(X,I_d,I_d,mu)
+
+    result <- .C(test_smoothed_objective_nok,
+                 X= as.double(X),
+                 d = as.integer(d),
+                 mu = as.double(mu),
+                 lambda_min = as.double(1),
+                 obj_val = as.double(1))
+
+    expect_equal(comp_result$lambda_min,result$lambda_min)
+    expect_equal(comp_result$objective_value,result$obj_val)
+    })
+
+
 #' @useDynLib GFORCE test_clust_to_opt_val
 test_that("K-Means Objective Value",{
 

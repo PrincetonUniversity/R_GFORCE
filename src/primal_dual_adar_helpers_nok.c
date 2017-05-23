@@ -54,6 +54,7 @@ void smoothed_gradient_nok(problem_instance* prob, double* X, double* GX_t, doub
     d2_tmp2 = d2_tmp + d2;
 
     //eigenvectors will overwrite input matrix, so GX_t becomes V, eigenvectors
+    memcpy(GX_t,X,d2*sizeof(double));
     F77_CALL(dsyevd)(&JOBZV,&UPLO,&d,GX_t,&d,X_eigs,work->dwork,&(work->ldwork),
                 work->iwork,&(work->liwork),&lapack_info);
     // GS_t is just current value of X
@@ -119,11 +120,12 @@ void smoothed_objective_nok(problem_instance* prob, double* X, double* lambda_mi
     GS_t = X_eigs + d;
     d2_tmp = GS_t + d2;
 
-    //eigenvectors will overwrite input matrix, so GX_t becomes V, eigenvectors
-    F77_CALL(dsyevd)(&JOBZN,&UPLO,&d,d2_tmp,&d,X_eigs,work->dwork,&(work->dsyevd_ldwork_N),
-                work->iwork,&(work->dsyevd_liwork_N),&lapack_info);
     // GS_t is just current value of X
     memcpy(GS_t,X,d2*sizeof(double));
+    // eigenvectors will overwrite input matrix, so GX_t becomes V, eigenvectors
+    memcpy(d2_tmp,X,d2*sizeof(double));
+    F77_CALL(dsyevd)(&JOBZN,&UPLO,&d,d2_tmp,&d,X_eigs,work->dwork,&(work->dsyevd_ldwork_N),
+                work->iwork,&(work->dsyevd_liwork_N),&lapack_info);
 
     X_min = min_array(d,X_eigs);
     S_min = min_array(d2,GS_t);
@@ -175,20 +177,6 @@ void C_perp_update_nok(problem_instance* prob, double alpha, double* X_t, double
     // update and return
     F77_NAME(daxpy)(&d2,&alpha,GX_t,&INC1,X_t,&INC1);
 }
-
-// // Return value is stored in Z_proj
-// // Z IS NOT ALTERED
-// void project_E(problem_instance* prob, double* Z, double lmin, double* Z_proj){
-//     int d = prob -> d;
-//     int d2 = d*d;
-//     double* E = prob -> E;
-//     double scale_factor = 1/(1-lmin);
-
-//     memcpy(Z_proj,Z,d2*sizeof(double));
-//     F77_NAME(dscal)(&d2,&scale_factor,Z_proj,&INC1);
-//     scale_factor = 1 - scale_factor;
-//     F77_NAME(daxpy)(&d2,&scale_factor,E,&INC1,Z_proj,&INC1);
-// }
 
 
 // OUTPUT STORED IN GX_T

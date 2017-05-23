@@ -10,11 +10,15 @@
 void test_smoothed_gradient_S_base(double* X, double* E,double* GS_t, int* d, double* S_min_r);
 void test_smoothed_gradient_X_base(double* X, double* ESI, double* GX_t, int* d, int* K, double* X_min_r);
 void test_smoothed_gradient(double* X, double* E,double* ESI,int* d0, int* K0, double* mu0,double* GX_t,double* GS_t);
+void test_smoothed_gradient_nok(double* X, int* d0, double* mu0, double* GX_t,double* GS_t);
 void test_project_C_perpendicular(double* D, int* d0, int* K0, double* GX_t, double* GS_t);
+void test_project_C_perpendicular_nok(double* D, int* d0, double* GX_t, double* GS_t);
 void test_project_E(double* E, double* Z, int* d, double* lmin, double* Z_proj);
 void test_smoothed_objective(double* X, double* E,double* ESI,int* d0, int* K0,
                             double* mu0, double* lambda_min, double* obj_val);
+void test_smoothed_objective_nok(double* X, int* d0, double* mu0, double* lambda_min, double* obj_val);
 void test_clust_to_opt_val(double* D, int* d, int* K, int* clusters, double* opt_val_r);
+
 
 // convex_kmeans_util.c
 void test_daps(double* A,double* c, int* d);

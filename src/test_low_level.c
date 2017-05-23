@@ -107,6 +107,42 @@ void test_clust_to_opt_val(double* D, int* d, int* K, int* clusters, double* opt
 }
 
 
+void test_smoothed_gradient_nok(double* X, int* d0, double* mu0, double* GX_t,double* GS_t){
+    workspace work;
+    problem_instance prob;
+    int d = *d0;
+    prob.d = d;
+    prob.mu_n = -1 * (*mu0);
+
+    allocate_workspace_pd(d,d,&work);
+    smoothed_gradient_nok(&prob,X,GX_t,GS_t,&work);
+}
+
+void test_smoothed_objective_nok(double* X, int* d0, double* mu0, double* lambda_min, double* obj_val){
+    workspace work;
+    problem_instance prob;
+    int d = *d0;
+
+    prob.d = d;
+    prob.mu_n = -1 * (*mu0);
+
+    allocate_workspace_pd(d,d,&work);
+    smoothed_objective_nok(&prob,X,lambda_min,obj_val,&work);
+}
+
+void test_project_C_perpendicular_nok(double* D, int* d0, double* GX_t, double* GS_t){
+    workspace work;
+    problem_instance prob;
+    int d = *d0;
+    double mu = 1;
+    double* ptmp1 = (void *) R_alloc(d*d,sizeof(double));
+    initialize_identity_matrix(ptmp1,d);
+
+    allocate_workspace_pd(d,d,&work);
+    initialize_problem_instance(D,ptmp1,ptmp1,mu,d,d,&prob);
+    project_C_perpendicular_nok(&prob,GX_t,GS_t,&work);
+}
+
 
 
 void test_daps(double* A,double* c, int* d){

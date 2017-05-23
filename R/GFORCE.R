@@ -17,6 +17,7 @@
 #' @useDynLib GFORCE test_dxpyez
 #' @useDynLib GFORCE test_clust_to_opt_val
 #' @useDynLib GFORCE test_smoothed_objective
+#' @useDynLib GFORCE test_smoothed_objective_nok
 #' @useDynLib GFORCE test_project_E
 #' @useDynLib GFORCE test_project_C_perpendicular
 #' @useDynLib GFORCE test_smoothed_gradient
