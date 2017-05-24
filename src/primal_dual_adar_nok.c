@@ -16,7 +16,8 @@ static const int INC1 = 1;
 //             1 == startup, termination, iteration counter
 //             2 == startup, termination, iteration full information
 //             5 == DEBUG. Prints all info above plus some additional. It WILL trigger extra computation
-void primal_dual_adar_nok(double* D, double* D_kmeans, double* X0, int d, pgd_opts* opts, pgd_results* results) {
+void primal_dual_adar_nok(double* D, double* D_kmeans, double* E, double* ESI,
+                             double* X0, int d, pgd_opts* opts, pgd_results* results) {
     /////////////////////////////////////////////////////////////
     //// STEP 1 - Local Variable Initialization, Memory Allocation
     /////////////////////////////////////////////////////////////
@@ -32,9 +33,9 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* X0, int d, pgd_op
     workspace work;
     mem_pool free_d2;
     double mu = 0.5*eps_obj/log(d);
-    ptmp1 = (void *) R_alloc(d2,sizeof(double));
-    initialize_identity_matrix(ptmp1,d);
-    initialize_problem_instance(D, ptmp1, ptmp1, mu, d, 0, &prob);
+    // ptmp1 = (void *) R_alloc(d2,sizeof(double));
+    // initialize_identity_matrix(ptmp1,d);
+    initialize_problem_instance(D, E, ESI, mu, d, 0, &prob);
     // allocate_workspace_pd(d, K, &work);
     allocate_workspace_pd(d, d, &work);
     free_d2.base = (void **) R_alloc(5,sizeof(void*));
@@ -153,6 +154,7 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* X0, int d, pgd_op
     memcpy(X_tp1,X0,d2*sizeof(double));
     memcpy(Z_tp1,X_tp1,d2*sizeof(double));
     smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
+    smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
     lambda_min_best = lambda_min_tp1;
     obj_best = obj_tp1;
 
@@ -202,7 +204,8 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* X0, int d, pgd_op
                 // s_res <- smoothed_objective_nok(Z_tp1,E,E_sqrt_inv,mu)
                 // obj_tp1 <- s_res$objective_value
                 // lambda_min_tp1 <- s_res$lambda_min
-                smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
+                // smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
+                smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
                 //set best result
                 memcpy(Z_best,Z_tp1,d2*sizeof(double));
                 obj_best = obj_tp1;
@@ -232,13 +235,15 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* X0, int d, pgd_op
             // STEP 3AD -- Find Gradient
             GX_t = (double *) mem_pool_remove(&free_d2);
             GS_t = (double *) mem_pool_remove(&free_d2);
-            smoothed_gradient_nok(&prob, X_t, GX_t, GS_t, &work);
+            // smoothed_gradient_nok(&prob, X_t, GX_t, GS_t, &work);
+            smoothed_gradient(&prob, X_t, GX_t, GS_t, &work);
 
             // STEP 3AE -- Update Primary Sequences
-            C_perp_update(&prob,alpha,X_t,GX_t,GS_t,&work);
+            C_perp_update_nok(&prob,alpha,X_t,GX_t,GS_t,&work);
             Z_tp1 = X_t;
             X_t = 0;
-            smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
+            // smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
+            smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
 
             // Memory @ GS_t can be freed
             // Memory @ X_t can be freed
@@ -381,7 +386,7 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* X0, int d, pgd_op
 
 // Access point for R code --- needed to pass in options because
 // cannot pass struct
-void primal_dual_adar_nok_R(double* D, double* D_kmeans, double* X0, int* d,
+void primal_dual_adar_nok_R(double* D, double* D_kmeans, double* E, double* ESI, double* X0, int* d,
     int* in_verbosity, int* in_kmeans_iter, int* in_dual_frequency, int* in_max_iter,
     int* in_finish_pgd, int* in_number_restarts, int* in_restarts, double* in_alpha, double* in_eps_obj,
     double* out_Z_T, double* out_B_Z_T, double* out_Z_T_lmin, double* out_Z_best, double* out_B_Z_best, double* out_Z_best_lmin,
@@ -410,7 +415,7 @@ void primal_dual_adar_nok_R(double* D, double* D_kmeans, double* X0, int* d,
     results.kmeans_best = out_kmeans_best;
 
     // call primal_dual_adar
-    primal_dual_adar_nok(D,D_kmeans,X0,*d, &opts_in, &results);
+    primal_dual_adar_nok(D,D_kmeans,E,ESI,X0,*d, &opts_in, &results);
 
     // assign out_* values from results
     // out_Z_T passed by reference

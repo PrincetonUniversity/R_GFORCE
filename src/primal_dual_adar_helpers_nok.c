@@ -167,7 +167,7 @@ void C_perp_update_nok(problem_instance* prob, double alpha, double* X_t, double
     int d2 = d*d;
 
     // compute projection -- gradient is partially overwritten
-    project_C_perpendicular(prob, GX_t, GS_t, work);
+    project_C_perpendicular_nok(prob, GX_t, GS_t, work);
 
     // compute norm and rescale
     g_norm = F77_NAME(dnrm2)(&d2,GX_t,&INC1);

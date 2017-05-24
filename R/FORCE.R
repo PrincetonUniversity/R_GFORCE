@@ -209,12 +209,21 @@ gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_o
     X0 <- 1
     # TODO - CREATE GOOD INITIALIZATION SCHEME
   }
+  # initialize E and ESI
+  E <- 0.5*diag(d) + (1/(2*d))*matrix(1,ncol=d,nrow=d)
+  E_EVEV <- eigen(E)
+  E_V <- E_EVEV$vectors
+  E_D <- diag(E_EVEV$values)
+  E_sqrt <- E_V%*%(E_D^(0.5))%*%t(E_V)
+  ESI <- solve(E_sqrt)
 
   res <- NULL
 
   C_result <- .C(primal_dual_adar_nok_R,
           D = as.double(D),
           D_Kmeans = as.double(D_Kmeans),
+          E = as.double(E),
+          ESI = as.double(ESI),
           X0 = as.double(X0),
           d = as.integer(d),
           verbosity = as.integer(force_opts$verbose),
