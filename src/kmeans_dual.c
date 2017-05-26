@@ -170,6 +170,23 @@ void kmeans_dual_solution_impl(int* ga_hat, problem_instance* prob, double eps1,
     memcpy(Y_a_r,Y_a_best,d*sizeof(double));
 }
 
+
+
+//Internal Access Point
+//KMEANS DUAL SOLUTION MIN PRIMAL FORM (K IS UNKNOWN)
+//ga_hat should be in "Standard Form" - group names are use 1...K
+//REQUIRES d(d-1)/2 + 7d -2 length dwork
+//REQUIRES d+3K+3 length iwork
+//REQUIRES d length Y_a_r
+void kmeans_dual_solution_nok_impl(int* ga_hat, problem_instance* prob, int K_hat, double eps1, double eps2,
+                                double Y_T_min, double* Y_a_r, double* Y_T_r, int* feasible_r,
+                                workspace* work) {
+    ;
+}
+
+
+
+
 // Computes Y_a_base, group_sums and group_sizes. Assumes these have already been allocated
 // to the proper size. Also computes optval
 //REQUIRES K+1 length dwork

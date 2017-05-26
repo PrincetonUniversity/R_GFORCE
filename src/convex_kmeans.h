@@ -43,6 +43,9 @@ void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double
 void kmeans_dual_solution_primal_min(int* ga_hat, double* D, int K, int d, double eps1, 
                                         double eps2, double Y_T_min, double* Y_a_r,
                                         double* Y_T_r, int* feasible_r);
+void kmeans_dual_solution_primal_min_nok(int* ga_hat, double* D, int d, double eps1, 
+                                        double eps2, double Y_T_min, double* Y_a_r,
+                                        double* Y_T_r, int* feasible_r);
 void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, double* X0, 
                         int d, int K, pgd_opts* opts, pgd_results* results);
 void primal_dual_adar_nok(double* D, double* D_kmeans, double* E, double* ESI, double* X0, 
@@ -77,6 +80,9 @@ void primal_dual_adar_nok_R(double* D, double* D_kmeans, double* E, double* ESI,
 
 
 void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *dimension, 
+                                        double* eps1_0, double* eps2_0, double* Y_T_min_0, 
+                                        double* Y_a_r, double* Y_T_r, int* feasible_r);
+void kmeans_dual_solution_primal_min_nok_R(int* ga_hat, double* D, int *dimension, 
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0, 
                                         double* Y_a_r, double* Y_T_r, int* feasible_r);
 void v_measure(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);

@@ -153,7 +153,6 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* E, double* ESI,
     X_tp1 = (double *) mem_pool_remove(&free_d2);
     memcpy(X_tp1,X0,d2*sizeof(double));
     memcpy(Z_tp1,X_tp1,d2*sizeof(double));
-    smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
     smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
     lambda_min_best = lambda_min_tp1;
     obj_best = obj_tp1;
@@ -201,10 +200,8 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* E, double* ESI,
                 lambda_t = 0;
                 // lambda_tp1 <- 1
                 lambda_tp1 = 1;
-                // s_res <- smoothed_objective_nok(Z_tp1,E,E_sqrt_inv,mu)
                 // obj_tp1 <- s_res$objective_value
                 // lambda_min_tp1 <- s_res$lambda_min
-                // smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
                 smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
                 //set best result
                 memcpy(Z_best,Z_tp1,d2*sizeof(double));
@@ -235,14 +232,12 @@ void primal_dual_adar_nok(double* D, double* D_kmeans, double* E, double* ESI,
             // STEP 3AD -- Find Gradient
             GX_t = (double *) mem_pool_remove(&free_d2);
             GS_t = (double *) mem_pool_remove(&free_d2);
-            // smoothed_gradient_nok(&prob, X_t, GX_t, GS_t, &work);
             smoothed_gradient(&prob, X_t, GX_t, GS_t, &work);
 
             // STEP 3AE -- Update Primary Sequences
             C_perp_update_nok(&prob,alpha,X_t,GX_t,GS_t,&work);
             Z_tp1 = X_t;
             X_t = 0;
-            // smoothed_objective_nok(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
             smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
 
             // Memory @ GS_t can be freed
