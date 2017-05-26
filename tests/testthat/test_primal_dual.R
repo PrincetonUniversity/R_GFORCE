@@ -152,6 +152,46 @@ test_that("Projection onto C Perpendicular",{
     expect_equal(comp_Z$Z_proj,Z_proj)
     })
 
+#' @useDynLib GFORCE test_project_C_perpendicular_nok
+test_that("Projection onto C Perpendicular (No K)",{
+    set.seed(12345)
+    K <- 5
+    d <- 20
+    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
+    sh <- t(dat$X)%*%dat$X / d
+    gh <- gforce.Gamma(dat$X)
+    diff <- diag(gh) - sh
+    initial_mixing <- 2/d
+    km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
+    km_res <- km_res$clusters
+    km_sol <- gforce.clust2mat(km_res)
+
+    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
+    X <- ren_start_res$X0
+    E <- ren_start_res$E
+
+    E_EVEV <- eigen(E)
+    V <- E_EVEV$vectors
+    D <- diag(E_EVEV$values)
+    E_sqrt <- V%*%(D^(0.5))%*%t(V)
+    ESI <- solve(E_sqrt)
+
+    mu <- 0.5*0.01/log(d)
+    gradSX <- smoothed_gradient(X,E,ESI,mu)
+
+    result <- .C(test_project_C_perpendicular_nok,
+                 D= as.double(diff),
+                 d = as.integer(d),
+                 GX_t = as.double(gradSX$GX),
+                 GS_t = as.double(gradSX$GS))
+    Z_proj <- matrix(result$GX_t,ncol=d)
+
+    # comp_Z <- project_C_perpendicular(gradSX$GX, gradSX$GS,diff)
+
+    expect_equal(rep(0,d),colSums(Z_proj))
+    expect_equal(matrix(0,ncol=d,nrow=d),Z_proj-t(Z_proj))
+    })
+
 #' @useDynLib GFORCE test_project_E
 test_that("Projection Onto PSD Cone Border",{
     K <- 5

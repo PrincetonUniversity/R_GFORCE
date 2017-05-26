@@ -20,6 +20,7 @@
 #' @useDynLib GFORCE test_smoothed_objective_nok
 #' @useDynLib GFORCE test_project_E
 #' @useDynLib GFORCE test_project_C_perpendicular
+#' @useDynLib GFORCE test_project_C_perpendicular_nok
 #' @useDynLib GFORCE test_smoothed_gradient
 #' @useDynLib GFORCE test_smoothed_gradient_X_base
 #' @useDynLib GFORCE test_smoothed_gradient_S_base

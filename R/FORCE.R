@@ -274,6 +274,9 @@ gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_o
   res$grad_iter_best <- C_result$grad_iter_best
   res$grad_iter_best_time <- C_result$grad_iter_best_time
   res$total_time <- C_result$total_time
+
+  res$X0 <- X0
+  res$E <- E
   res <- res[sort(names(res))]
   
   return(res)

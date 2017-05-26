@@ -135,11 +135,11 @@ void test_project_C_perpendicular_nok(double* D, int* d0, double* GX_t, double* 
     problem_instance prob;
     int d = *d0;
     double mu = 1;
-    double* ptmp1 = (void *) R_alloc(d*d,sizeof(double));
-    initialize_identity_matrix(ptmp1,d);
+    double* E;
+    double* ESI;
 
     allocate_workspace_pd(d,d,&work);
-    initialize_problem_instance(D,ptmp1,ptmp1,mu,d,d,&prob);
+    initialize_problem_instance(D,E,ESI,mu,d,d,&prob);
     project_C_perpendicular_nok(&prob,GX_t,GS_t,&work);
 }
 

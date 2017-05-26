@@ -230,7 +230,7 @@ void project_C_perpendicular_nok(problem_instance* prob, double* GX_t, double* G
     dxpyez(d,X_rsums,S_rsums,b);
     // M[p+1,1:p] <- 2*colSums(D)
     scale_factor = 2.0;
-    ptmp1 = M+d+1;
+    ptmp1 = M+d;
     for(int i=0; i < d; i++){
         dtmp1 = (*D_rsums)*scale_factor;
         *ptmp1 = dtmp1;
