@@ -8,6 +8,10 @@
 // CONSTANTS
 static const int INC1 = 1;
 
+//Function Declarations
+void precompute_all_shuffles_par(const int d, const int num_shuffles, int* restrict shuffles);
+void dgxpby(double a, int* restrict G, int K, double b, double* restrict Y, int d, int* restrict group_sizes);
+
 //external functions
 extern void do_nothing();
 
@@ -232,7 +236,7 @@ void FORCE_initialization_par(double* D, double s, int d, int K, double* opt_est
 // Y = a*B(G) + b*Y
 // iwork needs length at least K+1
 // clusters are numbered either 1..K or 0..K-1
-void dgxpby(double a, int* restrict G, int K, double b, double* restrict Y, int d, int* group_sizes) {
+void dgxpby(double a, int* restrict G, int K, double b, double* restrict Y, int d, int* restrict group_sizes) {
     // get group sizes
     // Local Vars
     int itmp1,itmp2,itmp3;

@@ -38,4 +38,6 @@ void smoothed_gradient_X_base(double* X, double* ESI, double* GX_t, double* d2_t
                                 workspace* work, int d, int X_eigs_idx);
 void project_C_perpendicular(problem_instance* prob, double* GX_t, double* GS_t,
                                 workspace* work);
+void project_C_perpendicular_nok(problem_instance* prob, double* GX_t, double* GS_t,
+                                  workspace* work);
 #endif

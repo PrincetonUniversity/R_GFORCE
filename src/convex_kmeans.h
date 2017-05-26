@@ -43,9 +43,8 @@ void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double
 void kmeans_dual_solution_primal_min(int* restrict ga_hat, double* restrict D, int K, int d, double eps1, 
                                         double eps2, double Y_T_min, double* restrict Y_a_r,
                                         double* restrict Y_T_r, int* restrict feasible_r);
-void kmeans_dual_solution_primal_min_nok(int* restrict ga_hat, double* restrict D, int d, int K_hat, double eps1, 
-                                        double eps2, double Y_T_min, double* restrict Y_a_r,
-                                        double* restrict Y_T_r, int* restrict feasible_r);
+void kmeans_dual_solution_primal_min_nok(int* restrict ga_hat, double* restrict D, int d, int K_hat,
+                                        double eps1, double* restrict Y_a_r, int* restrict feasible_r);
 void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, double* X0, 
                         int d, int K, pgd_opts* opts, pgd_results* results);
 void primal_dual_adar_nok(double* D, double* D_kmeans, double* E, double* ESI, double* X0, 
@@ -83,8 +82,7 @@ void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *di
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0, 
                                         double* Y_a_r, double* Y_T_r, int* feasible_r);
 void kmeans_dual_solution_primal_min_nok_R(int* ga_hat, double* D, int *K_hat0, int *dimension, 
-                                        double* eps1_0, double* eps2_0, double* Y_T_min_0, 
-                                        double* Y_a_r, double* Y_T_r, int* feasible_r);
+                                        double* eps1_0, double* Y_a_r, int* feasible_r);
 void v_measure(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);
 void v_measure_par(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);
 void gamma_alternative_estimator_R(double* restrict IPS,double* restrict ips_diag_sqrt, int* dimension,
