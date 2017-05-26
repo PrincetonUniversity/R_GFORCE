@@ -20,6 +20,13 @@ static const int INC1 = 1;
 static const int NRHS1 = 1;
 static const double GNORM_FACTOR = 2.82842712475; //\sqrt{8}
 
+void smoothed_objective_X_base(double* X, double* ESI, double* d2_tmp, double* d2_tmp2,
+                                workspace* work, int d, int X_eigs_idx);
+void smoothed_gradient_X_base(double* X, double* ESI, double* GX_t, double* d2_tmp,
+                                workspace* work, int d, int X_eigs_idx);
+void smoothed_gradient_S_base(double* X, double* E,double* GS_t, int d, double* S_min_r);
+
+
 // NOTE: All methods assume column major layout
 
 // CANNOT OVERWRITE *X or *E or *ESI

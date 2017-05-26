@@ -40,12 +40,12 @@ typedef struct {
 // C Access points
 void kmeans(double* D, int K, int n, int m, int* centers_init, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
 void kmeans_pp(double* D, int K, int n, int m, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
-void kmeans_dual_solution_primal_min(int* ga_hat, double* D, int K, int d, double eps1, 
-                                        double eps2, double Y_T_min, double* Y_a_r,
-                                        double* Y_T_r, int* feasible_r);
-void kmeans_dual_solution_primal_min_nok(int* ga_hat, double* D, int d, double eps1, 
-                                        double eps2, double Y_T_min, double* Y_a_r,
-                                        double* Y_T_r, int* feasible_r);
+void kmeans_dual_solution_primal_min(int* restrict ga_hat, double* restrict D, int K, int d, double eps1, 
+                                        double eps2, double Y_T_min, double* restrict Y_a_r,
+                                        double* restrict Y_T_r, int* restrict feasible_r);
+void kmeans_dual_solution_primal_min_nok(int* restrict ga_hat, double* restrict D, int d, int K_hat, double eps1, 
+                                        double eps2, double Y_T_min, double* restrict Y_a_r,
+                                        double* restrict Y_T_r, int* restrict feasible_r);
 void primal_dual_adar(double* D, double* D_kmeans, double* E, double* ESI, double* X0, 
                         int d, int K, pgd_opts* opts, pgd_results* results);
 void primal_dual_adar_nok(double* D, double* D_kmeans, double* E, double* ESI, double* X0, 
@@ -54,7 +54,7 @@ void gamma_alternative_estimator(double* restrict IPS,double* restrict ips_diag_
                                 int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas);
 void gamma_alternative_estimator_par(double* restrict IPS,double* restrict ips_diag_sqrt, int d, double scaling,
                                         int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas,int* restrict par_idxs);
-void full_rank_feasible(int d, int K, double* E);
+void full_rank_feasible(int d, int K, double* restrict E);
 void FORCE_initialization(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
                             double* E, double* X0, double* E_obj, double* X0_obj, double* fr_base, int* iwork);
 void FORCE_initialization_par(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
@@ -82,7 +82,7 @@ void primal_dual_adar_nok_R(double* D, double* D_kmeans, double* E, double* ESI,
 void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *dimension, 
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0, 
                                         double* Y_a_r, double* Y_T_r, int* feasible_r);
-void kmeans_dual_solution_primal_min_nok_R(int* ga_hat, double* D, int *dimension, 
+void kmeans_dual_solution_primal_min_nok_R(int* ga_hat, double* D, int *K_hat0, int *dimension, 
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0, 
                                         double* Y_a_r, double* Y_T_r, int* feasible_r);
 void v_measure(double* restrict IPS,double* restrict n_xc_xd, int* dimension, double* restrict vm);

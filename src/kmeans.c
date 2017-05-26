@@ -21,7 +21,7 @@ int sample_discrete_distribution(double* restrict prob_dist,int n);
 void update_min_distance(double const* restrict D, double* restrict min_center_distance, int new_center_idx,
                             int n, int m, double* restrict euclidean_distance_tmp);
 void min_distance_to_probability(double* restrict min_distances, double* restrict prob_dist, int n);
-double euclidean_distance(double* restrict p1, double* restrict p2, int m,double* restrict euclidean_distance_tmp);
+double euclidean_distance(double const* restrict p1, double const* restrict p2, int m,double* restrict euclidean_distance_tmp);
 
 
 // // Generic Kmeans -- specify initialization method
@@ -149,7 +149,7 @@ void lloyd_update_centers(double const* restrict D, double* restrict centers, in
     int tmp1;
     double dtmp1;
     double* restrict tmp_ptr1;
-    double* restrict tmp_ptr2;
+    double const* restrict tmp_ptr2;
     int* restrict cluster_sizes;
     cluster_sizes = iwork;
 
@@ -246,7 +246,7 @@ void min_distance_to_probability(double* restrict min_distances, double* restric
     }
 }
 
-double euclidean_distance(double* restrict p1, double* restrict p2, int m, double* restrict euclidean_distance_tmp) {
+double euclidean_distance(double const* restrict p1, double const* restrict p2, int m, double* restrict euclidean_distance_tmp) {
     double acc = 0.0;
     double dtmp1;
 

@@ -200,8 +200,6 @@ void project_C_perpendicular_nok(problem_instance* prob, double* GX_t, double* G
     int d2 = d*d;
 
     // Setup linear system, precompute
-    // double TrX = dtrace(GX_t,d);
-    // double TrS = dtrace(GS_t,d);
     double DTX = F77_NAME(ddot)(&d2,D,&INC1,GX_t,&INC1);
     double DTS = F77_NAME(ddot)(&d2,D,&INC1,GS_t,&INC1);
     double* M = work -> dwork;
