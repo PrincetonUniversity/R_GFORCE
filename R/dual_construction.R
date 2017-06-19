@@ -68,6 +68,59 @@ gforce.certify <- function(sol,D,eps1 = 0.01,eps2 = 10^-7,Y_T_min = 0.01) {
 }
 
 
+#' K-means optimality certificate (K is unknown).
+#' 
+#' Given a proposed integer solution to the \eqn{K}-means SDP relaxation, this
+#' function attempts to construct a solution to the dual problem with matching
+#' objective value.
+#' @param sol vector of length \eqn{d}. This contains the assignment of variables or
+#' points to clusters.
+#' @param D \eqn{d x d} matrix.
+#' @param eps1 a scalar. It controls the infeasibility tolerance for the dual solution to allow for numerical imprecision.
+#'
+#' @return An object with the following components:
+#' \describe{
+#' \item{\code{Y_a}}{ a \eqn{d} dimensional numeric vector. The value of the variable \code{Y_a} in the dual solution found.}
+#' \item{\code{feasible}}{an integer. 1 signifies that \code{sol} is optimal, 0 otherwise.}
+#' }
+#'
+#' @examples
+#' K <- 5
+#' n <- 50 
+#' d <- 50
+#' dat <- gforce.generator(K,d,n,3,graph='scalefree')
+#' sig_hat <- (1/n)*t(dat$X)%*%dat$X
+#' gam_hat <- gforce.Gamma(dat$X)
+#' D <- diag(gam_hat) - sig_hat
+#' dual_cert <- gforce.certify(dat$group_assignments,D)
+#' 
+#' @useDynLib GFORCE kmeans_dual_solution_primal_min_nok_R
+#' @export
+gforce.certify_nok <- function(sol,D,eps1 = 10^-7) {
+  # check inputs
+  eps1 <- as.double(eps1)
+
+  if(eps1 <= 0){
+    stop('gforce.certify_nok -- eps1 must be greater than 0.')
+  }
+
+  K <- length(unique(sol))
+  d <- dim(D)[1]
+  C_result <- .C(kmeans_dual_solution_primal_min_nok_R,
+               sol=as.integer(sol),
+               D=as.double(D),
+               K= as.integer(K),
+               dimension=as.integer(d),
+               eps1 = eps1,
+               Y_a = numeric(d),
+               feasible = as.integer(0))
+  res <- NULL
+  res$Y_a <- C_result$Y_a
+  res$feasible <- C_result$feasible
+  return(res)
+}
+
+
 # This function is used now for testing the C implementation
 # construct dual solutions to kmeans SDP relaxation
 # ga_hat -- proposed primal integer solution

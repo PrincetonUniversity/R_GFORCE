@@ -97,7 +97,7 @@ void project_E(problem_instance* prob, double* Z, double lmin, double* Z_proj);
 void kmeans_dual_solution_impl(int* restrict ga_hat, problem_instance* restrict prob, double eps1, double eps2,
                                 double Y_T_min, double* restrict Y_a_r, double* restrict Y_T_r, int* restrict feasible_r,
                                 workspace* restrict work);
-void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restrict prob, int K_hat, double eps1,
+void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restrict prob, double eps1,
                                    double* restrict Y_a_r, int* restrict feasible_r, workspace* restrict work);
 void kmeans_pp_impl(double const* D, int K, int n, int m, int* cluster_assignment_r,
                         double* centers_r, int* num_iters_R, double* time_R, workspace* work);

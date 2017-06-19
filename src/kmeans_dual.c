@@ -45,16 +45,16 @@ void kmeans_dual_solution_primal_min(int* restrict ga_hat, double* restrict D, i
     kmeans_dual_solution_impl(ga_hat,&prob,eps1,eps2,Y_T_min,Y_a_r,Y_T_r,feasible_r,&work);
 }
 
-void kmeans_dual_solution_primal_min_nok(int* restrict ga_hat, double* restrict D, int d, int K_hat,
+void kmeans_dual_solution_primal_min_nok(int* restrict ga_hat, double* restrict D, int K_hat, int d,
                                         double eps1, double* restrict Y_a_r, int* restrict feasible_r) {
     workspace work;
     problem_instance prob;
     prob.D = D;
     prob.K = K_hat;
     prob.d = d;
-    work.dwork = (double *) R_alloc((d*(d-1))/2 + 7*d -2,sizeof(double));
+    work.dwork = (double *) R_alloc(d*d + 7*d,sizeof(double));
     work.iwork = (int *) R_alloc(d + 3*K_hat + 3,sizeof(int));
-    kmeans_dual_solution_nok_impl(ga_hat,&prob,K_hat,eps1,Y_a_r,feasible_r,&work);
+    kmeans_dual_solution_nok_impl(ga_hat,&prob,eps1,Y_a_r,feasible_r,&work);
 }
 
 //Internal Access Point
@@ -197,7 +197,7 @@ void kmeans_dual_solution_impl(int* restrict ga_hat, problem_instance* restrict 
 //REQUIRES d(d-1)/2 + 7d -2 length dwork
 //REQUIRES d+3K+3 length iwork
 //REQUIRES d length Y_a_r
-void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restrict prob, int K_hat, double eps1,
+void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restrict prob, double eps1,
                                    double* restrict Y_a_r, int* restrict feasible_r, workspace* restrict work) {
     // Local Variable Declarations
     double* R;
@@ -211,6 +211,7 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
     int same_group; //boolean values
     double* D = prob -> D;
     int d = prob -> d;
+    int K_hat = prob -> K;
 
     // FOR LAPACK CALLS
     int lapack_info = 0;
@@ -220,12 +221,16 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
     int feasible = 1;
     double primal_value = 0;
     eps1 = -1*eps1;
+    R = work -> dwork;
+    T_d = R + d + (d*(d-1))/2;
+    T_e = T_d + d;
+    T_tau = T_e + d-1;
 
     // Get memory from workspace for group_sizes
     group_sizes = work -> iwork;
 
     // Compute Y_a (Y_T is always 0 when K is unknown)
-    precompute_values(Y_a_r,group_sizes,&primal_value,D,ga_hat,d,K_hat, work -> dwork,group_sizes+K_hat+1);
+    precompute_values(Y_a_r,group_sizes,&primal_value,D,ga_hat,d,K_hat,R,group_sizes+K_hat+1);
 
         
     //iterate over off diagonal elements
