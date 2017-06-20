@@ -45,7 +45,7 @@ An object with following components
 }
 }
 \description{
-Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm when \eqn{K} is unknown.
+Solves a K-means SDP Relaxation using the FORCE algorithm when \eqn{K} is unknown.
 }
 \seealso{
 \code{\link{gforce.defaults}}

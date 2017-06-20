@@ -159,7 +159,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 
 #' FORCE \eqn{K}-means solver.
 #' 
-#' Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm when \eqn{K} is unknown.
+#' Solves a K-means SDP Relaxation using the FORCE algorithm when \eqn{K} is unknown.
 #' 
 #' @param D a matrix \eqn{D} as defined above.
 #' @param force_opts tuning parameters. \code{NULL} signifies defaults will be used.
