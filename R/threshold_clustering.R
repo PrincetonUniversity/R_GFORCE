@@ -22,22 +22,36 @@
 #' km_res <- gforce.kmeans(X,3)
 #'
 #' @export
-gforce.threshold_clustering <- function(X, threshold = 0.7){
+gforce.threshold_clustering <- function(X, threshold = 0.7,mode=1){
   res <- NULL
   d <- ncol(X)
-  unclust <- 1:d
-  clusters <- list()
-  K <- 0
-  for(i in 1:d){
-    if(i %in% unclust){
+
+  if(mode == 1){
+    unclust <- 1:d
+    clusters <- list()
+    K <- 0
+    for(i in 1:d){
+      if(i %in% unclust){
+        K <- K + 1
+        diag_element <- X[i,i]
+        i_row <- X[i,]
+        same_group <- which(i_row > threshold*diag_element)
+        same_group <- intersect(same_group,unclust)
+        clusters[[K]] <- same_group
+        unclust <- setdiff(unclust,same_group)
+      }
+    }
+  } else {
+    unclust <- 1:d
+    adj_mat <- matrix(rep(0,d^2),ncol=d)
+    for(i in 1:d){
       K <- K + 1
       diag_element <- X[i,i]
       i_row <- X[i,]
       same_group <- which(i_row > threshold*diag_element)
-      same_group <- intersect(same_group,unclust)
-      clusters[[K]] <- same_group
-      unclust <- setdiff(unclust,same_group)
+      adj_mat[i,same_group] <- 1
     }
+    return(adj_mat)    
   }
 
   res$K <- K

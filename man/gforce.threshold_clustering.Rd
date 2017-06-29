@@ -4,7 +4,7 @@
 \alias{gforce.threshold_clustering}
 \title{Threshold Clustering.}
 \usage{
-gforce.threshold_clustering(X, threshold = 0.7)
+gforce.threshold_clustering(X, threshold = 0.7, mode = 1)
 }
 \arguments{
 \item{X}{\eqn{n x m} matrix. Each row is treated as a point in \eqn{R^m}.}

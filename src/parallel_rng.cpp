@@ -4,6 +4,7 @@
 
 typedef boost::mt19937 rng_t;
 typedef boost::uniform_01<rng_t&> rng_unif_t;
+
 static rng_t master_rng;
 
 threadsafe_rng create_threadsafe_rng(){

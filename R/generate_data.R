@@ -45,6 +45,10 @@ gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size
     res$Cstar <- random_covariance(K,zeta)
     res$Theta_star <- solve(res$Cstar)
 
+  } else if(graph == 'identity') {
+    res$Cstar <- diag(K)
+    res$Theta_star <- diag(K)
+    
   } else if(graph == 'scalefree') {
     A <- matrix(rep(0,K^2), nrow=K)
     A[1,2] <- 0.3
