@@ -195,7 +195,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE primal_dual_adar_nok_R
 #' @export
-gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_only = FALSE) {
+gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_only = FALSE) {
   d <- ncol(D)
 
   if(is.null(force_opts)){
@@ -206,8 +206,9 @@ gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_o
       D_Kmeans <- D
   }
   if(is.null(X0)){
-    X0 <- 1
-    # TODO - CREATE GOOD INITIALIZATION SCHEME
+    hc_opt_guess <- hclust_B(D_Kmeans)
+    rs <- gforce.FORCE.init(D,hc_opt_guess$K,opts$initial_mixing,gforce.clust2mat(hc_opt_guess$clusters),R_only=FALSE)
+    X0 <- rs$X0
   }
   # initialize E and ESI
   E <- 0.5*diag(d) + (1/(2*d))*matrix(1,ncol=d,nrow=d)
@@ -281,21 +282,6 @@ gforce.FORCE_nok <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_o
   
   return(res)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

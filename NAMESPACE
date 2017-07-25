@@ -2,8 +2,8 @@
 
 export(gforce.FORCE)
 export(gforce.FORCE.init)
+export(gforce.FORCE_adapt)
 export(gforce.FORCE_matrix_rep)
-export(gforce.FORCE_nok)
 export(gforce.Gamma)
 export(gforce.PECOK)
 export(gforce.certify)
