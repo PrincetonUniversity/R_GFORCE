@@ -35,9 +35,28 @@ void FORCE_initialization_par_R(double* D, double* s, int* d, int* K, double* op
 }
 
 
+void FORCE_adapt_initialization_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
+                                    double* X0, double* X0_obj) {
+    int d0 = *d;
+    int* iwork = (int *) R_alloc(d0,sizeof(int));
+    double* dwork = (double *) R_alloc(d0*d0,sizeof(double));
+    do_nothing();
+    FORCE_adapt_initialization(D,*s,d0,*K,opt_estimate,clusters,*cluster_representation,X0,X0_obj,dwork,iwork);
+}
+
+void FORCE_adapt_initialization_par_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
+                                        double* X0, double* X0_obj) {
+    int d0 = *d;
+    int* iwork = (int *) R_alloc(d0*d0,sizeof(int));
+    double* dwork = (double *) R_alloc(d0*d0,sizeof(double));
+    do_nothing();
+    FORCE_adapt_initialization_par(D,*s,d0,*K,opt_estimate,clusters,*cluster_representation,X0,X0_obj,dwork,iwork);
+}
+
+
 // average random permutations of fr_base
 // assumes initialization of E to zero
-void add_random_shuffle(const int d, const int num_shuffles, double* const restrict E, 
+void add_random_shuffle(const int d, const int num_shuffles, double* const restrict E,
                         double* const restrict fr_base, int* const restrict shuffled){
     double dtmp1;
     int itmp1, itmp2;
@@ -109,7 +128,7 @@ void add_random_shuffle_par(const int d,const int num_shuffles, double* const re
         #pragma omp simd
         for(int a=0; a < d; a++){
             E_col[a] = E_col[a] / d;
-        }   
+        }
     }
 
 
@@ -175,7 +194,7 @@ void FORCE_initialization(double* D, double s, int d, int K, double* opt_estimat
     } else {
         dgxpby(s,clusters,K,1-s,X0,d,iwork);
     }
-    
+
     X0_obj_l = F77_NAME(ddot)(&d2,D,&INC1,X0,&INC1);
 
     // Copy return objective values
@@ -221,13 +240,82 @@ void FORCE_initialization_par(double* D, double s, int d, int K, double* opt_est
     } else {
         dgxpby(s,clusters,K,1-s,X0,d,iwork);
     }
-    
+
     X0_obj_l = F77_NAME(ddot)(&d2,D,&INC1,X0,&INC1);
 
     // Copy return objective values
     *X0_obj = X0_obj_l;
     *E_obj = E_obj_l;
 }
+
+/* Return Values are Matrices X0 and its objective value */
+// iwork should have length d
+// fr_base must be at least length d^2
+void FORCE_adapt_initialization(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
+                                double* X0, double* X0_obj, double* fr_base, int* iwork) {
+    double X0_obj_l, dtmp1;
+    int d2 = d*d;
+
+    full_rank_feasible(d,K,fr_base);
+
+    /* zero out X0 array */
+    for(int i=0; i < d2; i++){
+        X0[i] = 0;
+    }
+
+    /* average random shuffles of indices */
+    add_random_shuffle(d,d,X0,fr_base,iwork);
+
+    /* get corresponding objective values */
+    X0_obj_l = F77_NAME(ddot)(&d2,D,&INC1,X0,&INC1);
+
+    // mix with opt_estimate
+    if(cluster_representation == 0){
+        daxpby(s,opt_estimate,1-s,X0,d2);
+    } else {
+        dgxpby(s,clusters,K,1-s,X0,d,iwork);
+    }
+
+    X0_obj_l = F77_NAME(ddot)(&d2,D,&INC1,X0,&INC1);
+
+    // Copy return objective values
+    *X0_obj = X0_obj_l;
+}
+
+/* Return Values are Matrices X0 and its objective value */
+// iwork should have length d
+// fr_base must be at least length d^2
+void FORCE_adapt_initialization_par(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
+                            double* X0, double* X0_obj, double* fr_base, int* iwork) {
+    double X0_obj_l, dtmp1;
+    int d2 = d*d;
+
+    full_rank_feasible(d,K,fr_base);
+
+    /* zero out X0 array */
+    for(int i=0; i < d2; i++){
+        X0[i] = 0;
+    }
+
+    /* average random shuffles of indices */
+    add_random_shuffle_par(d,d,X0,fr_base,iwork);
+
+    /* get corresponding objective values */
+    X0_obj_l = F77_NAME(ddot)(&d2,D,&INC1,X0,&INC1);
+
+    // mix with opt_estimate
+    if(cluster_representation == 0){
+        daxpby(s,opt_estimate,1-s,X0,d2);
+    } else {
+        dgxpby(s,clusters,K,1-s,X0,d,iwork);
+    }
+
+    X0_obj_l = F77_NAME(ddot)(&d2,D,&INC1,X0,&INC1);
+
+    // Copy return objective values
+    *X0_obj = X0_obj_l;
+}
+
 
 
 // add matrices with B(G) given as G

@@ -60,23 +60,3 @@ L_curve_criterion <- function(x) {
   res$max <- which.max(dists)
   return(res)
 }
-
-hclust_B <- function(BZ) {
-  res <- NULL
-  dBZ <- dist(BZ)
-  hc <- hclust(dBZ)
-  d <- ncol(BZ)
-
-  MSEs <- rep(0,d)
-  for(k in 2:d){
-    cc <- cutree(hc,k=k)
-    cc_mat <- gforce.clust2mat(cc)
-    MSEs[k] <- 0.5*sum(cc_mat*as.matrix(dBZ))
-  }
-
-  lc <- L_curve_criterion(MSEs[2:(d-1)])
-  res$K <- lc$max + 1
-  res$clusters <- cutree(hc,k=res$K)
-  res$MSE <- MSEs
-  return(res)
-}

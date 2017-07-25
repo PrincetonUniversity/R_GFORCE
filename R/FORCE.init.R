@@ -87,6 +87,81 @@ gforce.FORCE.init <- function(D,K,s,opt_estimate,R_only=FALSE,cluster_representa
   return(res)
 }
 
+#' Generate Random Initial Iterate and Values for FORCE Algorithm with Adaptive Selection of \eqn{K}.
+#' 
+#' This function constructs a random full-rank solution to the Peng-Wei \eqn{K}-means SDP
+#' and also gives an initial iterate \eqn{X0} for the FORCE algorithm.
+#' @param D \eqn{d x d} numeric array. Specifies the objective function of the \eqn{K}-means SDP.
+#' @param K number of groups.
+#' @param s numeric value. Indicates the initial mixing of \code{opt_estimate} and a random full rank solution.
+#' @param opt_estimate \eqn{d x d} numeric array. Specifies a guess of a feasible solution and is used to construct the initial feasible solution.
+#' @param R_only logical expression. If \code{R_only == FALSE}, then the included
+#' native code implementation will be used. Otherwise, an R implementation is used.
+#' @param cluster_representation logical expression. If \code{cluster_representation == FALSE}, then \code{opt_estimate} is assumed to
+#' be a length \eqn{d} array with the values \eqn{0,...,K-1}, indicating cluster assignments.
+#' @param par logical expression. If \code{par == TRUE}, then a multi-threaded version
+#' of the function is called. If \code{par == FALSE}, a single-threaded version is called.
+#' @return An object with following components
+#' \describe{
+#' \item{\code{X0}}{Strictly feasible initial iterate.}
+#' \item{\code{X0_val}}{Objective value of SDP at \eqn{X_0}.}
+#' }
+#'
+#'
+#' @examples
+#' K <- 5
+#' n <- 50 
+#' d <- 50
+#' m <- 3
+#' s <- 0.25
+#' dat <- gforce.generator(K,d,n,m,graph='DeltaC')
+#' sh <- t(dat$X)%*%dat$X / n
+#' gh <- gforce.Gamma(dat$X,par=TRUE)
+#' D <- diag(gh)-sh
+#' opt_guess <- kmeans(sh,K)$cluster
+#' init_vals <- gforce.FORCE_adapt.init(D,K,s)
+#'
+#'
+#' @useDynLib GFORCE FORCE_adapt_initialization_R
+#' @useDynLib GFORCE FORCE_adapt_initialization_par_R
+#' @export
+gforce.FORCE_adapt.init <- function(D,K,s,opt_estimate,R_only=FALSE,cluster_representation=FALSE,par=FALSE) {
+  res <- NULL
+  if(!R_only){
+    d <- dim(D)[1]
+    C_result <- NULL
+    if(par){
+      C_result <- .C("FORCE_adapt_initialization_par_R",
+                   D=as.double(D),
+                   s=as.double(s),
+                   d=as.integer(d),
+                   K=as.integer(K),
+                   opt_estimate=as.double(opt_estimate),
+                   clusters=as.integer(opt_estimate),
+                   cluster_representation=as.integer(cluster_representation),
+                   X0=numeric(d^2),
+                   X0_obj=as.double(0.0))
+    } else{
+      C_result <- .C("FORCE_adapt_initialization_R",
+                   D=as.double(D),
+                   s=as.double(s),
+                   d=as.integer(d),
+                   K=as.integer(K),
+                   opt_estimate=as.double(opt_estimate),
+                   clusters=as.integer(opt_estimate),
+                   cluster_representation=as.integer(cluster_representation),
+                   X0=numeric(d^2),
+                   X0_obj=as.double(0.0))
+    }
+    res$X0 <- C_result$X0
+    res$X0_val <- C_result$X0_obj
+  } else{
+    # TODO
+  }
+  return(res)
+}
+
+
 renegar_start <- function(diff,K,s,opt_estimate) {
   d <- dim(diff)[1]
   i <- 0

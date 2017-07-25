@@ -4,12 +4,10 @@
 \alias{gforce.defaults}
 \title{FORCE default tuning parameters.}
 \usage{
-gforce.defaults(d, K)
+gforce.defaults(d)
 }
 \arguments{
 \item{d}{dimension of random vector or number of datapoints.}
-
-\item{K}{number of clusters.}
 }
 \value{
 An object with following components

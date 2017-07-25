@@ -94,5 +94,8 @@ void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_es
                                         double* E, double* X0, double* E_obj, double* X0_obj);
 void FORCE_initialization_par_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
                                         double* E, double* X0, double* E_obj, double* X0_obj);
-
+void FORCE_adapt_initialization_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
+                                    double* X0, double* X0_obj);
+void FORCE_adapt_initialization_par_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
+                                        double* X0, double* X0_obj);
 #endif

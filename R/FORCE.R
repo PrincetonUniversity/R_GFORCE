@@ -206,8 +206,8 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
       D_Kmeans <- D
   }
   if(is.null(X0)){
-    hc_opt_guess <- hclust_B(D_Kmeans)
-    rs <- gforce.FORCE.init(D,hc_opt_guess$K,opts$initial_mixing,gforce.clust2mat(hc_opt_guess$clusters),R_only=FALSE)
+    hc_opt_guess <- gforce.hclust(D_Kmeans)
+    rs <- gforce.FORCE_adapt.init(D,hc_opt_guess$K,opts$initial_mixing,gforce.clust2mat(hc_opt_guess$clusters),R_only=FALSE)
     X0 <- rs$X0
   }
   # initialize E and ESI
@@ -220,6 +220,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
 
   res <- NULL
 
+  # SHOULD HAVE CHECK TO MAKE SURE THAT OBJECTIVE VALUES OKAY
   C_result <- .C(primal_dual_adar_nok_R,
           D = as.double(D),
           D_Kmeans = as.double(D_Kmeans),
@@ -278,6 +279,11 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
 
   res$X0 <- X0
   res$E <- E
+
+  # perform HC clustering on final result
+  hc_res <- gforce.hclust(res$B_Z_best)
+  res$hc_best <- hc_res$clusters
+  res$hc_K <- hc_res$K
   res <- res[sort(names(res))]
   
   return(res)
@@ -323,7 +329,6 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
 #'
 #' Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
 #' @param d dimension of random vector or number of datapoints.
-#' @param K number of clusters.
 #'
 #' @return An object with following components
 #' \describe{
@@ -342,7 +347,7 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
 #' @examples
 #' opts <- gforce.defaults(20,5)
 #' @export
-gforce.defaults <- function(d,K){
+gforce.defaults <- function(d){
   options <- NULL
   options$alpha = 10^-4
   options$alpha_decrease_time = 10
