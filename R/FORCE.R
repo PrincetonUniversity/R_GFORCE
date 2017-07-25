@@ -290,9 +290,6 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
 }
 
 
-
-
-
 #' Solve PECOK with FORCE.
 #'
 #' Uses the FORCE algorithm to solve the PECOK SDP.
@@ -318,12 +315,60 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
     n <- nrow(X)
     gamma_hat <- gforce.Gamma(X)
     sigma_hat <- t(X)%*%X / n
+    D <- diag(gh)-sh
+  }
+  if(is.null(sigma_hat)){
+    sigma_hat <- D
   }
 
   res <- gforce.FORCE(D,K,D_Kmeans = sigma_hat, force_opts = force_opts, X0 = X0, E = E)
   res$D <- D
   return(res)
 }
+
+
+
+#' Solve PECOK Adaptive SDP with FORCE.
+#'
+#' Uses the FORCE algorithm to solve the PECOK SDP when \eqn{K} is unknown.
+#' 
+#' @param K number of clusters.
+#' @param X \eqn{n x d} matrix. Either this or \code{D} must be specified.
+#' @param D \eqn{d x d} matrix. Either this or \code{X} must be specified.
+#' @param sigma_hat \eqn{d x d} matrix. If \code{D} is specified, this argument should be the
+#' estimated covariance matrix. It is not strictly necessary to provide it, but it should be for
+#' optimal performance. If \code{X} is specified, it will be ignored.
+#' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed, 
+#' a multi-threaded method is called, otherwise a single-threaded method is called.
+#' @inheritParams gforce.FORCE_adapt
+#' @seealso \code{\link{gforce.defaults}}
+#' @export
+gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL, X0 = NULL, E = NULL, gamma_par = FALSE) {
+  if(is.null(X) && is.null(D)) {
+    stop('gforce.PECOK -- You must specify one of X or D.')
+  } else if (!is.null(X) && !is.null(D)) {
+    stop('gforce.PECOK -- You must specify one of X or D.')
+  }
+  if(is.null(D)){
+    n <- nrow(X)
+    gamma_hat <- gforce.Gamma(X)
+    sigma_hat <- t(X)%*%X / n
+    D_orig <- diag(gh)-sh
+    kappa_hat <- max(gh)*(d/n + sqrt(d/n))
+    D <- D_orig + kappa_hat*diag(d)
+  }
+  if(is.null(sigma_hat)){
+    sigma_hat <- D
+  }
+
+
+  res <- gforce.FORCE_adapt(D,D_Kmeans = sigma_hat, force_opts = force_opts, X0 = X0, E = E)
+  res$D <- D
+  return(res)
+}
+
+
+
 
 #' FORCE default tuning parameters.
 #'
