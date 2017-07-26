@@ -40,7 +40,7 @@ cv_lambda_selection <- function(objective_function,function_solver,X_vals,group_
   return(lambda_sequence[which.min(lambda_test_values)])
 }
 
-#objective function takes only two argunments -- data and parameter
+#objective function takes only two arguments -- data and parameter
 #solver only takes two arguments -- data and tuning parameter
 cv_lambda_selection_scio <- function(X_vals,group_assignments,num_folds,lambda_max,max_levels,alpha){
   # create test and train data

@@ -124,6 +124,7 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,us
 
   for(k in 1:K){
     lot_part_B_theta_k <- (theta_hat[,k]^2)*lot_part_B_diag
+
     vt_lot_part_B_theta_k_vt <- v_hat%*%diag(lot_part_B_theta_k)%*%t(v_hat)
     vt_lot_part_B_theta_k_vt <- diag(vt_lot_part_B_theta_k_vt)
     for(t in 1:K){
@@ -193,7 +194,7 @@ latent_confidence_intervals_all <- function(Chat,n,alpha,lambda1,lambda2) {
 }
 
 
-averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv_opts=NULL) {
+averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,use_scio_package,cv_opts=NULL) {
   # ensure group labels ordered properly
   group_assignments <- order_group_assignments(group_assignments)
   
@@ -254,21 +255,7 @@ decorrelated_estimator_t <- function(C,theta_hat,v_t,t) {
 }
 
 
-latent_spectrum_check <- function(Chat,epsilon=0.00001) {
-  edecomp <- eigen(Chat)
-  evals <- edecomp$values
-  evecs <- edecomp$vectors
-  eval_shift_idx <- which(evals < epsilon)
-  evals[eval_shift_idx] <- epsilon
-
-  Chat_shift <- evecs%*%diag(evals)%*%t(evecs)
-
-  return(Chat_shift)
-
-  # edecomp$vectors%*%diag(edecomp$values)%*%t(edecomp$vectors)
-}
-
-
+#comnputes \bar{\Gamma} from Appendix D of GBlock Paper
 variance_latent_group_average_error <- function(gh,group_assignments){
   K <- length(unique(group_assignments))
   gh_bar <- rep(0,K)
@@ -281,6 +268,10 @@ variance_latent_group_average_error <- function(gh,group_assignments){
   return(gh_bar)  
 }
 
+# computes the diagonal matrix P in Appendix D of GBlock Paper
+# GBlock assumes |G_i| > 1, but if G_i = 1 we can assume gamma_i = 0
+# and the inference results still hold. In this case, the LOT in
+# the variance estimate are just 0.
 variance_latent_lot_part_B <- function(gh,group_assignments) {
   K <- length(unique(group_assignments))
   lot_mat <- rep(0,K)
@@ -289,16 +280,21 @@ variance_latent_lot_part_B <- function(gh,group_assignments) {
     group_idx <- which(group_assignments == i)
     group_size <- length(group_idx)
     cross_sums <- 0
-    for(l in 1:group_size){
-      for(m in 1:group_size){
-        if(m != l){
-          cross_sums <- cross_sums + gh[group_idx[l]]*gh[group_idx[m]]
+    #check if group is singleton
+    if(group_size <= 1){
+      lot_mat[i] <- 0
+    } else {
+      for(l in 1:group_size){
+        for(m in 1:group_size){
+          if(m != l){
+            cross_sums <- cross_sums + gh[group_idx[l]]*gh[group_idx[m]]
+          }
         }
       }
+      sq_sums <- sum(gh[group_idx]^2)
+      gh_bar_i_sq <- sum(gh[group_idx])^2
+      lot_mat[i] <- 8*sq_sums/(group_size^4) + 2*cross_sums/(group_size^2 * (group_size-1)^2) - gh_bar_i_sq/(group_size^4)
     }
-    sq_sums <- sum(gh[group_idx]^2)
-    gh_bar_i_sq <- sum(gh[group_idx])^2
-    lot_mat[i] <- 8*sq_sums/(group_size^4) + 2*cross_sums/(group_size^2 * (group_size-1)^2) - gh_bar_i_sq/(group_size^4)
   }
   
   return(lot_mat)

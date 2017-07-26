@@ -60,3 +60,15 @@ L_curve_criterion <- function(x) {
   res$max <- which.max(dists)
   return(res)
 }
+
+cluster_sizes <- function(clusts) {
+  groups <- unique(clusts)
+  K <- length(groups)
+  group_sizes <- rep(0,K)
+  for(i in 1:length(clusts)){
+    group_name <- clusts[i]
+    group_idx <- which(groups == group_name)
+    group_sizes[group_idx] <- group_sizes[group_idx] + 1
+  }
+  return(group_sizes)
+}

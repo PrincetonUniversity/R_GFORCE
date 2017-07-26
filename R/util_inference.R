@@ -174,3 +174,18 @@ v_hat <- function(Chat,t,lambda) {
   vt[-t] = -1*wh
   return(vt)
 }
+
+
+latent_spectrum_check <- function(Chat,epsilon=0.00001) {
+  edecomp <- eigen(Chat)
+  evals <- edecomp$values
+  evecs <- edecomp$vectors
+  eval_shift_idx <- which(evals < epsilon)
+  evals[eval_shift_idx] <- epsilon
+
+  Chat_shift <- evecs%*%diag(evals)%*%t(evecs)
+
+  return(Chat_shift)
+
+  # edecomp$vectors%*%diag(edecomp$values)%*%t(edecomp$vectors)
+}
