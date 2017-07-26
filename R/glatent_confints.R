@@ -66,7 +66,7 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,us
   if(is.null(cv_opts)){
     cv_opts <- gforce.glatent_confints.cv_defaults()
   }
-  print(cv_opts)
+
   # ensure group labels ordered properly
   group_assignments <- order_group_assignments(group_assignments)
   
@@ -195,6 +195,11 @@ latent_confidence_intervals_all <- function(Chat,n,alpha,lambda1,lambda2) {
 
 
 averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,use_scio_package,cv_opts=NULL) {
+  # check for cv_opts
+  if(is.null(cv_opts)){
+    cv_opts <- gforce.glatent_confints.cv_defaults()
+  }
+  
   # ensure group labels ordered properly
   group_assignments <- order_group_assignments(group_assignments)
   

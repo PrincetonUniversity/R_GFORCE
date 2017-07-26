@@ -1,43 +1,74 @@
 # estimate a columnwise SCIO estimator like \hat\Theta_{\cdot K}
 # see Liu and Luo (2012)
 
-scio_estimator <- function(Chat, k, lambda, eps = 10^-18, max_iter = 1000) {
+scio_estimator <- function(C, k, lambda, eps = 10^-6, max_iter = 10000) {
   # soft thresholding
   soft_threshold <- function(x){
     #find soft threshold
-    st_x <- sign(x)*(abs(x)-lambda)
-    return(st_x)
-  }
-  
-  K <- nrow(Chat)
-  scio_t <- NULL
-  val_t <- 1
-  val_tp1 <- 0
-  t <- 0
-  scio_tp1 <- rnorm(K) #rep(0,K)
-  p <- 1
-  while(abs(val_t-val_tp1) > eps && t < max_iter) {
-    val_t <- val_tp1
-    scio_t <- scio_tp1
-    t <- t+1
-    x_tp1_p <- scio_t[-p]%*%Chat[-p,p]
-    s_tp1_p <- NULL
-    if(p == k){
-      s_tp1_p <- soft_threshold(1-x_tp1_p) / Chat[p,p]
-    }else{
-      s_tp1_p <- soft_threshold(-1*x_tp1_p) / Chat[p,p]
+    x_th <- abs(x)-lambda
+
+    if(x_th >= 0){
+      return(sign(x)*x_th)
     }
-    scio_tp1 <- scio_t
-    scio_tp1[p] <- s_tp1_p
-    if(p == K) {
-      p <- 1
-    } else{
-      p <- p + 1
-    }
-    val_tp1 <- scio_objective_function(Chat,scio_tp1,k) + lambda*sum(abs(scio_tp1))
+    return(0)
   }
-  return(scio_tp1)
+  d <- nrow(C)
+
+  eps50 <- 50*eps
+  done_eps <- FALSE
+  theta_t <- rep(0,d)
+  #warm start for theta
+  theta_t[k] = C[k,k]
+  nCtheta <- -C%*%theta_t
+
+  active_set_mode <- FALSE
+  active_idx <- rep(TRUE,d)
+
+  niter <- 1
+  while(niter < max_iter && !done_eps){
+    delta_t <- 0
+    for(i in 1:d) {
+      if(!active_set_mode || active_idx[i]) {
+        theta_t_i <- theta_t[i]
+        theta_tp1_i <- nCtheta[i] + C[i,i]*theta_t_i
+        if(i == k){
+          theta_tp1_i <- theta_tp1_i + 1
+        }
+
+        #perform the update
+        theta_t[i] <- soft_threshold(theta_tp1_i) / C[i,i]
+
+        # if theta_t[i] changes, we need to update deltas and nCtheta
+        if(theta_t_i != theta_t[i]){
+          delta <- theta_t[i] - theta_t_i
+          delta_t <- max(delta_t,abs(delta))
+          nCtheta <- nCtheta - delta*C[,i]
+        }
+
+      }
+    }
+
+    #update active sets
+    if(active_set_mode) {
+      if(delta_t < eps) {
+        active_set_mode <- FALSE
+      }
+    } else {
+      if(delta_t < eps) {
+        done_eps <- TRUE
+      }
+      if(delta_t < eps50) {
+        active_set_mode <- TRUE
+        active_idx <- theta_t != 0.0
+      }
+    }
+
+    niter <- niter+1
+  }
+
+  return(theta_t)
 }
+
 
 scio_objective_function <- function(Chat,theta,k){
   return((1/2)*(theta%*%Chat%*%theta) - theta[k])
