@@ -85,9 +85,9 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,us
     theta_hat <- array(0,c(K,K))
     for(k in 1:K){
       objective_function <- function(ch,tha) scio_objective_function(ch,tha,k)
-      function_solver <- function(ch,lambda) scio_estimator(ch,k,lambda)
+      function_solver <- function(ch,lambda) gforce.scio(ch,lambda,k)
       lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds)
-      theta_hat[,k] <- scio_estimator(Chat,k,lambda1)
+      theta_hat[,k] <- gforce.scio(Chat,lambda1,k)
     }
     
     
@@ -136,7 +136,7 @@ latent_confidence_intervals_all <- function(Chat,n,alpha,lambda1,lambda2) {
   #estimate theta *columnwise*
   theta_hat <- array(0,c(K,K))
   for(k in 1:K){
-    theta_hat[,k] <- scio_estimator(Chat,k,lambda1)
+    theta_hat[,k] <- gforce.scio(Chat,lambda1,k)
   }
   
   #estimate v *row-wise*
@@ -198,9 +198,9 @@ averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,
   xi_hat <- array(0,c(K,K))
   for(k in 1:K){
     objective_function <- function(ch,tha) scio_objective_function(ch,tha,k)
-    function_solver <- function(ch,lambda) scio_estimator(ch,k,lambda)
+    function_solver <- function(ch,lambda) gforce.scio(ch,lambda,k)
     lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds)
-    xi_hat[,k] <- scio_estimator(s_hat,k,lambda1)
+    xi_hat[,k] <- gforce.scio(s_hat,lambda1,k)
   }
   
   #estimate v *row-wise*

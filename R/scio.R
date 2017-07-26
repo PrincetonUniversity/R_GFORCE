@@ -1,7 +1,29 @@
 # estimate a columnwise SCIO estimator like \hat\Theta_{\cdot K}
 # see Liu and Luo (2012)
 
-scio_estimator <- function(C, k, lambda, eps = 10^-6, max_iter = 10000) {
+
+#' SCIO Estimator.
+#'
+#' Estimate the precision matrix with the SCIO estimator. 
+#' The implementation follows the active set strategy also used in the SCIO package.
+#' 
+#' @param K number of clusters.
+#' @export
+gforce.scio <- function(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,R_only=TRUE) {
+  res <- NULL
+  if(!is.null(k)) {
+    if(R_only) {
+      res <- scio_column_R(C,k,lambda,eps,max_iter)
+    } else {
+      ;
+    }
+  }
+
+
+  return(res)
+}
+
+scio_column_R <- function(C, k, lambda, eps = 10^-6, max_iter = 10000) {
   # soft thresholding
   soft_threshold <- function(x){
     #find soft threshold
@@ -70,10 +92,10 @@ scio_estimator <- function(C, k, lambda, eps = 10^-6, max_iter = 10000) {
 }
 
 
+
 scio_objective_function <- function(Chat,theta,k){
   return((1/2)*(theta%*%Chat%*%theta) - theta[k])
 }
-
 
 
 scio_package <- function(Chat, lambda, eps=10^-6, max_iter=10000, sym=FALSE) {
