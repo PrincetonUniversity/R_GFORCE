@@ -12,7 +12,7 @@ static const char SIDE_L = 'L';
 static const char SIDE_R = 'R';
 static const char TRANS_N = 'N';
 static const char TRANS_T = 'T';
-static const double ALPHA = 1.0;
+static const double ALPHA = -1.0;
 static const double BETA = 0.0;
 static const int INC1 = 1;
 static const int NRHS1 = 1;
@@ -23,7 +23,7 @@ void scio_column_R(double* restrict C, int* d0, int* k0,double* restrict theta_k
     int d = *d0;
     int k = *k0;
     double lambda = *lambda0;
-    double eps0 = *eps0;
+    double eps = *eps0;
     int max_iter = *max_iter0;
 
     double* dwork = (double *) R_alloc(d,sizeof(double));
@@ -42,28 +42,28 @@ void scio_column(double* restrict C, int d, int k, double* restrict theta_k,
     int done_eps;
     int* pitmp;
     double* pdtmp;
+    double* nCtheta;
     int t;
     int active_set_mode;
 
     eps_act = eps*50; //arbitrary constant. 50 is same choice as scio package...
     done_eps = 0;
-    t = 0;
-    int_active_set_mode = 0;
-
-    //init nCtheta
-    //output is in pdtmp
-    pdtmp = dwork;
-    memcpy(pdtmp,theta_k,d2*sizeof(double))
-    F77_NAME(dgemv)(&TRANS_N,&d,&d,&ALPHA,C,&d,pdtmp,&INC1,&BETA,theta_k,&INC1);
+    t = 1;
+    active_set_mode = 0;
 
     // init theta_k
     pdtmp = theta_k;
     for(int i=0; i < d; i++) {
         *pdtmp = 0;
         pdtmp++;
-    }
-    theta_k[k] = C[k*(d-1) + k];
+    } 
+    theta_k[k] = C[k*d + k];
 
+    //init nCtheta
+    //output is in pdtmp
+    nCtheta = dwork;
+    // memcpy(pdtmp,theta_k,d*sizeof(double));
+    F77_NAME(dgemv)(&TRANS_N,&d,&d,&ALPHA,C,&d,theta_k,&INC1,&BETA,nCtheta,&INC1);
 
     // init active indices
     pitmp = active_idx;
@@ -74,13 +74,16 @@ void scio_column(double* restrict C, int d, int k, double* restrict theta_k,
 
     // main loop, each outer iteration loops over all indices in theta_k
     while(t < max_iter && done_eps == 0) {
+        delta_t = 0;
         //inner loop
         for(int i=0; i < d; i++) {
             //only update if active_set_mode is 0 or active set mode is 1 and
             //the index is selected as active
             if(active_set_mode == 0 || active_idx[i] == 1) {
                 theta_t_i = theta_k[i];
-                theta_tp1_i = nCtheta[i] + C[i*(d-1) + i]*theta_t_i;
+                theta_tp1_i = nCtheta[i];
+                dtmp = C[i*d + i];
+                theta_tp1_i = theta_tp1_i + dtmp*theta_t_i;
                 
                 // need to add 1 if diagonal element
                 if(i == k){
@@ -88,13 +91,15 @@ void scio_column(double* restrict C, int d, int k, double* restrict theta_k,
                 }
 
                 // soft threshold theta_tp1_i
-                dtmp = abs(theta_tp1_i) - lambda;
+                dtmp = fabs(theta_tp1_i) - lambda;
                 dtmp2 = theta_tp1_i >= 0 ? 1 : -1;
 
                 if(dtmp > 0) {
-                    theta_tp1_i = dtmp2*dtmp / C[i*(d-1) + i]; //soft threshold and divide
+                    theta_tp1_i = dtmp2*dtmp;
+                    dtmp = C[i*d + i];
+                    theta_tp1_i = theta_tp1_i / dtmp; //soft threshold and divide
                     // make the update
-                    theta_k[i] = theta_tp1_i ;
+                    theta_k[i] = theta_tp1_i;
                 } else{
                     theta_k[i] = 0;
                 }
@@ -102,8 +107,12 @@ void scio_column(double* restrict C, int d, int k, double* restrict theta_k,
                 // if theta_k[i] changes, need to update deltas and nCtheta
                 if(theta_t_i != theta_k[i]) {
                     delta = theta_k[i] - theta_t_i;
-                    delta_t = max(delta_t,abs(delta));
-                    for(int j=0; j < d; j++) nCtheta[j] = nCtheta[j] - delta*C[j*(d-1) + i];
+                    dtmp = fabs(delta);
+                    delta_t = delta_t > dtmp ? delta_t : dtmp;
+                    for(int j=0; j < d; j++) {
+                        dtmp = nCtheta[j] - delta*(C[i*d + j]);
+                        nCtheta[j] = dtmp;
+                    }
                 }
             }
         }

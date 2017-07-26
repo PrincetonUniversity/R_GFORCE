@@ -8,22 +8,31 @@
 #' The implementation follows the active set strategy also used in the SCIO package.
 #' 
 #' @param K number of clusters.
+#' @useDynLib GFORCE scio_column_R
 #' @export
 gforce.scio <- function(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,R_only=TRUE) {
   res <- NULL
   if(!is.null(k)) {
     if(R_only) {
-      res <- scio_column_R(C,k,lambda,eps,max_iter)
+      res <- scio_column(C,k,lambda,eps,max_iter)
     } else {
-      ;
+      d <- ncol(C)
+      C_res <- .C(scio_column_R,
+            C = as.double(C),
+            d = as.integer(d),
+            k = as.integer(k - 1),
+            theta_k = numeric(d),
+            lamba = as.double(lambda),
+            eps = as.double(eps),
+            max_iter = as.integer(max_iter))
+      res <- C_res$theta_k
     }
   }
-
 
   return(res)
 }
 
-scio_column_R <- function(C, k, lambda, eps = 10^-6, max_iter = 10000) {
+scio_column <- function(C, k, lambda, eps = 10^-6, max_iter = 10000) {
   # soft thresholding
   soft_threshold <- function(x){
     #find soft threshold
