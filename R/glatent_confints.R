@@ -7,16 +7,18 @@
 #' 
 #' @param K number of clusters.
 #' @export
-gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha = 0.05,graph='latent',use_cv = FALSE,cv_opts = NULL,lambda1=NULL,lambda2=NULL,use_scio_package=TRUE) {
+gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha = 0.05,
+                                    graph='latent',use_cv = FALSE,cv_opts = NULL,
+                                    lambda1=NULL,lambda2=NULL,use_scio_package=FALSE) {
   res <- NULL
   # if user specified C_hat
   if(!is.null(C_hat)){
     if(graph == 'latent') {
       # cross validation cannot be used
-      ;
+      stop('gforce.glatent_confints -- Option not implemented.')
     } else if(graph == 'averages') {
       # cross validation cannot be used
-      ;
+      stop('gforce.glatent_confints -- Option not implemented.')
     } else {
       stop('gforce.glatent_confints -- You must specify either latent or averages graphs.')
     }
@@ -26,13 +28,13 @@ gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha =
       if(use_cv){
         res <- latent_confidence_intervals_all_cv(X_vals,clusters,alpha,use_scio_package,cv_opts)
       } else {
-        ;
+        stop('gforce.glatent_confints -- Option not implemented.')
       }
     } else if(graph == 'averages') {
       if(use_cv){
         res <- averages_confidence_intervals_all_cv(X_vals,clusters,alpha,use_scio_package,cv_opts)
       } else {
-        ;
+        stop('gforce.glatent_confints -- Option not implemented.')
       }
     } else {
       stop('gforce.glatent_confints -- You must specify either latent or averages graphs.')

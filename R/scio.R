@@ -10,7 +10,7 @@
 #' @param K number of clusters.
 #' @useDynLib GFORCE scio_column_R
 #' @export
-gforce.scio <- function(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,R_only=TRUE) {
+gforce.scio <- function(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,R_only=FALSE) {
   res <- NULL
   if(!is.null(k)) {
     if(R_only) {
