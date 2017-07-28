@@ -60,7 +60,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
   d <- ncol(D)
 
   if(is.null(force_opts)){
-      force_opts <- gforce.defaults(d,K)
+      force_opts <- gforce.defaults(d)
   }
 
   if(is.null(D_Kmeans)) {
@@ -199,7 +199,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
   d <- ncol(D)
 
   if(is.null(force_opts)){
-      force_opts <- gforce.defaults(d,K)
+      force_opts <- gforce.defaults(d)
   }
 
   if(is.null(D_Kmeans)) {
@@ -390,7 +390,7 @@ gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NU
 #' }
 #' 
 #' @examples
-#' opts <- gforce.defaults(20,5)
+#' opts <- gforce.defaults(20)
 #' @export
 gforce.defaults <- function(d){
   options <- NULL
