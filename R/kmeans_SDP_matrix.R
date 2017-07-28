@@ -1,6 +1,6 @@
 
 
-#' FORCE SDP Matrices.
+#' K-means SDP Matrices.
 #' 
 #' Constructs the SDP constraint matrices so they can be passed to a black-box solver.
 #' 
@@ -18,7 +18,7 @@
 #' d <- 50
 #'
 #' @export
-gforce.FORCE_matrix_rep <- function(D,K){
+gforce.kmeans_SDP_matrix <- function(D,K){
     
     # Initialization
     d <- ncol(D)
