@@ -70,14 +70,21 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
   if(is.null(X0) && is.null(E)){
     km_res <- gforce.kmeans(-D_Kmeans,K,R_only)
     km_res <- km_res$clusters
-    # km_sol <- gforce.clust2mat(km_res)
-    ren_start_res <- gforce.FORCE.init(D,K,force_opts$initial_mixing,km_res,cluster_representation=TRUE)
-    X0 <- ren_start_res$X0
-    E <- ren_start_res$E 
+    km_sol <- gforce.clust2mat(km_res)
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X0 <- opts$initial_mixing*km_sol + (1-opts$initial_mixing)*E
   } else if(is.null(X0)){
     stop('FORCE -- Either specify both X0 and E or neither\r\n')
   } else if(is.null(E)){
     stop('FORCE -- Either specify both X0 and E or neither\r\n')
+  }
+
+  # make sure that initialization is well defined
+  if(sum(X0*D) >= sum(E*D)) {
+    stop('gforce.FORCE -- D^TX_0 >= D^TE. Check D, and if D is well specified, pass valid X0 as argument.')
   }
 
   E_EVEV <- eigen(E)
@@ -206,9 +213,8 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
       D_Kmeans <- D
   }
   if(is.null(X0)){
-    hc_opt_guess <- gforce.hclust(D_Kmeans)
-    rs <- gforce.FORCE_adapt.init(D,hc_opt_guess$K,opts$initial_mixing,gforce.clust2mat(hc_opt_guess$clusters),R_only=FALSE)
-    X0 <- rs$X0
+    o <- ones(d)
+    X0 <- (1/d)*o%*%t(o)
   }
   # initialize E and ESI
   E <- 0.5*diag(d) + (1/(2*d))*matrix(1,ncol=d,nrow=d)
@@ -217,6 +223,11 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
   E_D <- diag(E_EVEV$values)
   E_sqrt <- E_V%*%(E_D^(0.5))%*%t(E_V)
   ESI <- solve(E_sqrt)
+
+  # make sure that initialization is well defined
+  if(sum(X0*D) >= sum(E*D)) {
+    stop('gforce.FORCE_adapt -- D^TX_0 >= D^TE. Check D, and if D is well specified, pass valid X0 as argument.')
+  }
 
   res <- NULL
 
