@@ -53,12 +53,6 @@ void gamma_alternative_estimator(double* restrict IPS,double* restrict ips_diag_
                                 int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas);
 void gamma_alternative_estimator_par(double* restrict IPS,double* restrict ips_diag_sqrt, int d, double scaling,
                                         int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas,int* restrict par_idxs);
-void full_rank_feasible(int d, int K, double* restrict E);
-void FORCE_initialization(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
-                            double* E, double* X0, double* E_obj, double* X0_obj, double* fr_base, int* iwork);
-void FORCE_initialization_par(double* D, double s, int d, int K, double* opt_estimate, int* clusters, int cluster_representation,
-                            double* E, double* X0, double* E_obj, double* X0_obj, double* fr_base, int* iwork);
-
 
 // R Access Points
 void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
@@ -89,10 +83,5 @@ void gamma_alternative_estimator_R(double* restrict IPS,double* restrict ips_dia
                                     double* scaling, int* restrict nes, double* restrict gamma_hat);
 void gamma_alternative_estimator_par_R(double* restrict IPS,double* restrict ips_diag_sqrt, int* dimension, 
                                         double* scaling, int* restrict nes, double* restrict gamma_hat);
-void full_rank_feasible_R(int* d, int* K, double* E);
-void FORCE_initialization_R(double* D, double* s, int* d, int* K, double* opt_estimate, int* clusters, int* cluster_representation,
-                                        double* E, double* X0, double* E_obj, double* X0_obj);
-void FORCE_initialization_par_R(double* D, double* s, int* d, int* K, double* opt_estimate,int* clusters, int* cluster_representation,
-                                        double* E, double* X0, double* E_obj, double* X0_obj);
 
 #endif

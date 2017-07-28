@@ -10,9 +10,14 @@ test_that("GS_t Base",{
     initial_mixing <- 2/d
     km_res <- gforce.kmeans(-sh,K,R_only=TRUE)
     km_res <- km_res$clusters
-    ren_start_res <- gforce.FORCE.init(-sh,K,initial_mixing,km_res)
-    X <- ren_start_res$X0
-    E <- ren_start_res$E
+    km_sol <- gforce.clust2mat(km_res)
+
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X <- initial_mixing*km_sol + (1-initial_mixing)*E
+
     S_min_r <- 0
 
     result <- .C(test_smoothed_gradient_S_base,
@@ -42,9 +47,11 @@ test_that("GX_t Base",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X0
-    E <- ren_start_res$E
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X <- initial_mixing*km_sol + (1-initial_mixing)*E
 
     E_EVEV <- eigen(E)
     V <- E_EVEV$vectors
@@ -83,9 +90,11 @@ test_that("Smoothed Gradient (GX_t, GS_t)",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X0
-    E <- ren_start_res$E
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X <- initial_mixing*km_sol + (1-initial_mixing)*E
 
     E_EVEV <- eigen(E)
     V <- E_EVEV$vectors
@@ -126,9 +135,11 @@ test_that("Projection onto C Perpendicular",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X0
-    E <- ren_start_res$E
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X <- initial_mixing*km_sol + (1-initial_mixing)*E
 
     E_EVEV <- eigen(E)
     V <- E_EVEV$vectors
@@ -166,9 +177,11 @@ test_that("Projection onto C Perpendicular (No K)",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X0
-    E <- ren_start_res$E
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X <- initial_mixing*km_sol + (1-initial_mixing)*E
 
     E_EVEV <- eigen(E)
     V <- E_EVEV$vectors
@@ -205,9 +218,11 @@ test_that("Projection Onto PSD Cone Border",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X0
-    E <- ren_start_res$E
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X <- initial_mixing*km_sol + (1-initial_mixing)*E
 
     E_EVEV <- eigen(E)
     V <- E_EVEV$vectors
@@ -243,9 +258,11 @@ test_that("Smoothed Objective",{
     km_res <- km_res$clusters
     km_sol <- gforce.clust2mat(km_res)
 
-    ren_start_res <- gforce.FORCE.init(diff,K,initial_mixing,km_sol)
-    X <- ren_start_res$X0
-    E <- ren_start_res$E
+    o <- rep(1,d)
+    a <- (K-1)/(d-1)
+    b <- (d-K)/(d^2-d)
+    E <- a*diag(d) + b*o%*%t(o)
+    X <- initial_mixing*km_sol + (1-initial_mixing)*E
 
     E_EVEV <- eigen(E)
     V <- E_EVEV$vectors
