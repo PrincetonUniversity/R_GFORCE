@@ -6,7 +6,7 @@
 \usage{
 gforce.glatent_confints(C_hat = NULL, X_vals = NULL, clusters = NULL,
   alpha = 0.05, graph = "latent", use_cv = FALSE, cv_opts = NULL,
-  lambda1 = NULL, lambda2 = NULL, use_scio_package = TRUE)
+  lambda1 = NULL, lambda2 = NULL, use_scio_package = FALSE)
 }
 \arguments{
 \item{K}{number of clusters.}

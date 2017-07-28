@@ -28,6 +28,6 @@ An object with following components
 Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
 }
 \examples{
-opts <- gforce.defaults(20,5)
+opts <- gforce.defaults(20)
 }
 

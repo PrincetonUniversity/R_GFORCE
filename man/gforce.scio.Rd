@@ -5,7 +5,7 @@
 \title{SCIO Estimator.}
 \usage{
 gforce.scio(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,
-  R_only = TRUE)
+  R_only = FALSE)
 }
 \arguments{
 \item{K}{number of clusters.}
