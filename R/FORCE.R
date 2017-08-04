@@ -53,7 +53,7 @@
 #' res <- gforce.FORCE(D,K)
 #'
 #' @seealso \code{\link{gforce.defaults}}
-#' @useDynLib GFORCE primal_dual_adar_R
+#' @useDynLib GFORCE FORCE_R
 #' @export
 gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
                          E = NULL, R_only = FALSE) {
@@ -96,7 +96,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
   res <- NULL
 
   if(!R_only){
-    C_result <- .C(primal_dual_adar_R,
+    C_result <- .C(FORCE_R,
             D = as.double(D),
             D_Kmeans = as.double(D_Kmeans),
             E = as.double(E),
@@ -199,7 +199,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #'
 #'
 #' @seealso \code{\link{gforce.defaults}}
-#' @useDynLib GFORCE primal_dual_adar_nok_R
+#' @useDynLib GFORCE FORCE_adapt_R
 #' @export
 gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   d <- ncol(D)
@@ -231,7 +231,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   res <- NULL
 
   # SHOULD HAVE CHECK TO MAKE SURE THAT OBJECTIVE VALUES OKAY
-  C_result <- .C(primal_dual_adar_nok_R,
+  C_result <- .C(FORCE_adapt_R,
           D = as.double(D),
           D_Kmeans = as.double(D_Kmeans),
           E = as.double(E),
