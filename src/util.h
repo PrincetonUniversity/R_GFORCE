@@ -1,7 +1,6 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include "parallel_rng.h"
 #include "time.h"
 
 // CONSTANTS
@@ -53,8 +52,6 @@ void allocate_workspace_pd(int d, int K, workspace* work);
 void initialize_problem_instance(double* D, double* E, double* ESI, double mu,
                                 int d,int K, problem_instance* prob);
 double time_difference_ms(clock_t start, clock_t end);
-void random_shuffle(int n,int* shuffled);
-void random_shuffle_threadsafe(int n,int* shuffled,threadsafe_rng rng_func);
 void initialize_identity_matrix(double* restrict I, int d);
 
 // KMEANS CLUSTERING
