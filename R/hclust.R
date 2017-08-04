@@ -4,7 +4,6 @@
 #'
 #' Clusters input and estimates \eqn{K}.
 #' @param X \eqn{n x m} matrix. Each row is treated as a point in \eqn{R^m}.
-#' @param K integer. The number of clusters to group the data into.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
 #' native code implementation will be used. Otherwise, an R implementation is used.
 #' @return Returns an object with the components:
@@ -18,26 +17,59 @@
 #' m <- 10 
 #' n <- 10
 #' X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
-#' hc_res <- gforce.hclust(X)
+#' hc_res <- gforce.hclust(X=X)
 #'
+#' @useDynLib GFORCE hclust_R
 #' @export
-gforce.hclust <- function(X) {
+gforce.hclust <- function(X=NULL,dists=NULL,R_only=FALSE) {
   res <- NULL
-  dX <- dist(X)
-  hc <- hclust(dX)
-  d <- ncol(X)
+  if(R_only) {
+    if(is.null(X)) {
+      stop('gforce.hclust -- need to specify X in R_only mode')
+    }
+    dX <- dist(X)
+    hc <- hclust(dX)
+    d <- ncol(X)
 
-  MSEs <- rep(0,d)
-  for(k in 2:d){
-    cc <- cutree(hc,k=k)
-    cc_mat <- gforce.clust2mat(cc)
-    MSEs[k] <- 0.5*sum(cc_mat*as.matrix(dX))
+    MSEs <- rep(0,d)
+    for(k in 2:d){
+      cc <- cutree(hc,k=k)
+      cc_mat <- gforce.clust2mat(cc)
+      MSEs[k] <- 0.5*sum(cc_mat*as.matrix(dX))
+    }
+
+    lc <- L_curve_criterion(MSEs[2:(d-1)])
+    res$K <- lc$max + 1
+    res$clusters <- cutree(hc,k=res$K)
+    res$MSE <- MSEs
+  } else {
+    if(is.null(X) && is.null(dists)) {
+      stop('gforce.hclust -- need to specify at least one of X and dists')
+    }
+    if(is.null(dists)) {
+      n <- nrow(X)
+      dists <- matrix(0,ncol=n,nrow=n)
+      ips <- X %*% t(X)
+      o <- rep(1,n)
+      ips_d <- diag(ips)
+      dists <- ips_d%*%t(o) + o%*%t(ips_d) - 2*ips
+      dists <- sqrt(dists)
+    }
+
+    n <- nrow(dists)
+
+    C_result <- .C(hclust_R,
+            D = as.double(dists),
+            n = as.integer(n),
+            clusters = as.integer(rep(1,n)),
+            K = as.integer(1),
+            MSE = numeric(n))
+
+    res$K <- C_result$K
+    res$clusters <- C_result$clusters
+    res$MSE <- C_result$MSE
   }
-
-  lc <- L_curve_criterion(MSEs[2:(d-1)])
-  res$K <- lc$max + 1
-  res$clusters <- cutree(hc,k=res$K)
-  res$MSE <- MSEs
+  
   return(res)
 }
 
@@ -100,40 +132,5 @@ gforce.hclust.agg2clust <- function(hc,K) {
 
 
   res$clusters <- clusts
-  return(res)
-}
-
-#' Hierarchical Clustering with Estimation of \eqn{K}.
-#' @useDynLib GFORCE hclust_R
-#' @export
-gforce.hclustC <- function(X=NULL,dists = NULL) {
-  res <- NULL
-
-  if(is.null(X) && is.null(dists)) {
-    stop('gforce.hclust -- need to specify at least one of X and dists')
-  }
-  if(is.null(dists)) {
-    n <- nrow(X)
-    dists <- matrix(0,ncol=n,nrow=n)
-    ips <- X %*% t(X)
-    o <- rep(1,n)
-    ips_d <- diag(ips)
-    dists <- ips_d%*%t(o) + o%*%t(ips_d) - 2*ips
-    dists <- sqrt(dists)
-  }
-
-  n <- nrow(dists)
-
-  C_result <- .C(hclust_R,
-          D = as.double(dists),
-          n = as.integer(n),
-          clusters = as.integer(rep(1,n)),
-          K = as.integer(1),
-          MSE = numeric(n))
-
-  res$K <- C_result$K
-  res$clusters <- C_result$clusters
-  res$MSE <- C_result$MSE
-
   return(res)
 }

@@ -4,12 +4,10 @@
 \alias{gforce.hclust}
 \title{Hierarchical Clustering with Estimation of \eqn{K}.}
 \usage{
-gforce.hclust(X)
+gforce.hclust(X = NULL, dists = NULL, R_only = FALSE)
 }
 \arguments{
 \item{X}{\eqn{n x m} matrix. Each row is treated as a point in \eqn{R^m}.}
-
-\item{K}{integer. The number of clusters to group the data into.}
 
 \item{R_only}{logical expression. If \code{R_only == FALSE}, then the included
 native code implementation will be used. Otherwise, an R implementation is used.}
@@ -29,7 +27,7 @@ Clusters input and estimates \eqn{K}.
 m <- 10 
 n <- 10
 X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
-hc_res <- gforce.hclust(X)
+hc_res <- gforce.hclust(X=X)
 
 }
 
