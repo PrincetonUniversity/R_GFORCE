@@ -11,6 +11,8 @@
 
 // void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin,double* dwork,int* iwork);
 
+int L_curve_criterion(double* vals,int n);
+
 void hclust_agglomerate_R(double* data, int* n0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin){
     hclust_agg_t hclust_sol;
     int n = *n0;
@@ -32,16 +34,19 @@ void hclust_R(double* data, int* n0, int* clusters,int* K, double* MSE){
     double* dwork;
     hclust_sol.MSE = MSE;
     hclust_sol.clusters = clusters;
-    dwork = (double *) R_alloc(n,sizeof(double));
-    iwork = (int *) R_alloc(3*n,sizeof(int));
+    dwork = (double *) R_alloc(2*n,sizeof(double));
+    iwork = (int *) R_alloc(7*n + 3,sizeof(int));
 
     hclust(data,n,&hclust_sol,dwork,iwork);
+
+    // set return value for K
+    *K = hclust_sol.K;
 }
 
 
 // returns hclust_t
-//requires dwork of length at least n
-//requires iwork of length at least 3n
+//requires dwork of length at least 2n
+//requires iwork of length at least 7n + 3
 void hclust(double* dists,int n,hclust_t* hclust_sol,double* dwork,int* iwork) {
     hclust_agg_t hclust_agg;
     int* clusters;
@@ -52,6 +57,13 @@ void hclust(double* dists,int n,hclust_t* hclust_sol,double* dwork,int* iwork) {
 
     // Step 0 - Init
     mse = hclust_sol -> MSE;
+    hclust_agg.agg_dist = dwork;
+    dwork = dwork + n;
+    hclust_agg.agg_idx_min = iwork;
+    iwork = iwork + n;
+    hclust_agg.agg_idx_max = iwork;
+    iwork = iwork + n;
+    hclust_agg.n = n;
     clusters = iwork;
     iwork = iwork + n;
 
@@ -66,8 +78,8 @@ void hclust(double* dists,int n,hclust_t* hclust_sol,double* dwork,int* iwork) {
 
     // Step 2 - Compute all MSEs
     int k = n;
-    while(k > 0) {
-        mse[k] = dabgtp(dists,clusters,n,k,iwork,dwork);
+    while(k > 1) {
+        mse[k-1] = dabgtp(dists,clusters,n,k,iwork,dwork);
 
         // Update clusterings based on agglomeration
         idx1 = ag1[n-k];
@@ -90,16 +102,53 @@ void hclust(double* dists,int n,hclust_t* hclust_sol,double* dwork,int* iwork) {
             }
         }
 
-
         // Decrement Cluster Number
         k--;
     }
+    // calculate vals for last clustering
+    mse[0] = dabgtp(dists,clusters,n,1,iwork,dwork);
 
-    // Step 3 - Find minimum MSE and clustering
+    // Step 3 - Find minimum MSE and Estimate K
+    k = L_curve_criterion(mse+1,n-1);
+    k  = k + 2;
+    hclust_sol -> K = k;
 
-
+    // Step 4 - Get Clustering
 
 }
+
+int L_curve_criterion(double* vals,int n){
+    int max_idx;
+    double dmax,a_1,a_2,b_1,b_2,n_1,n_2,nnorm,c_1,c_2,cproj_l,cperp_1,cperp_2,dnew;
+    a_1 = 1;
+    a_2 = vals[0];
+    b_1 = n;
+    b_2 = vals[n-1];
+    n_1 = b_1 - a_1;
+    n_2 = b_2 - a_2;
+    nnorm = sqrt(pow(n_1,2) + pow(n_2,2));
+    n_1 = n_1 / nnorm;
+    n_2 = n_2 / nnorm;
+
+    dmax = -DBL_MAX;
+    max_idx = -1;
+    for(int i=0; i < n; i++) {
+        c_1 = i;
+        c_2 = vals[i];
+        cproj_l = (a_1 - c_1)*n_1 + (a_2 - c_2)*n_2;
+        cperp_1 = (a_1 - c_1) - n_1*cproj_l;
+        cperp_2 = (a_2 - c_2) - n_2*cproj_l;
+        dnew = cperp_1*cperp_1 + cperp_2*cperp_2;
+
+        if(dnew > dmax){
+            dmax = dnew;
+            max_idx = i;
+        }
+    }
+
+    return(max_idx);
+}
+
 
 
 //requires dwork of length at least n

@@ -47,7 +47,7 @@ typedef struct hclust_agg_t {
 typedef struct hclust_t {
     double* MSE;
     int* clusters;
-    int* K;
+    int K;
     int n;
 } hclust_t;
 
