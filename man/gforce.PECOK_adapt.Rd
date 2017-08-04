@@ -22,7 +22,7 @@ optimal performance. If \code{X} is specified, it will be ignored.}
 
 \item{E}{strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.}
 
-\item{gamma_par}{logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed, 
+\item{gamma_par}{logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed,
 a multi-threaded method is called, otherwise a single-threaded method is called.}
 
 \item{K}{number of clusters.}

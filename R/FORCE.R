@@ -4,13 +4,13 @@
 # e.g. D can be a distances matrix or negated covariance
 # INPUTS: Needs to have D and K. Optional force_opts
 # optional initial feasible, optional E
-# OUTPUTS: 
+# OUTPUTS:
 
 
 #' FORCE \eqn{K}-means solver.
-#' 
+#'
 #' Solves the Peng-Wei K-means SDP Relaxation using the FORCE algorithm.
-#' 
+#'
 #' @param D a matrix \eqn{D} as defined above.
 #' @param K number of clusters.
 #' @param force_opts tuning parameters. \code{NULL} signifies defaults will be used.
@@ -19,7 +19,7 @@
 #' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
 #' native code implementation will be used. Otherwise, an R implementation is used.
-#' 
+#'
 #' @return An object with following components
 #' \describe{
 #' \item{\code{Z_T}}{Final iterate of the projected gradient descent algorithm run on the smoothed eigenvalue problem.}
@@ -44,7 +44,7 @@
 #'
 #' @examples
 #' K <- 5
-#' n <- 50 
+#' n <- 50
 #' d <- 50
 #' dat <- gforce.generator(K,d,n,3,graph='scalefree')
 #' sig_hat <- (1/n)*t(dat$X)%*%dat$X
@@ -55,7 +55,7 @@
 #' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE primal_dual_adar_R
 #' @export
-gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, 
+gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
                          E = NULL, R_only = FALSE) {
   d <- ncol(D)
 
@@ -109,6 +109,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
             dual_frequency = as.integer(force_opts$dual_frequency),
             max_iter = as.integer(force_opts$max_iter),
             finish_pgd = as.integer(force_opts$finish_pgd),
+            primal_only = as.integer(force_opts$primal_only),
             number_restarts = as.integer(length(force_opts$restarts)),
             restarts = as.integer(force_opts$restarts),
             alpha = as.double(force_opts$alpha),
@@ -159,15 +160,15 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
   res$X0 <- X0
   res$E <- E
   res <- res[sort(names(res))]
-  
+
   return(res)
 }
 
 
 #' FORCE \eqn{K}-means solver.
-#' 
+#'
 #' Solves a K-means SDP Relaxation using the FORCE algorithm when \eqn{K} is unknown.
-#' 
+#'
 #' @param D a matrix \eqn{D} as defined above.
 #' @param force_opts tuning parameters. \code{NULL} signifies defaults will be used.
 #' @param D_Kmeans matrix to be used for initial integer solution. \code{NULL} signifies that \code{D} will be used.
@@ -175,7 +176,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
 #' native code implementation will be used. Otherwise, an R implementation is used.
-#' 
+#'
 #' @return An object with following components
 #' \describe{
 #' \item{\code{Z_T}}{Final iterate of the projected gradient descent algorithm run on the smoothed eigenvalue problem.}
@@ -296,7 +297,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
   res$hc_best <- hc_res$clusters
   res$hc_K <- hc_res$K
   res <- res[sort(names(res))]
-  
+
   return(res)
 }
 
@@ -304,14 +305,14 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R
 #' Solve PECOK with FORCE.
 #'
 #' Uses the FORCE algorithm to solve the PECOK SDP.
-#' 
+#'
 #' @param K number of clusters.
 #' @param X \eqn{n x d} matrix. Either this or \code{D} must be specified.
 #' @param D \eqn{d x d} matrix. Either this or \code{X} must be specified.
 #' @param sigma_hat \eqn{d x d} matrix. If \code{D} is specified, this argument should be the
 #' estimated covariance matrix. It is not strictly necessary to provide it, but it should be for
 #' optimal performance. If \code{X} is specified, it will be ignored.
-#' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed, 
+#' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed,
 #' a multi-threaded method is called, otherwise a single-threaded method is called.
 #' @inheritParams gforce.FORCE
 #' @seealso \code{\link{gforce.defaults}}
@@ -342,14 +343,14 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
 #' Solve PECOK Adaptive SDP with FORCE.
 #'
 #' Uses the FORCE algorithm to solve the PECOK SDP when \eqn{K} is unknown.
-#' 
+#'
 #' @param K number of clusters.
 #' @param X \eqn{n x d} matrix. Either this or \code{D} must be specified.
 #' @param D \eqn{d x d} matrix. Either this or \code{X} must be specified.
 #' @param sigma_hat \eqn{d x d} matrix. If \code{D} is specified, this argument should be the
 #' estimated covariance matrix. It is not strictly necessary to provide it, but it should be for
 #' optimal performance. If \code{X} is specified, it will be ignored.
-#' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed, 
+#' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed,
 #' a multi-threaded method is called, otherwise a single-threaded method is called.
 #' @inheritParams gforce.FORCE_adapt
 #' @seealso \code{\link{gforce.defaults}}
@@ -399,7 +400,7 @@ gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NU
 #' \item{\code{restarts}}{a vector of integers. This specifies the iterations at which to take the projection of the current iterate and restart the algorithm with that as the initial solution.}
 #' \item{\code{verbose}}{an integer. Specifies the level of verbosity requested from gforce.FORCE.}
 #' }
-#' 
+#'
 #' @examples
 #' opts <- gforce.defaults(20)
 #' @export
@@ -420,6 +421,7 @@ gforce.defaults <- function(d){
   options$kmeans_iter = 10
   options$max_iter = 500
   options$pgd_result_mode = 0
+  options$primal_only = 0
   options$random_seed = -1
   options$restarts = c(100)
   options$slack_scale = 1
