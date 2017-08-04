@@ -12,6 +12,7 @@
 // void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin,double* dwork,int* iwork);
 
 int L_curve_criterion(double* vals,int n);
+void hclust_agg2clust(int* ag1,int* ag2,int n,int K,int* clusters);
 
 void hclust_agglomerate_R(double* data, int* n0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin){
     hclust_agg_t hclust_sol;
@@ -114,7 +115,40 @@ void hclust(double* dists,int n,hclust_t* hclust_sol,double* dwork,int* iwork) {
     hclust_sol -> K = k;
 
     // Step 4 - Get Clustering
+    hclust_agg2clust(ag1,ag2,n,k,hclust_sol->clusters);
+}
 
+
+void hclust_agg2clust(int* ag1,int* ag2,int n,int K,int* clusters) {
+    int idx1,idx2,clust1,clust2;
+
+    for(int i=0; i < n; i++){
+        clusters[i] = i;
+    }
+
+
+    for(int i=0; i < n-K; i++) {
+        // Update clusterings based on agglomeration
+        idx1 = ag1[i];
+        idx2 = ag2[i];
+        clust1 = clusters[idx1];
+        clust2 = clusters[idx2];
+
+        // Relabel clusters
+        // name clust2 with label clust1
+        for(int j=0; j <n; j++){
+            if(clusters[j] == clust2) {
+                clusters[j] = clust1;
+            }
+        }
+
+        // reorder cluster labels
+        for(int j=0; j <n; j++){
+            if(clusters[j] == n-i-1) {
+                clusters[j] = clust2;
+            }
+        }
+    }
 }
 
 int L_curve_criterion(double* vals,int n){
