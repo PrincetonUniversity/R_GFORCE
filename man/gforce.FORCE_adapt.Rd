@@ -4,8 +4,7 @@
 \alias{gforce.FORCE_adapt}
 \title{FORCE \eqn{K}-means solver.}
 \usage{
-gforce.FORCE_adapt(D, force_opts = NULL, D_Kmeans = NULL, X0 = NULL,
-  R_only = FALSE)
+gforce.FORCE_adapt(D, force_opts = NULL, D_Kmeans = NULL, X0 = NULL)
 }
 \arguments{
 \item{D}{a matrix \eqn{D} as defined above.}
@@ -15,9 +14,6 @@ gforce.FORCE_adapt(D, force_opts = NULL, D_Kmeans = NULL, X0 = NULL,
 \item{D_Kmeans}{matrix to be used for initial integer solution. \code{NULL} signifies that \code{D} will be used.}
 
 \item{X0}{initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.}
-
-\item{R_only}{logical expression. If \code{R_only == FALSE}, then the included
-native code implementation will be used. Otherwise, an R implementation is used.}
 
 \item{E}{strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.}
 }

@@ -72,6 +72,8 @@ void primal_dual_adar_nok_R(double* D, double* D_kmeans, double* E, double* ESI,
     int* out_kmeans_iter_best, int* out_kmeans_iter_total, int* out_dc, double* out_dc_time,
     int* out_dc_grad_iter, int* out_grad_iter_best, double* out_grad_iter_best_time, double* out_total_time);
 
+void hclust_R(double* data, int* n0, int* m0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin);
+
 
 void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *dimension,
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0,

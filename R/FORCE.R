@@ -174,8 +174,6 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' @param D_Kmeans matrix to be used for initial integer solution. \code{NULL} signifies that \code{D} will be used.
 #' @param X0 initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.
 #' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
-#' @param R_only logical expression. If \code{R_only == FALSE}, then the included
-#' native code implementation will be used. Otherwise, an R implementation is used.
 #'
 #' @return An object with following components
 #' \describe{
@@ -203,7 +201,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE primal_dual_adar_nok_R
 #' @export
-gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL, R_only = FALSE) {
+gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   d <- ncol(D)
 
   if(is.null(force_opts)){

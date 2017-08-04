@@ -246,16 +246,3 @@ void min_distance_to_probability(double* restrict min_distances, double* restric
     }
 }
 
-double euclidean_distance(double const* restrict p1, double const* restrict p2, int m, double* restrict euclidean_distance_tmp) {
-    double acc = 0.0;
-    double dtmp1;
-
-    #pragma omp simd
-    for(int i=0; i < m; i++){
-        //it seems to vectorize better this way...
-        euclidean_distance_tmp[i] = p1[i] - p2[i];
-        acc = acc + euclidean_distance_tmp[i] * euclidean_distance_tmp[i] ;
-    } 
-
-    return acc;
-}

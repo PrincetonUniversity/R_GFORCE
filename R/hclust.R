@@ -40,3 +40,66 @@ gforce.hclust <- function(X) {
   res$MSE <- MSEs
   return(res)
 }
+
+
+#' Hierarchical Clustering with Estimation of \eqn{K}.
+#' @useDynLib GFORCE hclust_R
+#' @export
+gforce.hclustC <- function(X=NULL,dists = NULL) {
+  res <- NULL
+
+  if(is.null(X) && is.null(dists)) {
+    stop('gforce.hclust -- need to specify at least one of X and dists')
+  }
+  if(is.null(dists)) {
+    n <- nrow(X)
+    dists <- matrix(0,ncol=n,nrow=n)
+    ips <- X %*% t(X)
+    o <- rep(1,n)
+    ips_d <- diag(ips)
+    dists <- ips_d%*%t(o) + o%*%t(ips_d) - 2*ips
+    dists <- sqrt(dists)
+  }
+
+  n <- nrow(dists)
+
+  C_result <- .C(hclust_R,
+          D = as.double(dists),
+          n = as.integer(n),
+          m = as.integer(n),
+          ag1 = as.integer(rep(1,n)),
+          ag2 = as.integer(rep(1,n)),
+          agdist = numeric(n))
+
+  res$ag1 <- C_result$ag1 + 1
+  res$ag2 <- C_result$ag2 + 1
+  res$agdist <- C_result$agdist
+
+  return(res)
+}
+
+#' Hierarchical Clustering with Estimation of \eqn{K}.
+#'
+#' @export
+gforce.hclustCagg <- function(hc,K) {
+  res <- NULL
+  ag_min <- hc$ag1
+  ag_max <- hc$ag2
+  n <- length(ag_min)
+
+  # K groups means that we need to perform n-K merges
+  clusts <- 1:n
+  for(i in 1:(n-K)) {
+    idx1 <- ag_min[i]
+    idx2 <- ag_max[i]
+
+    clust_1 <- clusts[idx1]
+    clust_2 <- clusts[idx2]
+    clust_2idx <- which(clusts == clust_2)
+    clusts[clust_2idx] <- clust_1
+  }
+
+
+  res$clusters <- clusts
+  return(res)
+}
