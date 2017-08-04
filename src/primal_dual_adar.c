@@ -3,7 +3,7 @@
 #include "time.h"
 #include "R.h"
 #include "R_ext/Lapack.h"
-#include "convex_kmeans.h"
+#include "FORCE.h"
 #include "convex_kmeans_util.h"
 
 static const int INC1 = 1;

@@ -1,5 +1,5 @@
-#ifndef CONVEX_KMEANS_H
-#define CONVEX_KMEANS_H
+#ifndef FORCE_H
+#define FORCE_H
 
 // Type for PGD Options and return values
 typedef struct {

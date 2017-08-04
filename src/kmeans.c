@@ -3,7 +3,7 @@
 #include "time.h"
 #include "R.h"
 #include "omp.h"
-#include "convex_kmeans.h"
+#include "FORCE.h"
 #include "convex_kmeans_util.h"
 
 // Local Constant Strings

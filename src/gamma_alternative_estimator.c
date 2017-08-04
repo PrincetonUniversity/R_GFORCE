@@ -1,7 +1,7 @@
 #include "R.h"
 #include "math.h"
 #include "omp.h"
-#include "convex_kmeans.h"
+#include "FORCE.h"
 
 void gamma_alternative_estimator_R(double* restrict IPS,double* restrict ips_diag_sqrt, int* dimension, 
                                     double* scaling, int* restrict nes, double* restrict gamma_hat)

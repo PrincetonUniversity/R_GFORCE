@@ -1,7 +1,7 @@
 #include "R.h"
 #include "math.h"
 #include "omp.h"
-#include "convex_kmeans.h"
+#include "FORCE.h"
 
 void v_measure(double* restrict IPS,double* restrict n_xc_xd, int *dimension, double* restrict vm)
 {

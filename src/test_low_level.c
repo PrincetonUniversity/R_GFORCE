@@ -1,6 +1,6 @@
 #include "test_low_level.h"
 #include "convex_kmeans_util.h"
-#include "convex_kmeans.h"
+#include "FORCE.h"
 #include "R.h"
 #include "R_ext/Lapack.h"
 #include "test_low_level.h"

@@ -3,7 +3,7 @@
 #include "R.h"
 #include "R_ext/Lapack.h"
 #include "convex_kmeans_util.h"
-#include "convex_kmeans.h"
+#include "FORCE.h"
 
 // FUNCTION PROTOTPES
 void precompute_values(double* restrict Y_a_base, int* restrict group_sizes, double* restrict primal_value, double* restrict D, int* restrict ga_hat,

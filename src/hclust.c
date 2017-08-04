@@ -4,7 +4,7 @@
 #include "float.h"
 #include "R_ext/Lapack.h"
 #include "R_ext/BLAS.h"
-#include "convex_kmeans.h"
+#include "FORCE.h"
 // #include "convex_kmeans_util.h"
 
 
