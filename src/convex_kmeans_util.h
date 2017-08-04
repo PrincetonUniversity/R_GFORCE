@@ -75,6 +75,9 @@ void dcsum(double* restrict A, int d, double* restrict A_rsums);
 void dxpyez(int d, double* restrict X, double* restrict Y, double* restrict Z);
 // Compute y = a*x + b*y
 void daxpby(double a, double* restrict X, double b, double* restrict Y, int d);
+// Compute x = tr(A * B(G))
+double dabgtp(double* restrict A, int* restrict G, int d, int K,int* iwork,double* dwork);
+
 
 // PGD HELPERS
 double clust_to_opt_val(problem_instance* prob, int* ga_hat, workspace* work);
@@ -93,7 +96,7 @@ void C_perp_update_nok(problem_instance* prob, double alpha, double* X_t, double
 void project_E(problem_instance* prob, double* Z, double lmin, double* Z_proj);
 
 
-// KMEANS 
+// CLUSTERING
 void kmeans_dual_solution_impl(int* restrict ga_hat, problem_instance* restrict prob, double eps1, double eps2,
                                 double Y_T_min, double* restrict Y_a_r, double* restrict Y_T_r, int* restrict feasible_r,
                                 workspace* restrict work);
@@ -101,5 +104,7 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
                                    double* restrict Y_a_r, int* restrict feasible_r, workspace* restrict work);
 void kmeans_pp_impl(double const* D, int K, int n, int m, int* cluster_assignment_r,
                         double* centers_r, int* num_iters_R, double* time_R, workspace* work);
+void relabel_clusters(int* restrict clusters,int K);
+
 
 #endif

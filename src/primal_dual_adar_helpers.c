@@ -207,70 +207,14 @@ void smoothed_objective_X_base(double* X, double* ESI, double* d2_tmp, double* d
 // supports clusters numbered 1..K or 0..K-1
 double clust_to_opt_val(problem_instance* prob, int* ga_hat, workspace* work) {
     // Local Vars
+    double opt_val;
     double* D = prob -> D;
     int d = prob -> d;
     int K = prob -> K;
-    double opt_val = 0.0;
-    int tmp1,tmp2,tmp3,tmp4;
-    double dtmp1;
-    int Kp1 = K+1;
+    double* dwork = work -> dwork;
+    int* iwork = work -> iwork;
 
-    // Get Memory From Workspace
-    double* group_sums = work -> dwork;
-    int* group_sizes = work -> iwork;
-    int* group_tailp1_idx = group_sizes + Kp1;
-    int* group_start_idx = group_tailp1_idx + Kp1; 
-    int* group_idxs = group_start_idx + Kp1; // stores by group all idxs in that group
-
-    // Zero out
-    for(int i=0; i < Kp1; i++){
-        group_sizes[i] = 0;
-        group_sums[i] = 0;
-    }
-
-    // Group Sizes, zero out Y_a_base
-    for(int i=0; i < d; i++){
-        tmp1 = ga_hat[i];
-        group_sizes[tmp1] = group_sizes[tmp1] + 1;
-    }
-
-    // Group Bounds Initialization -- points to current last group member, first group member
-    tmp1 = 0;
-    for(int i=0; i < Kp1; i++){
-        group_tailp1_idx[i] = tmp1;
-        group_start_idx[i] = tmp1;
-        tmp1 += group_sizes[i];
-    }
-
-    // Group Membership
-    for(int i=0; i < d; i++){
-        tmp1 = ga_hat[i]; //store group membership of i
-        tmp2 = group_tailp1_idx[tmp1];
-        group_tailp1_idx[tmp1] = tmp2 + 1; //store location to add this index, then increment
-        group_idxs[tmp2] = i;
-    }
-
-    // Group Sums
-    for(int i=0; i < d; i++){
-        tmp1 = ga_hat[i]; // group membership of i
-        tmp2 = group_start_idx[tmp1]; //start idx of group
-        tmp3 = group_tailp1_idx[tmp1]; // end idx
-
-        for(int j=tmp2; j < tmp3; j++){
-            tmp4 = (group_idxs[j])*d + i; //Access is in column major form
-            dtmp1 = group_sums[tmp1] + D[tmp4];
-            group_sums[tmp1] = dtmp1;
-        }
-    }
-
-    // Objective Value
-    opt_val = 0;
-    for(int i=0; i < Kp1; i++){
-        tmp1 = group_sizes[i];
-        if(tmp1 > 0){
-            opt_val = opt_val + (group_sums[i] / ((double) tmp1));
-        }
-    }
+    opt_val = dabgtp(D,ga_hat,d,K,iwork,dwork);
 
     return opt_val;
 }

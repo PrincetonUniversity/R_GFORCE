@@ -289,21 +289,4 @@ test_that("Smoothed Objective",{
     })
 
 
-#' @useDynLib GFORCE test_clust_to_opt_val
-test_that("K-Means Objective Value",{
 
-    K <- 5
-    d <- 20
-    dat <- gforce.generator(K,d,d,3,graph='DeltaC',cov_gap_mult=4)
-    sh <- t(dat$X)%*%dat$X / d
-    opt_val_r <- 0
-    result <- .C(test_clust_to_opt_val,
-                 D = as.double(sh),
-                 d = as.integer(d),
-                 K = as.integer(K),
-                 clusters = as.integer(dat$group_assignments),
-                 opt_val = as.double(opt_val_r))
-
-    opt_val <- sum(sh*gforce.clust2mat(dat$group_assignments))
-    expect_equal(opt_val,result$opt_val)
-    })

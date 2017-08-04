@@ -37,6 +37,20 @@ typedef struct {
     double total_time;
 } pgd_results;
 
+typedef struct hclust_agg_t {
+    double* agg_dist;
+    int* agg_idx_min;
+    int* agg_idx_max;
+    int n;
+} hclust_agg_t;
+
+typedef struct hclust_t {
+    double* MSEs;
+    int* clusters;
+    int* K;
+    int n;
+} hclust_t;
+
 
 // C Access points
 void kmeans(double* D, int K, int n, int m, int* centers_init, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
@@ -72,7 +86,7 @@ void primal_dual_adar_nok_R(double* D, double* D_kmeans, double* E, double* ESI,
     int* out_kmeans_iter_best, int* out_kmeans_iter_total, int* out_dc, double* out_dc_time,
     int* out_dc_grad_iter, int* out_grad_iter_best, double* out_grad_iter_best_time, double* out_total_time);
 
-void hclust_R(double* data, int* n0, int* m0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin);
+void hclust_agglomerate_R(double* data, int* n0, int* m0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin);
 
 
 void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *dimension,

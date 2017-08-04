@@ -4,36 +4,47 @@
 #include "float.h"
 #include "R_ext/Lapack.h"
 #include "R_ext/BLAS.h"
+#include "convex_kmeans.h"
+// #include "convex_kmeans_util.h"
 
-void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin,double* dwork,int* iwork);
 
-void hclust_R(double* data, int* n0, int* m0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin){
+// void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin,double* dwork,int* iwork);
+
+void hclust_agglomerate_R(double* data, int* n0, int* m0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin){
+    hclust_agg_t hclust_sol;
     int n = *n0;
     int m = *m0;
     int* iwork;
     double* dwork;
+    hclust_sol.agg_idx_min = agglomerate_idx_1;
+    hclust_sol.agg_idx_max = agglomerate_idx_2;
+    hclust_sol.agg_dist = agglomerate_dmin;
     dwork = (double *) R_alloc(n,sizeof(double));
     iwork = (int *) R_alloc(2*n,sizeof(int));
-    hclust(data,n,m,agglomerate_idx_1,agglomerate_idx_2,agglomerate_dmin,dwork,iwork);
+
+    hclust_agglomerate(data,n,m,&hclust_sol,dwork,iwork);
 }
 
 
-// // data is an n x m matrix
-// // distances should be n x n matrix
-// void distance_matrix(double* dists,double* data,int n, int m) {
-//     // get distance matrix
-// }
+void hclust_agg2clust();
 
-// void complete_linkage() {
 
-// }
+// returns hclust_t
+// 
+void hclust();
+
+
+
 
 //requires dwork of length at least n
 //requires iwork of length at least 2n
-void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin,double* dwork,int* iwork) {
+void hclust_agglomerate(double* dist,int n,int m,hclust_agg_t* hclust_sol,double* dwork,int* iwork) {
     // Step 0 - Declarations
     int* nn_idx; //nearest neighbor idx
     int* active;
+    int* agglomerate_idx_1;
+    int* agglomerate_idx_2;
+    double* agglomerate_dmin;
     double* nn_dist; //nearest neighbor distance
     int n2,itmp1,itmp2,idx_min,idx_max,dmin_idx1,dmin_idx2,num_clust;
     double dtmp1,dtmp2,dmin;
@@ -43,8 +54,11 @@ void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_id
     nn_idx = iwork;
     active = iwork + n;
     n2 = n*n;
+    agglomerate_idx_1 = hclust_sol -> agg_idx_min;
+    agglomerate_idx_2 = hclust_sol -> agg_idx_max;
+    agglomerate_dmin = hclust_sol -> agg_dist;
 
-    // Step 2 - Distance Matrix, Active Flags
+    // Step 2 - Active Flags
 
     for(int i=0; i < n; i++){
         active[i] = 1;

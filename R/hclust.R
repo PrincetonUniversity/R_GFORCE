@@ -43,9 +43,9 @@ gforce.hclust <- function(X) {
 
 
 #' Hierarchical Clustering with Estimation of \eqn{K}.
-#' @useDynLib GFORCE hclust_R
+#' @useDynLib GFORCE hclust_agglomerate_R
 #' @export
-gforce.hclustC <- function(X=NULL,dists = NULL) {
+gforce.hclust.agglomerate <- function(X=NULL,dists = NULL) {
   res <- NULL
 
   if(is.null(X) && is.null(dists)) {
@@ -63,7 +63,7 @@ gforce.hclustC <- function(X=NULL,dists = NULL) {
 
   n <- nrow(dists)
 
-  C_result <- .C(hclust_R,
+  C_result <- .C(hclust_agglomerate_R,
           D = as.double(dists),
           n = as.integer(n),
           m = as.integer(n),
@@ -81,7 +81,7 @@ gforce.hclustC <- function(X=NULL,dists = NULL) {
 #' Hierarchical Clustering with Estimation of \eqn{K}.
 #'
 #' @export
-gforce.hclustCagg <- function(hc,K) {
+gforce.hclust.agg2clust <- function(hc,K) {
   res <- NULL
   ag_min <- hc$ag1
   ag_max <- hc$ag2
