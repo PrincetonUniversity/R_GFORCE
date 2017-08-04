@@ -66,7 +66,6 @@ gforce.hclust.agglomerate <- function(X=NULL,dists = NULL) {
   C_result <- .C(hclust_agglomerate_R,
           D = as.double(dists),
           n = as.integer(n),
-          m = as.integer(n),
           ag1 = as.integer(rep(1,n)),
           ag2 = as.integer(rep(1,n)),
           agdist = numeric(n))
@@ -101,5 +100,40 @@ gforce.hclust.agg2clust <- function(hc,K) {
 
 
   res$clusters <- clusts
+  return(res)
+}
+
+#' Hierarchical Clustering with Estimation of \eqn{K}.
+#' @useDynLib GFORCE hclust_R
+#' @export
+gforce.hclustC <- function(X=NULL,dists = NULL) {
+  res <- NULL
+
+  if(is.null(X) && is.null(dists)) {
+    stop('gforce.hclust -- need to specify at least one of X and dists')
+  }
+  if(is.null(dists)) {
+    n <- nrow(X)
+    dists <- matrix(0,ncol=n,nrow=n)
+    ips <- X %*% t(X)
+    o <- rep(1,n)
+    ips_d <- diag(ips)
+    dists <- ips_d%*%t(o) + o%*%t(ips_d) - 2*ips
+    dists <- sqrt(dists)
+  }
+
+  n <- nrow(dists)
+
+  C_result <- .C(hclust_R,
+          D = as.double(dists),
+          n = as.integer(n),
+          clusters = as.integer(rep(1,n)),
+          K = as.integer(1),
+          MSE = numeric(n))
+
+  res$K <- C_result$K
+  res$clusters <- C_result$clusters
+  res$MSE <- C_result$MSE
+
   return(res)
 }

@@ -2,8 +2,10 @@
 #include "string.h"
 #include "R.h"
 #include "R_ext/Lapack.h"
-#include "convex_kmeans_util.h"
 #include "FORCE.h"
+#include "util_FORCE.h"
+#include "util.h"
+#include "util_mops.h"
 
 // FUNCTION PROTOTPES
 void precompute_values(double* restrict Y_a_base, int* restrict group_sizes, double* restrict primal_value, double* restrict D, int* restrict ga_hat,

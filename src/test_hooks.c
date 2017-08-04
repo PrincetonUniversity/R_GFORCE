@@ -1,12 +1,10 @@
-#include "test_low_level.h"
-#include "convex_kmeans_util.h"
 #include "FORCE.h"
 #include "R.h"
 #include "R_ext/Lapack.h"
-#include "test_low_level.h"
-
-static const char JOBZ = 'V';
-static const char UPLO = 'U';
+#include "test_hooks.h"
+#include "util.h"
+#include "util_mops.h"
+#include "util_FORCE.h"
 
 
 void test_smoothed_gradient_S_base(double* X, double* E,double* GS_t, int* d, double* S_min_r) {

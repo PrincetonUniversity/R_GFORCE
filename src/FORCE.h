@@ -45,7 +45,7 @@ typedef struct hclust_agg_t {
 } hclust_agg_t;
 
 typedef struct hclust_t {
-    double* MSEs;
+    double* MSE;
     int* clusters;
     int* K;
     int n;
@@ -68,6 +68,9 @@ void gamma_alternative_estimator(double* restrict IPS,double* restrict ips_diag_
                                 int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas);
 void gamma_alternative_estimator_par(double* restrict IPS,double* restrict ips_diag_sqrt, int d, double scaling,
                                         int* restrict nes, double* restrict gamma_hat, double* restrict ne_meas,int* restrict par_idxs);
+void hclust_agglomerate(double* dist,int n,hclust_agg_t* hclust_sol,double* dwork,int* iwork);
+void hclust(double* dists,int n,hclust_t* hclust_sol,double* dwork,int* iwork);
+
 
 // R Access Points
 void kmeans_pp_R(double* D, int* K0, int* n0, int* m0, int* cluster_assignment_r, double* centers_r, int* num_iters_R, double* time_R);
@@ -86,8 +89,8 @@ void FORCE_adapt_R(double* D, double* D_kmeans, double* E, double* ESI, double* 
     int* out_kmeans_iter_best, int* out_kmeans_iter_total, int* out_dc, double* out_dc_time,
     int* out_dc_grad_iter, int* out_grad_iter_best, double* out_grad_iter_best_time, double* out_total_time);
 
-void hclust_agglomerate_R(double* data, int* n0, int* m0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin);
-
+void hclust_agglomerate_R(double* data, int* n0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin);
+void hclust_R(double* data, int* n0, int* clusters,int* K, double* MSE);
 
 void kmeans_dual_solution_primal_min_R(int* ga_hat, double* D, int* K_0, int *dimension,
                                         double* eps1_0, double* eps2_0, double* Y_T_min_0,

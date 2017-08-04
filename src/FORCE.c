@@ -4,9 +4,9 @@
 #include "R.h"
 #include "R_ext/Lapack.h"
 #include "FORCE.h"
-#include "convex_kmeans_util.h"
-
-static const int INC1 = 1;
+#include "util_FORCE.h"
+#include "util.h"
+#include "util_mops.h"
 
 // Needs for all pointers in return values to point to sufficiently allocated
 // memory. Solves primal problem in MINIMIZATION FORM

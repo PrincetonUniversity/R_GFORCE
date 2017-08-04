@@ -1,6 +1,7 @@
-#ifndef TEST_LOW_LEVEL_H
-#define TEST_LOW_LEVEL_H
-#include "convex_kmeans_util.h"
+#ifndef TEST_HOOKS_H
+#define TEST_HOOKS_H
+#include "util.h"
+// #include "util_FORCE.h"
 
 //////////////////////////////////////////////////////////////////
 ////// UNIT TEST R ENTRY POINTS FOR LOW LEVEL & UTILITY FUNCTIONS

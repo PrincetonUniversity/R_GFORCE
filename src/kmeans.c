@@ -4,7 +4,9 @@
 #include "R.h"
 #include "omp.h"
 #include "FORCE.h"
-#include "convex_kmeans_util.h"
+#include "util_FORCE.h"
+#include "util.h"
+#include "util_mops.h"
 
 // Local Constant Strings
 static const char* RANDOM_INIT = "random";

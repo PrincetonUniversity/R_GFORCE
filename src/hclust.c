@@ -5,15 +5,15 @@
 #include "R_ext/Lapack.h"
 #include "R_ext/BLAS.h"
 #include "FORCE.h"
+#include "util_mops.h"
 // #include "convex_kmeans_util.h"
 
 
 // void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin,double* dwork,int* iwork);
 
-void hclust_agglomerate_R(double* data, int* n0, int* m0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin){
+void hclust_agglomerate_R(double* data, int* n0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin){
     hclust_agg_t hclust_sol;
     int n = *n0;
-    int m = *m0;
     int* iwork;
     double* dwork;
     hclust_sol.agg_idx_min = agglomerate_idx_1;
@@ -22,23 +22,89 @@ void hclust_agglomerate_R(double* data, int* n0, int* m0, int* agglomerate_idx_1
     dwork = (double *) R_alloc(n,sizeof(double));
     iwork = (int *) R_alloc(2*n,sizeof(int));
 
-    hclust_agglomerate(data,n,m,&hclust_sol,dwork,iwork);
+    hclust_agglomerate(data,n,&hclust_sol,dwork,iwork);
+}
+
+void hclust_R(double* data, int* n0, int* clusters,int* K, double* MSE){
+    hclust_t hclust_sol;
+    int n = *n0;
+    int* iwork;
+    double* dwork;
+    hclust_sol.MSE = MSE;
+    hclust_sol.clusters = clusters;
+    dwork = (double *) R_alloc(n,sizeof(double));
+    iwork = (int *) R_alloc(3*n,sizeof(int));
+
+    hclust(data,n,&hclust_sol,dwork,iwork);
 }
 
 
-void hclust_agg2clust();
-
-
 // returns hclust_t
-// 
-void hclust();
+//requires dwork of length at least n
+//requires iwork of length at least 3n
+void hclust(double* dists,int n,hclust_t* hclust_sol,double* dwork,int* iwork) {
+    hclust_agg_t hclust_agg;
+    int* clusters;
+    double* mse;
+    int* ag1;
+    int* ag2;
+    int idx1,idx2,clust1,clust2;
+
+    // Step 0 - Init
+    mse = hclust_sol -> MSE;
+    clusters = iwork;
+    iwork = iwork + n;
+
+    for(int i=0; i < n; i++){
+        clusters[i] = i;
+    }
+
+    // Step 1 - Perform Agglomeration
+    hclust_agglomerate(dists,n,&hclust_agg,dwork,iwork);
+    ag1 = hclust_agg.agg_idx_min;
+    ag2 = hclust_agg.agg_idx_max;
+
+    // Step 2 - Compute all MSEs
+    int k = n;
+    while(k > 0) {
+        mse[k] = dabgtp(dists,clusters,n,k,iwork,dwork);
+
+        // Update clusterings based on agglomeration
+        idx1 = ag1[n-k];
+        idx2 = ag2[n-k];
+        clust1 = clusters[idx1];
+        clust2 = clusters[idx2];
+
+        // Relabel clusters
+        // name clust2 with label clust1
+        for(int i=0; i <n; i++){
+            if(clusters[i] == clust2) {
+                clusters[i] = clust1;
+            }
+        }
+
+        // reorder cluster labels
+        for(int i=0; i <n; i++){
+            if(clusters[i] == k-1) {
+                clusters[i] = clust2;
+            }
+        }
 
 
+        // Decrement Cluster Number
+        k--;
+    }
+
+    // Step 3 - Find minimum MSE and clustering
+
+
+
+}
 
 
 //requires dwork of length at least n
 //requires iwork of length at least 2n
-void hclust_agglomerate(double* dist,int n,int m,hclust_agg_t* hclust_sol,double* dwork,int* iwork) {
+void hclust_agglomerate(double* dist,int n,hclust_agg_t* hclust_sol,double* dwork,int* iwork) {
     // Step 0 - Declarations
     int* nn_idx; //nearest neighbor idx
     int* active;
