@@ -33,10 +33,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     workspace work;
     mem_pool free_d2;
     double mu = 0.5*eps_obj/log(d);
-    // ptmp1 = (void *) R_alloc(d2,sizeof(double));
-    // initialize_identity_matrix(ptmp1,d);
     initialize_problem_instance(D, E, ESI, mu, d, 0, &prob);
-    // allocate_workspace_pd(d, K, &work);
     allocate_workspace_pd(d, d, &work);
     free_d2.base = (void **) R_alloc(5,sizeof(void*));
     free_d2.length = 5;
@@ -51,14 +48,15 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     ptmp1 = (void *) R_alloc(d2,sizeof(double));
     mem_pool_insert(&free_d2, ptmp1);
 
-    // Non-convex rounding
+    // Non-convex rounding -- uses HC not KM
+    hclust_t tmp_hc_sol;
+    int* km_clusters_tmp;
     int* km_clusters_new = (int *) R_alloc(d,sizeof(int));
     int* km_clusters_best = (int *) R_alloc(d,sizeof(int));
-    int* km_clusters_tmp;
-    double* km_centers_new;// = (double *) R_alloc(d*K,sizeof(double));
     double km_val_best;
     double km_val_new;
     double km_best_time = -1;
+    int K_hat = -1;
     int km_iter_best = 1;
     int km_iter_total = 1;
     int new_best_km = 0;
@@ -68,7 +66,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     int dc_grad_iter = -1;
     double dc_time = -1;
     double* Y_a_best = (double *) R_alloc(d,sizeof(double));
-    double Y_T_best = 0.0;
 
     // Projected Gradient Descent A - declarations
     clock_t start_time = clock();
@@ -112,39 +109,43 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     int km_rep = opts->kmeans_iter;
     int verbosity = opts->verbosity;
     int finish_pgd = opts->finish_pgd;
-    int dual_frequency = opts->dual_frequency;
+    int primal_only = opts -> primal_only;
     int max_iter = opts -> max_iter;
+    int dual_frequency = opts->dual_frequency;
+    if(primal_only != 0) dual_frequency = max_iter + 1;
 
     ////////////////////////////////////////////////////////////
     //// STEP 2 - Initial K-means Solution, Certificate
     ////////////////////////////////////////////////////////////
-    // kmeans_pp_impl(D_kmeans,K,d,d,km_clusters_best,km_centers_new,&lloyds_updates,&lloyds_runtime,&work);
-    // km_val_best = clust_to_opt_val(&prob,km_clusters_best,&work);
-    // cur_time = clock();
-    // km_best_time = time_difference_ms(start_time,cur_time);
-    // for(int i=0; i < km_rep - 1; i++){
-    //     kmeans_pp_impl(D_kmeans,K,d,d,km_clusters_new,km_centers_new,&lloyds_updates,&lloyds_runtime,&work);
-    //     km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
-    //     km_iter_total++;
-    //     if(km_val_new < km_val_best) {
-    //         km_val_best = km_val_new;
-    //         km_clusters_tmp = km_clusters_best;
-    //         km_clusters_best = km_clusters_new;
-    //         km_clusters_new = km_clusters_tmp;
-    //         km_iter_best = km_iter_total;
-    //         cur_time = clock();
-    //         km_best_time = time_difference_ms(start_time,cur_time);
-    //     }
-    // }
-    // kmeans_dual_solution_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,
-    //                                 DUAL_EPS2_DEFAULT, DUAL_Y_T_MIN_DEFAULT,
-    //                                 Y_a_best, &Y_T_best, &dc, &work);
-    // if(dc == 1){
-    //     cur_time = clock();
-    //     dc_time = time_difference_ms(start_time,cur_time);
-    //     dc_grad_iter = grad_iter_total;
-    // }
-
+    if(primal_only == 0) {
+        tmp_hc_sol.clusters = km_clusters_best;
+        hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
+        K_hat = tmp_hc_sol.K;
+        km_val_best = clust_to_opt_val(&prob,km_clusters_best,&work);
+        cur_time = clock();
+        km_best_time = time_difference_ms(start_time,cur_time);
+        for(int i=0; i < km_rep - 1; i++){
+            tmp_hc_sol.clusters = km_clusters_new;
+            hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
+            km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
+            km_iter_total++;
+            if(km_val_new < km_val_best) {
+                km_val_best = km_val_new;
+                km_clusters_tmp = km_clusters_best;
+                km_clusters_best = km_clusters_new;
+                km_clusters_new = km_clusters_tmp;
+                km_iter_best = km_iter_total;
+                cur_time = clock();
+                km_best_time = time_difference_ms(start_time,cur_time);
+            }
+        }
+        kmeans_dual_solution_nok_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,Y_a_best, &dc, &work);
+        if(dc == 1){
+            cur_time = clock();
+            dc_time = time_difference_ms(start_time,cur_time);
+            dc_grad_iter = grad_iter_total;
+        }
+    }
     ////////////////////////////////////////////////////////////
     //// STEP 3 - Outer PGD Loop
     ////////////////////////////////////////////////////////////
@@ -295,33 +296,34 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         }
 
         // STEP 3B -- Dual Certificate Search
-        // new_best_km = 0;
-        // project_E(&prob,Z_best,lambda_min_best,results->B_Z_best);
-        // for(int i=0; i < km_rep; i++){
-        //     kmeans_pp_impl(results->B_Z_best,K,d,d,km_clusters_new,km_centers_new,&lloyds_updates,&lloyds_runtime,&work);
-        //     km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
-        //     km_iter_total++;
-        //     if(km_val_new < km_val_best) {
-        //         km_val_best = km_val_new;
-        //         km_clusters_tmp = km_clusters_best;
-        //         km_clusters_best = km_clusters_new;
-        //         km_clusters_new = km_clusters_tmp;
-        //         km_iter_best = km_iter_total;
-        //         new_best_km = 1;
-        //         cur_time = clock();
-        //         km_best_time = time_difference_ms(start_time,cur_time);
-        //     }
-        // }
-        // if(new_best_km && dc == 0){
-        //     kmeans_dual_solution_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,
-        //                                     DUAL_EPS2_DEFAULT, DUAL_Y_T_MIN_DEFAULT,
-        //                                     Y_a_best, &Y_T_best, &dc, &work);
-        //     if(dc == 1){
-        //         cur_time = clock();
-        //         dc_time = time_difference_ms(start_time,cur_time);
-        //         dc_grad_iter = grad_iter_total;
-        //     }
-        // }
+        new_best_km = 0;
+        project_E(&prob,Z_best,lambda_min_best,results->B_Z_best);
+
+        for(int i=0; i < km_rep; i++){
+            tmp_hc_sol.clusters = km_clusters_new;
+            hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
+            km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
+            km_iter_total++;
+            if(km_val_new < km_val_best) {
+                km_val_best = km_val_new;
+                km_clusters_tmp = km_clusters_best;
+                km_clusters_best = km_clusters_new;
+                km_clusters_new = km_clusters_tmp;
+                km_iter_best = km_iter_total;
+                new_best_km = 1;
+                cur_time = clock();
+                km_best_time = time_difference_ms(start_time,cur_time);
+            }
+        }
+        if(new_best_km && dc == 0){
+            kmeans_dual_solution_nok_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,Y_a_best, &dc, &work);
+            if(dc == 1){
+                cur_time = clock();
+                dc_time = time_difference_ms(start_time,cur_time);
+                dc_grad_iter = grad_iter_total;
+            }
+        }
+
         if(verbosity > 0){
             Rprintf("\tOUTER ITERATION %d -- Dual Feasible: %d\r\n",outer_iterations,dc);
             Rprintf("\tOUTER ITERATION %d -- COMPLETE\r\n",outer_iterations);
@@ -346,7 +348,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     results->B_Z_best_opt_val = F77_NAME(ddot)(&d2,D,&INC1,results->B_Z_best,&INC1);
 
     // Copy out kmeans best
-    // memcpy(results->kmeans_best,km_clusters_best,d*sizeof(int));
+    if(primal_only == 0) memcpy(results->kmeans_best,km_clusters_best,d*sizeof(int));
 
     // Set scalar return values
     results->Z_T_lmin = lambda_min_tp1;
@@ -371,7 +373,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         Rprintf("\t\tTotal Running Time:%.3fs\r\n",results->total_time);
         Rprintf("\t\t<D,B_Z_T> = %.4f\r\n",results->B_Z_T_opt_val);
         Rprintf("\t\t<D,B_Z_best> = %.4f\r\n",results->B_Z_best_opt_val);
-        Rprintf("\t\t<D,B_km> = %.4f\r\n",km_val_best);
+        if(primal_only == 0) Rprintf("\t\t<D,B_km> = %.4f\r\n",km_val_best);
     }
     if(verbosity == 5){
         Rprintf("\t\tTotal Momentum Restarts:%d\r\n",num_momentum_restarts);
@@ -383,7 +385,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
 // cannot pass struct
 void FORCE_adapt_R(double* D, double* D_kmeans, double* E, double* ESI, double* X0, int* d,
     int* in_verbosity, int* in_kmeans_iter, int* in_dual_frequency, int* in_max_iter,
-    int* in_finish_pgd, int* in_number_restarts, int* in_restarts, double* in_alpha, double* in_eps_obj,
+    int* in_finish_pgd, int* in_primal_only, int* in_number_restarts, int* in_restarts, double* in_alpha, double* in_eps_obj,
     double* out_Z_T, double* out_B_Z_T, double* out_Z_T_lmin, double* out_Z_best, double* out_B_Z_best, double* out_Z_best_lmin,
     double* out_B_Z_T_opt_val, double* out_B_Z_best_opt_val, double* out_kmeans_opt_val,  int* out_kmeans_best, double* out_kmeans_best_time,
     int* out_kmeans_iter_best, int* out_kmeans_iter_total, int* out_dc, double* out_dc_time,
@@ -402,6 +404,7 @@ void FORCE_adapt_R(double* D, double* D_kmeans, double* E, double* ESI, double* 
     opts_in.restarts = in_restarts;
     opts_in.alpha = *in_alpha;
     opts_in.eps_obj = *in_eps_obj;
+    opts_in.primal_only = *in_primal_only;
 
     results.Z_T = out_Z_T;
     results.B_Z_T = out_B_Z_T;

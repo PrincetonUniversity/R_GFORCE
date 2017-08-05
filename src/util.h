@@ -2,6 +2,7 @@
 #define UTIL_H
 
 #include "time.h"
+#include "FORCE.h"
 
 // CONSTANTS
 extern const double DUAL_EPS1_DEFAULT, DUAL_EPS2_DEFAULT, DUAL_Y_T_MIN_DEFAULT,GNORM_FACTOR,ALPHA,BETA;

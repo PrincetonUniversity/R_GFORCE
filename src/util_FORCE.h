@@ -28,4 +28,6 @@ void kmeans_dual_solution_impl(int* restrict ga_hat, problem_instance* restrict 
 void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restrict prob, double eps1,
                                    double* restrict Y_a_r, int* restrict feasible_r, workspace* restrict work);
 
+void hclust_FORCE(double* dists,int d,hclust_t* hclust_sol,workspace* work);
+
 #endif

@@ -5,8 +5,8 @@
 #include "R_ext/Lapack.h"
 #include "R_ext/BLAS.h"
 #include "FORCE.h"
+#include "util.h"
 #include "util_mops.h"
-// #include "convex_kmeans_util.h"
 
 
 // void hclust(double* dist,int n,int m,int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin,double* dwork,int* iwork);
@@ -42,6 +42,14 @@ void hclust_R(double* data, int* n0, int* clusters,int* K, double* MSE){
 
     // set return value for K
     *K = hclust_sol.K;
+}
+
+//requires dwork of length at least 2n
+//requires iwork of length at least 7n + 3
+void hclust_FORCE(double* dists,int d,hclust_t* hclust_sol,workspace* work) {
+    double* dwork = work -> dwork;
+    int* iwork = work -> iwork;
+    hclust(dists,d,hclust_sol,dwork,iwork);
 }
 
 

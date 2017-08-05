@@ -212,7 +212,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
       D_Kmeans <- D
   }
   if(is.null(X0)){
-    o <- ones(d)
+    o <- rep(1,d)
     X0 <- (1/d)*o%*%t(o)
   }
   # initialize E and ESI
@@ -243,6 +243,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
           dual_frequency = as.integer(force_opts$dual_frequency),
           max_iter = as.integer(force_opts$max_iter),
           finish_pgd = as.integer(force_opts$finish_pgd),
+          primal_only = as.integer(force_opts$primal_only),
           number_restarts = as.integer(length(force_opts$restarts)),
           restarts = as.integer(force_opts$restarts),
           alpha = as.double(force_opts$alpha),
@@ -274,12 +275,12 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   res$Z_best <- matrix(C_result$Z_best,ncol=d)
   res$B_Z_best <- matrix(C_result$B_Z_best,ncol=d)
   res$B_Z_best_opt_val <- C_result$B_Z_best_opt_val
-  # res$km_best <- C_result$km_best
-  # res$B_km <- gforce.clust2mat(res$km_best)
-  # res$km_opt_val <- C_result$km_opt_val
-  # res$km_best_time <- C_result$km_best_time
-  # res$km_iter_best <- C_result$km_iter_best
-  # res$km_iter_total <- C_result$km_iter_total
+  res$km_best <- C_result$km_best
+  res$B_km <- gforce.clust2mat(res$km_best)
+  res$km_opt_val <- C_result$km_opt_val
+  res$km_best_time <- C_result$km_best_time
+  res$km_iter_best <- C_result$km_iter_best
+  res$km_iter_total <- C_result$km_iter_total
   res$dual_certified <- C_result$dc
   res$dual_certified_grad_iter <- C_result$dc_grad_iter
   res$dual_certified_time <- C_result$dc_time
