@@ -33,7 +33,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     mem_pool free_d2;
     double mu = 0.5*eps_obj/log(d);
     initialize_problem_instance(D, E, ESI, mu, d, K, &prob);
-    allocate_workspace_pd(d, K, &work);
+    allocate_workspace_FORCE(d, K, &work);
     free_d2.base = (void **) R_alloc(5,sizeof(void*));
     free_d2.length = 5;
     free_d2.start_idx=0;

@@ -49,7 +49,8 @@ typedef struct problem_instance {
 double min_array(int d,double* V);
 void* mem_pool_remove(mem_pool* pool);
 void mem_pool_insert(mem_pool* pool, void* mem_ptr);
-void allocate_workspace_pd(int d, int K, workspace* work);
+void allocate_workspace_FORCE(int d, int K, workspace* work);
+void allocate_workspace_FORCE_adapt(int d, workspace* work);
 void initialize_problem_instance(double* D, double* E, double* ESI, double mu,
                                 int d,int K, problem_instance* prob);
 double time_difference_ms(clock_t start, clock_t end);

@@ -34,7 +34,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     mem_pool free_d2;
     double mu = 0.5*eps_obj/log(d);
     initialize_problem_instance(D, E, ESI, mu, d, 0, &prob);
-    allocate_workspace_pd(d, d, &work);
+    allocate_workspace_FORCE_adapt(d, &work);
     free_d2.base = (void **) R_alloc(5,sizeof(void*));
     free_d2.length = 5;
     free_d2.start_idx=0;
@@ -121,13 +121,13 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         tmp_hc_sol.clusters = km_clusters_best;
         hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
         K_hat = tmp_hc_sol.K;
-        km_val_best = clust_to_opt_val(&prob,km_clusters_best,&work);
+        km_val_best = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
         cur_time = clock();
         km_best_time = time_difference_ms(start_time,cur_time);
         for(int i=0; i < km_rep - 1; i++){
             tmp_hc_sol.clusters = km_clusters_new;
             hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
-            km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
+            km_val_new = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
             km_iter_total++;
             if(km_val_new < km_val_best) {
                 km_val_best = km_val_new;
@@ -135,6 +135,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
                 km_clusters_best = km_clusters_new;
                 km_clusters_new = km_clusters_tmp;
                 km_iter_best = km_iter_total;
+                K_hat = tmp_hc_sol.K;
                 cur_time = clock();
                 km_best_time = time_difference_ms(start_time,cur_time);
             }
@@ -302,7 +303,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         for(int i=0; i < km_rep; i++){
             tmp_hc_sol.clusters = km_clusters_new;
             hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
-            km_val_new = clust_to_opt_val(&prob,km_clusters_new,&work);
+            km_val_new = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
             km_iter_total++;
             if(km_val_new < km_val_best) {
                 km_val_best = km_val_new;
@@ -310,6 +311,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
                 km_clusters_best = km_clusters_new;
                 km_clusters_new = km_clusters_tmp;
                 km_iter_best = km_iter_total;
+                K_hat = tmp_hc_sol.K;
                 new_best_km = 1;
                 cur_time = clock();
                 km_best_time = time_difference_ms(start_time,cur_time);

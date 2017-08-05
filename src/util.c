@@ -51,7 +51,7 @@ void* mem_pool_remove(mem_pool* pool){
 
 
 // Allocates properly sized workspace for primal_dual_adar
-void allocate_workspace_pd(int d, int K, workspace* work){
+void allocate_workspace_FORCE(int d, int K, workspace* work){
     // local vars
     int liwork = -1;
     int liwork_N = -1;
@@ -111,6 +111,72 @@ void allocate_workspace_pd(int d, int K, workspace* work){
     work -> iwork = (int *) R_alloc(liwork,sizeof(int));
     work -> liwork = liwork;
 }
+
+// Allocates properly sized workspace for primal_dual_adar
+void allocate_workspace_FORCE_adapt(int d, workspace* work){
+    // local vars
+    int liwork = -1;
+    int liwork_N = -1;
+    int ldwork = -1;
+    int ldwork_N = -1;
+    int tmp1;
+
+    // USE CASE 0 -- Find Space Needed for both types of DSYEVD Calls
+    double* X;
+    double dwork0[2];
+    int iwork0[2];
+    double dvec[2];
+    int lapack_info = 0;
+    F77_CALL(dsyevd)(&JOBZN,&UPLO,&d,X,&d,dvec,dwork0,&ldwork_N,iwork0,&liwork_N,&lapack_info);
+    liwork_N = *iwork0;
+    ldwork_N = (int) *dwork0;
+    work -> dsyevd_liwork_N = liwork_N;
+    work -> dsyevd_ldwork_N = ldwork_N;
+    F77_CALL(dsyevd)(&JOBZV,&UPLO,&d,X,&d,dvec,dwork0,&ldwork,iwork0,&liwork,&lapack_info);
+    liwork = *iwork0;
+    ldwork = (int) *dwork0;
+    work -> dsyevd_liwork = liwork;
+    work -> dsyevd_ldwork = ldwork;
+
+
+    // USE CASE 1 -- SMOOTHED_GRADIENT COMPUTATION
+    ldwork = ldwork + d; //add space for w to hold eigvals
+
+    // Workspace size for smoothed gradient (ignoring) syevd is 2d^2+d
+    tmp1 = 2*d*d + d;
+    ldwork = ldwork > tmp1 ? ldwork : tmp1;
+
+
+    // USE CASE 2 -- C_perp_update and clust_to_opt_val
+    // Get workspace size needed for C_perp_update and clust_to_opt_val
+    // These require ldwork >= d^2+5d+2 and liwork >= d+3K+3 (K<= d)
+    tmp1 = d*d + 5*d + 2;
+    ldwork = ldwork > tmp1 ? ldwork : tmp1;
+    tmp1 = d + 3*d + 3;
+    liwork = liwork > tmp1 ? liwork : tmp1;
+    
+
+    // USE CASE 3 -- Hclust
+    // ldwork >= 2d, liwork >= 7d+3
+    tmp1 = 2*d;
+    ldwork = ldwork > tmp1 ? ldwork : tmp1;
+    tmp1 = 7*d + 3;
+    liwork = liwork > tmp1 ? liwork : tmp1;
+
+    // USE CASE 4 -- smoothed_objective
+    // STRICTLY DOMINATED BY REQUIREMENTS IN USE CASE 2 (should be)
+    tmp1 = ldwork_N + 2*d*d + d;
+    ldwork = ldwork > tmp1 ? ldwork : tmp1;
+    liwork = liwork > liwork_N ? liwork : liwork_N;
+
+
+    // Initialize workspace
+    work -> dwork = (double *) R_alloc(ldwork,sizeof(double));
+    work -> ldwork = ldwork;
+    work -> iwork = (int *) R_alloc(liwork,sizeof(int));
+    work -> liwork = liwork;
+}
+
 
 // Takes input and precomputes values for problem instance
 // computes the fields D_rsums, TrD, DTD

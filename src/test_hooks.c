@@ -22,7 +22,7 @@ void test_smoothed_gradient_X_base(double* X, double* ESI, double* GX_t, int* d0
     int d2 = d*d;
 
     double* d2_tmp = (double *) R_alloc(d2,sizeof(double));
-    allocate_workspace_pd(d,K,&work);
+    allocate_workspace_FORCE(d,K,&work);
 
     X_eigs_idx = work.dsyevd_ldwork;
     tmp = 2*d2;
@@ -45,7 +45,7 @@ void test_smoothed_gradient(double* X, double* E,double* ESI,int* d0, int* K0,
     prob.K = K;
     prob.mu_n = -1 * (*mu0);
 
-    allocate_workspace_pd(d,K,&work);
+    allocate_workspace_FORCE(d,K,&work);
     smoothed_gradient(&prob,X,GX_t,GS_t,&work);
 }
 
@@ -62,7 +62,7 @@ void test_smoothed_objective(double* X, double* E,double* ESI,int* d0, int* K0,
     prob.K = K;
     prob.mu_n = -1 * (*mu0);
 
-    allocate_workspace_pd(d,K,&work);
+    allocate_workspace_FORCE(d,K,&work);
     smoothed_objective(&prob,X,lambda_min,obj_val,&work);
 }
 
@@ -75,7 +75,7 @@ void test_project_C_perpendicular(double* D, int* d0, int* K0, double* GX_t, dou
     double* E;
     double* ESI;
 
-    allocate_workspace_pd(d,K,&work);
+    allocate_workspace_FORCE(d,K,&work);
     initialize_problem_instance(D,E,ESI,mu,d,K,&prob);
     project_C_perpendicular(&prob,GX_t,GS_t,&work);
 }
@@ -95,7 +95,7 @@ void test_clust_to_opt_val(double* D, int* d, int* K, int* clusters, double* opt
     prob.D = D;
     prob.d = *d;
     prob.K = *K;
-    allocate_workspace_pd(*d,*K,&work);
+    allocate_workspace_FORCE(*d,*K,&work);
     opt_val = clust_to_opt_val(&prob,clusters,&work);
     *opt_val_r = opt_val;
 }
@@ -108,7 +108,7 @@ void test_project_C_perpendicular_nok(double* D, int* d0, double* GX_t, double* 
     double* E;
     double* ESI;
 
-    allocate_workspace_pd(d,d,&work);
+    allocate_workspace_FORCE(d,d,&work);
     initialize_problem_instance(D,E,ESI,mu,d,d,&prob);
     project_C_perpendicular_nok(&prob,GX_t,GS_t,&work);
 }

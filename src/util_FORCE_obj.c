@@ -207,6 +207,20 @@ double clust_to_opt_val(problem_instance* prob, int* ga_hat, workspace* work) {
     return opt_val;
 }
 
+double clust_to_opt_val_adapt(problem_instance* prob,hclust_t* tmp_hc_sol,workspace* work) {
+    // Local Vars
+    double opt_val;
+    double* D = prob -> D;
+    int d = prob -> d;
+    int K = tmp_hc_sol -> K;
+    int* ga_hat = tmp_hc_sol -> clusters;
+    double* dwork = work -> dwork;
+    int* iwork = work -> iwork;
+
+    opt_val = dabgtp(D,ga_hat,d,K,iwork,dwork);
+
+    return opt_val;
+}
 
 
 // CANNOT OVERWRITE *X

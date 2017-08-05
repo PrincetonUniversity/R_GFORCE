@@ -203,18 +203,6 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' @export
 gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   d <- ncol(D)
-
-  if(is.null(force_opts)){
-      force_opts <- gforce.defaults(d)
-  }
-
-  if(is.null(D_Kmeans)) {
-      D_Kmeans <- D
-  }
-  if(is.null(X0)){
-    o <- rep(1,d)
-    X0 <- (1/d)*o%*%t(o)
-  }
   # initialize E and ESI
   E <- 0.5*diag(d) + (1/(2*d))*matrix(1,ncol=d,nrow=d)
   E_EVEV <- eigen(E)
@@ -223,6 +211,22 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   E_sqrt <- E_V%*%(E_D^(0.5))%*%t(E_V)
   ESI <- solve(E_sqrt)
 
+  if(is.null(force_opts)){
+      force_opts <- gforce.defaults(d)
+  }
+
+  if(is.null(D_Kmeans)) {
+      D_Kmeans <- D
+  }
+
+  if(is.null(X0)){
+    hc_res <- gforce.hclust(D)
+    hc_sol <- gforce.clust2mat(hc_res$clusters)
+    X0 <- opts$initial_mixing*hc_sol + (1-opts$initial_mixing)*E
+    # X0 <- 0.5*hc_sol + 0.5*(matrix(1,ncol=d,nrow=d))*(1/d)
+  }
+  print(sum(X0*D) )
+  print(sum(E*D) )
   # make sure that initialization is well defined
   if(sum(X0*D) >= sum(E*D)) {
     stop('gforce.FORCE_adapt -- D^TX_0 >= D^TE. Check D, and if D is well specified, pass valid X0 as argument.')
@@ -292,9 +296,9 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   res$E <- E
 
   # perform HC clustering on final result
-  hc_res <- gforce.hclust(res$B_Z_best)
-  res$hc_best <- hc_res$clusters
-  res$hc_K <- hc_res$K
+  # hc_res <- gforce.hclust(res$B_Z_best)
+  # res$hc_best <- hc_res$clusters
+  # res$hc_K <- hc_res$K
   res <- res[sort(names(res))]
 
   return(res)

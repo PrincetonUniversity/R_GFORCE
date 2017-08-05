@@ -1,11 +1,13 @@
 #ifndef UTIL_FORCE_H
 #define UTIL_FORCE_H
 #include "util.h"
+#include "FORCE.h"
 
 // External Functions
 
 // FORCE PRIMAL METHOD HELPERS
 double clust_to_opt_val(problem_instance* prob, int* ga_hat, workspace* work);
+double clust_to_opt_val_adapt(problem_instance* prob,hclust_t* tmp_hc_sol,workspace* work);
 void smoothed_gradient(problem_instance* prob, double* X, double* GX_t, double* GS_t,
                         workspace* work);
 void smoothed_gradient_nok(problem_instance* prob, double* X, double* GX_t, double* GS_t,

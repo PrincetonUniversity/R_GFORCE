@@ -48,6 +48,8 @@ void hclust_R(double* data, int* n0, int* clusters,int* K, double* MSE){
 //requires iwork of length at least 7n + 3
 void hclust_FORCE(double* dists,int d,hclust_t* hclust_sol,workspace* work) {
     double* dwork = work -> dwork;
+    hclust_sol -> MSE = dwork;
+    dwork = dwork + d;
     int* iwork = work -> iwork;
     hclust(dists,d,hclust_sol,dwork,iwork);
 }
