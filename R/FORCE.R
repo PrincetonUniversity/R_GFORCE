@@ -220,16 +220,13 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   }
 
   if(is.null(X0)){
-    hc_res <- gforce.hclust(D)
-    hc_sol <- gforce.clust2mat(hc_res$clusters)
-    X0 <- opts$initial_mixing*hc_sol + (1-opts$initial_mixing)*E
-    # X0 <- 0.5*hc_sol + 0.5*(matrix(1,ncol=d,nrow=d))*(1/d)
+    X0 <- FORCE_adapt_init(D,E,opts$adapt_init_mode,opts$initial_mixing)
   }
-  print(sum(X0*D) )
-  print(sum(E*D) )
-  # make sure that initialization is well defined
+
+  # make sure that initialization is valid
   if(sum(X0*D) >= sum(E*D)) {
-    stop('gforce.FORCE_adapt -- D^TX_0 >= D^TE. Check D, and if D is well specified, pass valid X0 as argument.')
+    stop(sprintf('gforce.FORCE_adapt -- D^TX_0 >= D^TE. Check D, and if D is well specified, pass valid X0 as argument. %3.3f >= %3.3f',
+          sum(X0*D),sum(E*D)))
   }
 
   res <- NULL
@@ -409,6 +406,7 @@ gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NU
 #' @export
 gforce.defaults <- function(d){
   options <- NULL
+  options$adapt_init_mode = 0
   options$alpha = 10^-4
   options$alpha_decrease_time = 10
   options$alpha_max = 1
@@ -433,4 +431,33 @@ gforce.defaults <- function(d){
   options$verbose = 0
 
   return(options)
+}
+
+
+FORCE_adapt_init <- function(D,E,mode,mixing) {
+  X0 <- NULL
+  if(mode == 1) {
+    hc_res <- gforce.hclust(D)
+    hc_sol <- gforce.clust2mat(hc_res$clusters)
+    X0 <- mixing*hc_sol + (1-mixing)*E
+  } else if(mode==2) {
+    hc_res <- gforce.hclust(D)
+    hc_sol <- gforce.clust2mat(hc_res$clusters)
+    X0 <- 0.5*hc_sol + 0.5*(matrix(1,ncol=d,nrow=d))*(1/d)
+  } else if (mode==3) {
+    X0 <- (1/d)*matrix(1,ncol=d,nrow=d)
+  } else {
+    hc_res <- gforce.hclust(D)
+    hc_sol <- gforce.clust2mat(hc_res$clusters)
+    X0_a <- opts$initial_mixing*hc_sol + (1-opts$initial_mixing)*E
+    X0_b <- 0.5*hc_sol + 0.5*(matrix(1,ncol=d,nrow=d))*(1/d)
+    val_a <- sum(X0_a*D)
+    val_b <- sum(X0_b*D)
+    X0 <- X0_a
+    if(val_b < val_a) {
+      X0 <- X0_b
+    }
+  }
+
+  return(X0)
 }
