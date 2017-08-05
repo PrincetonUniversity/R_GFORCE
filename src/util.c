@@ -157,8 +157,8 @@ void allocate_workspace_FORCE_adapt(int d, workspace* work){
     
 
     // USE CASE 3 -- Hclust
-    // ldwork >= 2d, liwork >= 7d+3
-    tmp1 = 2*d;
+    // ldwork >= d^2 + 2d, liwork >= 7d+3
+    tmp1 = 3*d*d;
     ldwork = ldwork > tmp1 ? ldwork : tmp1;
     tmp1 = 7*d + 3;
     liwork = liwork > tmp1 ? liwork : tmp1;

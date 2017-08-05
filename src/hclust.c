@@ -13,6 +13,7 @@
 
 int L_curve_criterion(double* vals,int n);
 void hclust_agg2clust(int* ag1,int* ag2,int n,int K,int* clusters);
+void hclust_distances(double* X,int n, int m,double* dists,double* dwork);
 
 void hclust_agglomerate_R(double* data, int* n0, int* agglomerate_idx_1, int* agglomerate_idx_2, double* agglomerate_dmin){
     hclust_agg_t hclust_sol;
@@ -44,13 +45,19 @@ void hclust_R(double* data, int* n0, int* clusters,int* K, double* MSE){
     *K = hclust_sol.K;
 }
 
-//requires dwork of length at least 2n
-//requires iwork of length at least 7n + 3
-void hclust_FORCE(double* dists,int d,hclust_t* hclust_sol,workspace* work) {
+//requires dwork of length at least 3*d^2
+//requires iwork of length at least 7d + 3
+void hclust_FORCE(double* D,int d,hclust_t* hclust_sol,workspace* work) {
     double* dwork = work -> dwork;
+    double* dists = dwork;
+    dwork = dwork + d*d;
+
+    hclust_distances(D,d,d,dists,dwork);
+
     hclust_sol -> MSE = dwork;
     dwork = dwork + d;
     int* iwork = work -> iwork;
+
     hclust(dists,d,hclust_sol,dwork,iwork);
 }
 
@@ -197,6 +204,7 @@ int L_curve_criterion(double* vals,int n){
 
 //requires dwork of length at least n
 //requires iwork of length at least 2n
+//WARNING: dist is overwritten
 void hclust_agglomerate(double* dist,int n,hclust_agg_t* hclust_sol,double* dwork,int* iwork) {
     // Step 0 - Declarations
     int* nn_idx; //nearest neighbor idx
@@ -322,3 +330,31 @@ void hclust_agglomerate(double* dist,int n,hclust_agg_t* hclust_sol,double* dwor
     }
 
 }
+
+
+// construct distances matrix
+// n x m matrix, n data points
+// output is n x n 
+// requires dwork = n^2 + n*m
+void hclust_distances(double* X,int n, int m,double* dists,double* dwork) {
+    double dtmp1;
+    double* ips = dwork;
+    dwork = dwork + n*n;
+    double* X_copy = dwork;
+    memcpy(X_copy,X,n*n*sizeof(double));
+
+    //neither matrix is symmetric, so need to use dgemm
+    F77_NAME(dgemm)(&TRANS_N,&TRANS_T,&n,&n,&m,&ALPHA,X,&n,X_copy,&n,&BETA,ips,&n);
+
+    //fill dists matrix
+    for(int i=0; i < n; i++) {
+        for(int j=0; j < n; j++) {
+            dtmp1 = ips[i*(n+1)]; //gets ith diagonal element
+            dtmp1 = dtmp1 + ips[j*(n+1)]; //gets jth diagonal element
+            dtmp1 = dtmp1 - 2*(ips[i*n + j]);
+            dists[i*n+j] = sqrt(dtmp1);
+        }
+    }
+}
+
+

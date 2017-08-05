@@ -124,22 +124,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         km_val_best = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
         cur_time = clock();
         km_best_time = time_difference_ms(start_time,cur_time);
-        for(int i=0; i < km_rep - 1; i++){
-            tmp_hc_sol.clusters = km_clusters_new;
-            hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
-            km_val_new = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
-            km_iter_total++;
-            if(km_val_new < km_val_best) {
-                km_val_best = km_val_new;
-                km_clusters_tmp = km_clusters_best;
-                km_clusters_best = km_clusters_new;
-                km_clusters_new = km_clusters_tmp;
-                km_iter_best = km_iter_total;
-                K_hat = tmp_hc_sol.K;
-                cur_time = clock();
-                km_best_time = time_difference_ms(start_time,cur_time);
-            }
-        }
         kmeans_dual_solution_nok_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,Y_a_best, &dc, &work);
         if(dc == 1){
             cur_time = clock();
@@ -296,26 +280,23 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
             grad_iter_total++;
         }
 
-        // STEP 3B -- Dual Certificate Search
+        // STEP 3B -- Dual Certificate Search -- HC is deterministic
         new_best_km = 0;
         project_E(&prob,Z_best,lambda_min_best,results->B_Z_best);
-
-        for(int i=0; i < km_rep; i++){
-            tmp_hc_sol.clusters = km_clusters_new;
-            hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
-            km_val_new = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
-            km_iter_total++;
-            if(km_val_new < km_val_best) {
-                km_val_best = km_val_new;
-                km_clusters_tmp = km_clusters_best;
-                km_clusters_best = km_clusters_new;
-                km_clusters_new = km_clusters_tmp;
-                km_iter_best = km_iter_total;
-                K_hat = tmp_hc_sol.K;
-                new_best_km = 1;
-                cur_time = clock();
-                km_best_time = time_difference_ms(start_time,cur_time);
-            }
+        tmp_hc_sol.clusters = km_clusters_new;
+        hclust_FORCE(results->B_Z_best,d,&tmp_hc_sol,&work);
+        km_val_new = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
+        km_iter_total++;
+        if(km_val_new < km_val_best) {
+            km_val_best = km_val_new;
+            km_clusters_tmp = km_clusters_best;
+            km_clusters_best = km_clusters_new;
+            km_clusters_new = km_clusters_tmp;
+            km_iter_best = km_iter_total;
+            K_hat = tmp_hc_sol.K;
+            new_best_km = 1;
+            cur_time = clock();
+            km_best_time = time_difference_ms(start_time,cur_time);
         }
         if(new_best_km && dc == 0){
             kmeans_dual_solution_nok_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,Y_a_best, &dc, &work);
