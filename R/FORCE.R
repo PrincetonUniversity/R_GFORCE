@@ -419,7 +419,7 @@ gforce.defaults <- function(d){
   options$duality_gap = 10^-5
   options$early_stop_mode = 1
   options$early_stop_lag = 50
-  options$early_stop_eps = 10^-8
+  options$early_stop_eps = 10^-5
   options$eps_obj = 0.01
   options$finish_pgd = 0
   options$initial_mixing = 2/d
