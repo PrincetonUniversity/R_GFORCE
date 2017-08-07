@@ -150,17 +150,23 @@ random_covariance <- function(K,zeta) {
 
 
 generate_random_partition <- function(K,d,m){
-  group_sum <- 0
-  pre_alloc <- K*m
   group_sizes <- NULL
-  while(group_sum != (d-pre_alloc)){
-    group_sizes <- runif(K)
-    group_sum = sum(group_sizes)
-    group_sizes <- ((d - pre_alloc)/group_sum)*group_sizes
-    group_sizes <- round(group_sizes)
-    group_sum <- sum(group_sizes)
+
+  if(K*m == d) {
+    group_sizes <- rep(m,K)
+  } else {
+    group_sum <- 0
+    pre_alloc <- K*m
+    group_sizes <- NULL
+    while(group_sum != (d-pre_alloc)){
+      group_sizes <- runif(K)
+      group_sum = sum(group_sizes)
+      group_sizes <- ((d - pre_alloc)/group_sum)*group_sizes
+      group_sizes <- round(group_sizes)
+      group_sum <- sum(group_sizes)
+    }
+    group_sizes <- group_sizes + m
   }
-  group_sizes <- group_sizes + m
   group_assignments <- rep(0,d)
   group_number <- 1
   group_counter <- 0

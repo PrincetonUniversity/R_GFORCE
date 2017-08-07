@@ -90,6 +90,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     double obj_tp1;
     double obj_t;
     int stop_loop = 0;
+    int early_stop = 0;
     int number_restarts = opts->number_restarts;
     int* restarts = opts->restarts;
     int current_restart = -1;
@@ -112,7 +113,10 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     int max_iter = opts -> max_iter;
     int dual_frequency = opts->dual_frequency;
     if(primal_only != 0) dual_frequency = max_iter + 1;
-
+    int early_stop_lag = opts -> early_stop_lag;
+    double early_stop_eps = opts -> early_stop_eps;
+    double early_stop_obj_val_prev = 0;
+    double early_stop_obj_val_next = 0;
 
     ////////////////////////////////////////////////////////////
     //// STEP 2 - Initial K-means Solution, Certificate
@@ -184,7 +188,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
         if(verbosity > 0){
             Rprintf("\tOUTER ITERATION %d -- START\r\n",outer_iterations);
         }
-        while((grad_iter_total % dual_frequency > 0) || next_iter) {
+        while(((grad_iter_total % dual_frequency > 0) || next_iter ) && early_stop == 0) {
             next_iter = 0;
             if(verbosity > 1){
                 Rprintf("\t\tINNER ITERATION %d -- START\r\n",grad_iter_total);
@@ -296,6 +300,17 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
                 Rprintf("\t\tINNER ITERATION %d -- COMPLETE\r\n",grad_iter_total);
             }
             grad_iter_total++;
+
+            // STEP 3AH -- Check early stop relative error criterion
+            if(early_stop_lag != -1 && grad_iter_total % early_stop_lag == 0 ) {
+                early_stop_obj_val_next = obj_tp1;
+                dtmp1 = (early_stop_obj_val_next - early_stop_obj_val_prev) / (early_stop_obj_val_prev + 0.000001);
+                dtmp1 = dtmp1 > 0 ? dtmp1 : -1.0*dtmp1;
+                early_stop = dtmp1 > early_stop_eps ? 0 : 1;
+                early_stop_obj_val_prev = early_stop_obj_val_next;
+            }
+
+
         }
 
         // STEP 3B -- Dual Certificate Search
@@ -335,7 +350,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
         }
 
         // STEP 3C - Update Stopping Criterion
-        stop_loop = ((dc && !finish_pgd) || (grad_iter_total >= max_iter) );
+        stop_loop = ((dc && !finish_pgd) || (grad_iter_total >= max_iter) || early_stop == 1);
     }
 
     ////////////////////////////////////////////////////////////
@@ -391,6 +406,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
 void FORCE_R(double* D, double* D_kmeans, double* E, double* ESI, double* X0, int* d, int* K,
     int* in_verbosity, int* in_kmeans_iter, int* in_dual_frequency, int* in_max_iter,
     int* in_finish_pgd, int* in_primal_only, int* in_number_restarts, int* in_restarts, double* in_alpha, double* in_eps_obj,
+    int* in_early_stop_lag, double* in_early_stop_eps,
     double* out_Z_T, double* out_B_Z_T, double* out_Z_T_lmin, double* out_Z_best, double* out_B_Z_best, double* out_Z_best_lmin,
     double* out_B_Z_T_opt_val, double* out_B_Z_best_opt_val, double* out_kmeans_opt_val,  int* out_kmeans_best, double* out_kmeans_best_time,
     int* out_kmeans_iter_best, int* out_kmeans_iter_total, int* out_dc, double* out_dc_time,
@@ -410,6 +426,8 @@ void FORCE_R(double* D, double* D_kmeans, double* E, double* ESI, double* X0, in
     opts_in.restarts = in_restarts;
     opts_in.alpha = *in_alpha;
     opts_in.eps_obj = *in_eps_obj;
+    opts_in.early_stop_lag = *in_early_stop_lag;
+    opts_in.early_stop_eps = *in_early_stop_eps;
 
     results.Z_T = out_Z_T;
     results.B_Z_T = out_B_Z_T;

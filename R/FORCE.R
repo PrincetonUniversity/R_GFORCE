@@ -75,7 +75,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
     a <- (K-1)/(d-1)
     b <- (d-K)/(d^2-d)
     E <- a*diag(d) + b*o%*%t(o)
-    X0 <- opts$initial_mixing*km_sol + (1-opts$initial_mixing)*E
+    X0 <- force_opts$initial_mixing*km_sol + (1-force_opts$initial_mixing)*E
   } else if(is.null(X0)){
     stop('FORCE -- Either specify both X0 and E or neither\r\n')
   } else if(is.null(E)){
@@ -114,6 +114,8 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
             restarts = as.integer(force_opts$restarts),
             alpha = as.double(force_opts$alpha),
             eps_obj = as.double(force_opts$eps_obj),
+            early_stop_lag = as.integer(force_opts$early_stop_lag),
+            early_stop_eps = as.double(force_opts$early_stop_eps),
             Z_T = numeric(d^2),
             B_Z_T = numeric(d^2),
             Z_T_lmin = as.double(1.0),
@@ -414,8 +416,8 @@ gforce.defaults <- function(d){
   options$alpha_mode = 0
   options$dual_frequency = 50
   options$duality_gap = 10^-5
-  options$early_stop = 0
-  options$early_stop_length = 0
+  options$early_stop_lag = -1
+  options$early_stop_eps = 10^-4
   options$eps_obj = 0.01
   options$finish_pgd = 0
   options$initial_mixing = 2/d
