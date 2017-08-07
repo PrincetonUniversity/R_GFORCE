@@ -428,7 +428,7 @@ gforce.defaults <- function(d){
   options$pgd_result_mode = 0
   options$primal_only = 0
   options$random_seed = -1
-  options$restarts = c(100)
+  options$restarts = c(75)
   options$slack_scale = 1
   options$start_mode = 1
   options$tau = 0.8

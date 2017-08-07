@@ -95,6 +95,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     int* restarts = opts->restarts;
     int current_restart = -1;
     int next_restart = -1;
+    int last_restart = 0;
     double* GX_t;
     double* GS_t;
     double alpha = opts->alpha;
@@ -222,6 +223,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
                 obj_best = obj_tp1;
                 lambda_min_best = lambda_min_tp1;
                 grad_iter_best = grad_iter_total;
+                last_restart = grad_iter_total;
 
                 if(current_restart < number_restarts){
                     current_restart++;
@@ -307,22 +309,25 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
             grad_iter_total++;
 
             // STEP 3AH -- Check early stop relative error criterion
-            if(early_stop_mode == 1 && grad_iter_total > early_stop_lag) {
-                //absolute error
+            if(early_stop_mode > 0) {
                 last_es_obj[ grad_iter_total % early_stop_lag] = obj_tp1;
+            }
+            if(early_stop_mode == 1 && grad_iter_total-last_restart > early_stop_lag) {
+                //absolute error
                 dtmp1 = min_array(early_stop_lag,last_es_obj);
                 dtmp2 = max_array(early_stop_lag,last_es_obj);
                 dtmp1 = dtmp2 - dtmp1;
                 early_stop = dtmp1 > early_stop_eps ? 0 : 1;
             }
-            if(early_stop_mode == 2 && grad_iter_total > early_stop_lag) {
+            if(early_stop_mode == 2 && grad_iter_total-last_restart > early_stop_lag) {
                 //relative error
-                last_es_obj[ grad_iter_total % early_stop_lag] = obj_tp1;
                 dtmp1 = min_array(early_stop_lag,last_es_obj);
                 dtmp2 = max_array(early_stop_lag,last_es_obj);
                 dtmp1 = (dtmp2 - dtmp1) / (dtmp1 + 0.000001);
                 early_stop = dtmp1 > early_stop_eps ? 0 : 1;
             }
+
+
         }
 
         // STEP 3B -- Dual Certificate Search
