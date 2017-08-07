@@ -47,6 +47,7 @@ typedef struct problem_instance {
 
 // GENERAL UTILITIES, MEMORY MANAGEMENT
 double min_array(int d,double* V);
+double max_array(int n, double* V);
 void* mem_pool_remove(mem_pool* pool);
 void mem_pool_insert(mem_pool* pool, void* mem_ptr);
 void allocate_workspace_FORCE(int d, int K, workspace* work);

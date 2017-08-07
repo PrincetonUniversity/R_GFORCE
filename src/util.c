@@ -30,6 +30,13 @@ double min_array(int n, double* V){
     return min_val;
 }
 
+double max_array(int n, double* V){
+    double max_val = -DBL_MAX;
+    for(int i=0; i < n; i++) max_val = (V[i] > max_val) ? V[i] : max_val;
+    return max_val;
+}
+
+
 void mem_pool_insert(mem_pool* pool, void* mem_ptr){
     int tmp_idx = (pool->end_idx);
     if(tmp_idx == (pool->length) -1) {
@@ -48,6 +55,9 @@ void* mem_pool_remove(mem_pool* pool){
     pool->start_idx = tmp_idx;
     return mem_ptr;
 }
+
+
+
 
 
 // Allocates properly sized workspace for primal_dual_adar

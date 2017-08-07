@@ -114,6 +114,7 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
             restarts = as.integer(force_opts$restarts),
             alpha = as.double(force_opts$alpha),
             eps_obj = as.double(force_opts$eps_obj),
+            early_stop_mode = as.integer(force_opts$early_stop_mode),
             early_stop_lag = as.integer(force_opts$early_stop_lag),
             early_stop_eps = as.double(force_opts$early_stop_eps),
             Z_T = numeric(d^2),
@@ -416,8 +417,9 @@ gforce.defaults <- function(d){
   options$alpha_mode = 0
   options$dual_frequency = 50
   options$duality_gap = 10^-5
-  options$early_stop_lag = -1
-  options$early_stop_eps = 10^-4
+  options$early_stop_mode = 1
+  options$early_stop_lag = 50
+  options$early_stop_eps = 10^-8
   options$eps_obj = 0.01
   options$finish_pgd = 0
   options$initial_mixing = 2/d
