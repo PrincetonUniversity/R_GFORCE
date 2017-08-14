@@ -152,7 +152,6 @@ random_covariance <- function(K,zeta) {
 generate_random_partition <- function(K,d,m){
   group_sizes <- rep(m,K)
   if(K*m != d) {
-    group_sum <- 0
     pre_alloc <- K*m
     remaining_group_assignments <- sample(1:K,d-pre_alloc,replace=T)
     for(g in remaining_group_assignments) {

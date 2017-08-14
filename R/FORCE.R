@@ -223,7 +223,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   }
 
   if(is.null(X0)){
-    X0 <- FORCE_adapt_init(D,E,opts$adapt_init_mode,opts$initial_mixing)
+    X0 <- FORCE_adapt_init(D,E,force_opts$adapt_init_mode,force_opts$initial_mixing)
   }
 
   # make sure that initialization is valid
@@ -252,6 +252,9 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
           restarts = as.integer(force_opts$restarts),
           alpha = as.double(force_opts$alpha),
           eps_obj = as.double(force_opts$eps_obj),
+          early_stop_mode = as.integer(force_opts$early_stop_mode),
+          early_stop_lag = as.integer(force_opts$early_stop_lag),
+          early_stop_eps = as.double(force_opts$early_stop_eps),
           Z_T = numeric(d^2),
           B_Z_T = numeric(d^2),
           Z_T_lmin = as.double(1.0),
@@ -440,6 +443,7 @@ gforce.defaults <- function(d){
 
 FORCE_adapt_init <- function(D,E,mode,mixing) {
   X0 <- NULL
+  d <- nrow(D)
   if(mode == 1) {
     hc_res <- gforce.hclust(D)
     hc_sol <- gforce.clust2mat(hc_res$clusters)
@@ -453,7 +457,7 @@ FORCE_adapt_init <- function(D,E,mode,mixing) {
   } else {
     hc_res <- gforce.hclust(D)
     hc_sol <- gforce.clust2mat(hc_res$clusters)
-    X0_a <- opts$initial_mixing*hc_sol + (1-opts$initial_mixing)*E
+    X0_a <- mixing*hc_sol + (1-mixing)*E
     X0_b <- 0.5*hc_sol + 0.5*(matrix(1,ncol=d,nrow=d))*(1/d)
     val_a <- sum(X0_a*D)
     val_b <- sum(X0_b*D)

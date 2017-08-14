@@ -21,7 +21,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     /////////////////////////////////////////////////////////////
     //// STEP 1 - Local Variable Initialization, Memory Allocation
     /////////////////////////////////////////////////////////////
-    double dtmp1;
+    double dtmp1,dtmp2;
     double* ptmp1;
     int d2 = d*d;
     double eps_obj = opts -> eps_obj;
@@ -91,10 +91,12 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     double obj_tp1;
     double obj_t;
     int stop_loop = 0;
+    int early_stop = 0;
     int number_restarts = opts->number_restarts;
     int* restarts = opts->restarts;
     int current_restart = -1;
     int next_restart = -1;
+    int last_restart = 0;
     double* GX_t;
     double* GS_t;
     double alpha = opts->alpha;
@@ -113,6 +115,16 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     int max_iter = opts -> max_iter;
     int dual_frequency = opts->dual_frequency;
     if(primal_only != 0) dual_frequency = max_iter + 1;
+    int early_stop_mode = opts -> early_stop_mode;
+    int early_stop_lag = opts -> early_stop_lag;
+    double early_stop_eps = opts -> early_stop_eps;
+    double* last_es_obj;
+    if(early_stop_mode > 0){
+        last_es_obj = (double *) R_alloc(early_stop_lag,sizeof(double));
+        for(int i = 0; i < early_stop_lag; i++) {
+            last_es_obj[i] = 0;
+        }
+    }
 
     ////////////////////////////////////////////////////////////
     //// STEP 2 - Initial K-means Solution, Certificate
@@ -166,7 +178,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         if(verbosity > 0){
             Rprintf("\tOUTER ITERATION %d -- START\r\n",outer_iterations);
         }
-        while((grad_iter_total % dual_frequency > 0) || next_iter) {
+        while(((grad_iter_total % dual_frequency > 0) || next_iter) && early_stop == 0) {
             next_iter = 0;
             if(verbosity > 1){
                 Rprintf("\t\tINNER ITERATION %d -- START\r\n",grad_iter_total);
@@ -194,6 +206,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
                 obj_best = obj_tp1;
                 lambda_min_best = lambda_min_tp1;
                 grad_iter_best = grad_iter_total;
+                last_restart = grad_iter_total;
 
                 if(current_restart < number_restarts){
                     current_restart++;
@@ -278,6 +291,26 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
                 Rprintf("\t\tINNER ITERATION %d -- COMPLETE\r\n",grad_iter_total);
             }
             grad_iter_total++;
+
+            // STEP 3AH -- Check early stop relative error criterion
+            if(early_stop_mode > 0) {
+                last_es_obj[ grad_iter_total % early_stop_lag] = obj_tp1;
+            }
+            if(early_stop_mode == 1 && grad_iter_total-last_restart > early_stop_lag) {
+                //absolute error
+                dtmp1 = min_array(early_stop_lag,last_es_obj);
+                dtmp2 = max_array(early_stop_lag,last_es_obj);
+                dtmp1 = dtmp2 - dtmp1;
+                early_stop = dtmp1 > early_stop_eps ? 0 : 1;
+            }
+            if(early_stop_mode == 2 && grad_iter_total-last_restart > early_stop_lag) {
+                //relative error
+                dtmp1 = min_array(early_stop_lag,last_es_obj);
+                dtmp2 = max_array(early_stop_lag,last_es_obj);
+                dtmp1 = (dtmp2 - dtmp1) / (dtmp1 + 0.000001);
+                early_stop = dtmp1 > early_stop_eps ? 0 : 1;
+            }
+
         }
 
         // STEP 3B -- Dual Certificate Search -- HC is deterministic
@@ -313,7 +346,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         }
 
         // STEP 3C - Update Stopping Criterion
-        stop_loop = ((dc && !finish_pgd) || (grad_iter_total >= max_iter) );
+        stop_loop = ((dc && !finish_pgd) || (grad_iter_total >= max_iter) || early_stop == 1);
     }
 
     ////////////////////////////////////////////////////////////
@@ -369,6 +402,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
 void FORCE_adapt_R(double* D, double* D_kmeans, double* E, double* ESI, double* X0, int* d,
     int* in_verbosity, int* in_kmeans_iter, int* in_dual_frequency, int* in_max_iter,
     int* in_finish_pgd, int* in_primal_only, int* in_number_restarts, int* in_restarts, double* in_alpha, double* in_eps_obj,
+    int* in_early_stop_mode, int* in_early_stop_lag, double* in_early_stop_eps,
     double* out_Z_T, double* out_B_Z_T, double* out_Z_T_lmin, double* out_Z_best, double* out_B_Z_best, double* out_Z_best_lmin,
     double* out_B_Z_T_opt_val, double* out_B_Z_best_opt_val, double* out_kmeans_opt_val,  int* out_kmeans_best, double* out_kmeans_best_time,
     int* out_kmeans_iter_best, int* out_kmeans_iter_total, int* out_dc, double* out_dc_time,
@@ -388,6 +422,9 @@ void FORCE_adapt_R(double* D, double* D_kmeans, double* E, double* ESI, double* 
     opts_in.alpha = *in_alpha;
     opts_in.eps_obj = *in_eps_obj;
     opts_in.primal_only = *in_primal_only;
+    opts_in.early_stop_mode = *in_early_stop_mode;
+    opts_in.early_stop_lag = *in_early_stop_lag;
+    opts_in.early_stop_eps = *in_early_stop_eps;
 
     results.Z_T = out_Z_T;
     results.B_Z_T = out_B_Z_T;
