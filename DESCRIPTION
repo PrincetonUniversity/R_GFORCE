@@ -1,11 +1,11 @@
 Package: GFORCE
 Type: Package
-Title: First Order Certifiable Clustering
+Title: FORCE: First Order Certifiably Optimal Clustering
 Version: 0.1.0
 Authors@R: person("Carson", "Eisenach", email = "eisenach@princeton.edu", role = c("aut", "cre"))
-Description: Provides the FORCE algorithm. Also provides inferential methods for
-    G-Block Latent Variable Graphical models.
-License: What license is it under?
+Description: A complete suite of computationally efficient methods for high dimensional clustering plus inference problems in G-Latent Models (a type of Latent Variable Gaussian graphical model). The main feature is the FORCE algorithm which is a fast solver for an SDP relaxation of the K-means problem. For certain types of graphical models (G-Latent Models), with high probability the algorithm not only finds the optimal clustering, but produces a certificate of having done so. This certificate, however, is model independent and so can also be used to certify data clustering problems. The GFORCE package also contains implementations of inferential procedures for G-Latent graphical models using k-fold cross validation. Also included are native code implementations of other popular clustering methods such as Lloyd's Algorithm with kmeans++ initialization and complete linkage hierarchical clustering.
+License: GPL-2
 LazyData: TRUE
 RoxygenNote: 5.0.1
+Imports: MASS,lpSolve
 Suggests: testthat

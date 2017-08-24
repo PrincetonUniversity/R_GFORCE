@@ -30,7 +30,6 @@
 #' @export
 gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size = 3, cov_gap_mult=1.0, 
                             error_base = 0.25, error_add = 0.25, corr_value = 0.3, normalize = TRUE) {
-  require(MASS)
   res <- NULL
 
   # generate error variances
@@ -104,8 +103,8 @@ gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size
   res$group_assignments <- generate_random_partition(K,d,m)
 
   # Generate Data
-  res$E <- mvrnorm(n,rep(0,d),diag(res$gamma_star))
-  res$Z <- mvrnorm(n,rep(0,K),res$Cstar)
+  res$E <- MASS:::mvrnorm(n,rep(0,d),diag(res$gamma_star))
+  res$Z <- MASS:::mvrnorm(n,rep(0,K),res$Cstar)
   res$X <- matrix(rep(0,d*n),nrow=n)
   for(i in 1:K) {
     group_idx = which(res$group_assignments == i)
