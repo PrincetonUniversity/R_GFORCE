@@ -6,7 +6,21 @@
 \usage{
 gforce.glatent_confints.cv_defaults()
 }
+\value{
+An object with following components
+\describe{
+\item{\code{grid_density}}{an integer. Indicates the number of values in the search grid.}
+\item{\code{lambda1_min_exp}}{a numeric. Minimum exponent for values of \eqn{\lambda_1} to search over.}
+\item{\code{lambda1_max_exp}}{a numeric. Maximum exponent for values of \eqn{\lambda_1} to search over.}
+\item{\code{lambda2_min_exp}}{a numeric. Minimum exponent for values of \eqn{\lambda_2} to search over.}
+\item{\code{lambda2_max_exp}}{a numeric. Maximum exponent for values of \eqn{\lambda_2} to search over.}
+\item{\code{num_folds}}{an integer. The number of cross-validation folds to use.}
+}
+}
 \description{
 Default Cross Validation Options for Confidence Intervals.
+}
+\seealso{
+\code{\link{gforce.glatent_confints}}
 }
 

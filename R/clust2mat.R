@@ -1,7 +1,9 @@
 # Convert K-means solution to SDP solution
 
-#' Convert K-means solution to partnership matrix.
+#' Convert a clustering or grouping to partnership matrix.
 #' 
+#' Takes a clustering \eqn{G} and constructs \eqn{B(G)}.
+#'
 #' @param clusters length \eqn{d} vector. Assigns each variable or data point to a cluster. Cluster names
 #' can be numbers or strings.
 #' @return a \eqn{d x d} numeric array that contains the partnership matrix corresponding to \code{clusters}.

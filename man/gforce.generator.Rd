@@ -17,7 +17,7 @@ gforce.generator(K, d, n, m, graph = "DeltaC", num_hubs = NULL,
 
 \item{m}{minimal group size.}
 
-\item{graph}{latent graph structure. Can be 'scalefree', 'hub', 'band' or 'DeltaC'.}
+\item{graph}{latent graph structure. Can be 'scalefree', 'hub', 'band', 'identity' or 'DeltaC'.}
 
 \item{num_hubs}{number of hubs in the latent graph. Ignored unless \code{graph == 'hub'}.}
 

@@ -4,10 +4,23 @@
 
 #' SCIO Estimator.
 #'
-#' Estimate the precision matrix with the SCIO estimator. 
+#' Estimate the precision matrix with the SCIO estimator. This algorithm is due to Liu and Luo (2012).
 #' The implementation follows the active set strategy also used in the SCIO package.
 #' 
-#' @param K number of clusters.
+#' @param C a \eqn{d x d} numeric matrix. This is the matrix of which we seek the inverse.
+#' @param lambda a numeric. This is the sparsity penalty parameter.
+#' @param k an integer. Indicates the column of the inverse to compute.
+#' @param eps a numeric. A threshold used as a stopping criterion.
+#' @param max_iter an integer. The max number of iterations of the SCIO algorithm.
+#' @param max_iter an integer. The max number of iterations of the SCIO algorithm.
+#' @param R_only logical expression. If \code{R_only == FALSE}, then the included
+#' native code implementation will be used. Otherwise, an R implementation is used.
+#' @return a \eqn{d} dimensional numeric vector that is the \code{k}th column of the inverse of \code{C}.
+#'
+#' @examples
+#' C <- diag(5)
+#' theta_1 <- gforce.scio(C,0.01,1)
+#'
 #' @useDynLib GFORCE scio_column_R
 #' @export
 gforce.scio <- function(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,R_only=FALSE) {

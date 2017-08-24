@@ -2,8 +2,10 @@
 
 #' Hierarchical Clustering with Estimation of \eqn{K}.
 #'
-#' Clusters input and estimates \eqn{K}.
+#' Clusters \eqn{n} points of dimension \eqn{m} using a complete linkage algorithm and estimates \eqn{K}.
+#' 
 #' @param X \eqn{n x m} matrix. Each row is treated as a point in \eqn{R^m}.
+#' @param dists \eqn{n x n} symmetric matrix. This encodes the distances between the \eqn{n} points.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
 #' native code implementation will be used. Otherwise, an R implementation is used.
 #' @return Returns an object with the components:

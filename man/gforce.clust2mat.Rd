@@ -2,7 +2,7 @@
 % Please edit documentation in R/clust2mat.R
 \name{gforce.clust2mat}
 \alias{gforce.clust2mat}
-\title{Convert K-means solution to partnership matrix.}
+\title{Convert a clustering or grouping to partnership matrix.}
 \usage{
 gforce.clust2mat(clusters)
 }
@@ -14,7 +14,7 @@ can be numbers or strings.}
 a \eqn{d x d} numeric array that contains the partnership matrix corresponding to \code{clusters}.
 }
 \description{
-Convert K-means solution to partnership matrix.
+Takes a clustering \eqn{G} and constructs \eqn{B(G)}.
 }
 \examples{
 clusters <- c(1,1,1,2,2,2,3,3)

@@ -7,23 +7,11 @@
 gforce.kmeans_SDP_matrix(D, K)
 }
 \arguments{
-\item{K}{number of clusters.}
+\item{D}{\eqn{d \times d} numeric matrix.}
 
-\item{d}{dimension.}
-}
-\value{
-An object with following components
-\describe{
-\item{\code{Z_T}}{Final iterate of the projected gradient descent algorithm run on the smoothed eigenvalue problem.}
-\item{\code{B_Z_T}}{Projection of \code{Z_T} to the border of the positive semi-definite cone.}
-}
+\item{K}{number of clusters.}
 }
 \description{
 Constructs the SDP constraint matrices so they can be passed to a black-box solver.
-}
-\examples{
-K <- 5
-d <- 50
-
 }
 

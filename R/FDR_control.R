@@ -3,8 +3,16 @@
 #' Performs the Banjamini and Yeuketli FDR control procedure. As input it takes a symmetric matrix of
 #' test statistics with standard normal null distributions.
 #' 
-#' @param test_stats symmetric matrix of test statistics.
+#' @param test_stats \eqn{d x d} symmetric matrix of test statistics.
 #' @param alpha alpha level for the FDR control procedure.
+#'
+#' @return An object with following components
+#' \describe{
+#' \item{\code{reject_null}}{\eqn{d x d} upper triangular matrix. \code{TRUE} entries indicate the null hypothesis should be rejected.}
+#' \item{\code{R_tau_hat}}{an integer. Indicates the number of hypotheses rejected.}
+#' \item{\code{tau_hat}}{a real number. Indicates a threshold above which the null hypothesis is rejected.}
+#' }
+#'
 #' @export
 gforce.FDR_control <- function(test_stats,alpha) {
     # set up
@@ -71,8 +79,12 @@ gforce.FDR_control <- function(test_stats,alpha) {
 #' Can convert a 4D array encoding the confidence intervals for a precision
 #' matrix to standard normal test-statistics.
 #' 
-#' @param conf_ints symmetric matrix of confidence intervals.
-#' @param alpha alpha level of the confidence intervals.
+#' @param conf_ints \eqn{d x d x 3} array. Each \eqn{d x d x 1} slice is a symmetric matrix.
+#' @param alpha confidence level level of the confidence intervals.
+#' 
+#' @return a \eqn{d x d} symmetric matrix of test statistics. 
+#'
+#'
 #' @export
 gforce.confint2test <- function(conf_ints,alpha) {
     K <- nrow(conf_ints)

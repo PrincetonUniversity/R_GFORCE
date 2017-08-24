@@ -2,7 +2,7 @@
 % Please edit documentation in R/certify.R
 \name{gforce.certify}
 \alias{gforce.certify}
-\title{K-means optimality certificate.}
+\title{FORCE optimality certificate.}
 \usage{
 gforce.certify(sol, D, eps1 = 0.01, eps2 = 10^-7, Y_T_min = 0.01)
 }

@@ -7,9 +7,12 @@
 gforce.confint2test(conf_ints, alpha)
 }
 \arguments{
-\item{conf_ints}{symmetric matrix of confidence intervals.}
+\item{conf_ints}{\eqn{d x d x 3} array. Each \eqn{d x d x 1} slice is a symmetric matrix.}
 
-\item{alpha}{alpha level of the confidence intervals.}
+\item{alpha}{confidence level level of the confidence intervals.}
+}
+\value{
+a \eqn{d x d} symmetric matrix of test statistics.
 }
 \description{
 Can convert a 4D array encoding the confidence intervals for a precision

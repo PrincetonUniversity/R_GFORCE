@@ -4,19 +4,9 @@
 #' 
 #' Constructs the SDP constraint matrices so they can be passed to a black-box solver.
 #' 
-#' @param d dimension.
+#' @param D \eqn{d \times d} numeric matrix.
 #' @param K number of clusters.
 #' 
-#' @return An object with following components
-#' \describe{
-#' \item{\code{Z_T}}{Final iterate of the projected gradient descent algorithm run on the smoothed eigenvalue problem.}
-#' \item{\code{B_Z_T}}{Projection of \code{Z_T} to the border of the positive semi-definite cone.}
-#' }
-#'
-#' @examples
-#' K <- 5
-#' d <- 50
-#'
 #' @export
 gforce.kmeans_SDP_matrix <- function(D,K){
     

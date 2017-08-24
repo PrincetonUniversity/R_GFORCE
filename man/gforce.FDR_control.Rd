@@ -7,9 +7,17 @@
 gforce.FDR_control(test_stats, alpha)
 }
 \arguments{
-\item{test_stats}{symmetric matrix of test statistics.}
+\item{test_stats}{\eqn{d x d} symmetric matrix of test statistics.}
 
 \item{alpha}{alpha level for the FDR control procedure.}
+}
+\value{
+An object with following components
+\describe{
+\item{\code{reject_null}}{\eqn{d x d} upper triangular matrix. \code{TRUE} entries indicate the null hypothesis should be rejected.}
+\item{\code{R_tau_hat}}{an integer. Indicates the number of hypotheses rejected.}
+\item{\code{tau_hat}}{a real number. Indicates a threshold above which the null hypothesis is rejected.}
+}
 }
 \description{
 Performs the Banjamini and Yeuketli FDR control procedure. As input it takes a symmetric matrix of

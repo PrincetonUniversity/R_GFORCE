@@ -186,12 +186,10 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' \item{\code{Z_best}}{Iterate with best objective value found during projected gradient descent on the smoothed eigenvalue problem.}
 #' \item{\code{B_Z_best}}{Projection of \code{Z_best} to the border of the positive semi-definite cone.}
 #' \item{\code{B_Z_best_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
-#' \item{\code{km_best}}{Best clustering in terms of objective value of the SDP relaxation. This is found by running Lloyd's algorithm on the rows of \code{D_kmeans_matrix}.}
+#' \item{\code{km_best}}{Best clustering in terms of objective value of the SDP relaxation. This is found by running a complete linkage clustering algorithm on the rows of the iterate \code{Z_t}.}
 #' \item{\code{B_km}}{Partnership matrix corresponding to \code{km_best}.}
 #' \item{\code{km_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_km}.}
 #' \item{\code{km_best_time}}{Time elapsed (in seconds) until \code{km_best} was found.}
-#' \item{\code{km_iter_best}}{Number of times a \eqn{K}-means algorithm was run before \code{km_best} was found.}
-#' \item{\code{km_iter_total}}{Total number of calls to a \eqn{K}-means solver (such as Lloyd's algorithm).}
 #' \item{\code{dual_certified}}{1 if a dual certificate was found, and 0 otherwise.}
 #' \item{\code{dual_certified_grad_iter}}{Number of gradient updates performed before a dual certificate was found.}
 #' \item{\code{dual_certified_time}}{Time elapsed (in seconds) until dual certificate was found for \code{B_km}.}
@@ -200,6 +198,15 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' \item{\code{total_time}}{Total time elapsed (in seconds) during call to \code{gforce.FORCE}.}
 #' }
 #'
+#' @examples
+#' K <- 5
+#' n <- 50
+#' d <- 50
+#' dat <- gforce.generator(K,d,n,3,graph='scalefree')
+#' sig_hat <- (1/n)*t(dat$X)%*%dat$X
+#' gam_hat <- gforce.Gamma(dat$X)
+#' D <- diag(gam_hat) - sig_hat
+#' res <- gforce.FORCE_adapt(D)
 #'
 #' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE FORCE_adapt_R
@@ -286,8 +293,6 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
   res$B_km <- gforce.clust2mat(res$km_best)
   res$km_opt_val <- C_result$km_opt_val
   res$km_best_time <- C_result$km_best_time
-  res$km_iter_best <- C_result$km_iter_best
-  res$km_iter_total <- C_result$km_iter_total
   res$dual_certified <- C_result$dc
   res$dual_certified_grad_iter <- C_result$dc_grad_iter
   res$dual_certified_time <- C_result$dc_time
@@ -395,14 +400,19 @@ gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NU
 #'
 #' @return An object with following components
 #' \describe{
+#' \item{\code{adapt_init_mode}}{a numeric. Indicates which initialization mode to use for \code{\link{gforce.FORCE_adapt}}.}
 #' \item{\code{alpha}}{a numeric. Gives the step size for the projected gradient descent updates.}
 #' \item{\code{dual_frequency}}{an integer. Specifies how many gradient updates to perform between searches for a dual certificate. }
 #' \item{\code{duality_gap}}{a numeric. If the duality gap can be shown to be less than \code{duality_gap}, the FORCE algorithm terminates.}
+#' \item{\code{early_stop_mode}}{a numeric. \code{early_stop_mode == 1} indicates that the algorithm should use an early stopping rule.}
+#' \item{\code{early_stop_lag}}{an integer. This indicates the number of iterations without sufficient improvement in objective value before early stopping.}
+#' \item{\code{early_stop_eps}}{a numeric. Threshold for objective value improvement used to determine early stopping.}
 #' \item{\code{eps_obj}}{a numeric. Specifies the precision required of the optimal solution to the eigenvalue maximization problem.}
 #' \item{\code{finish_pgd}}{an integer. If \code{finish_pgd} is 1, then other stopping criteria are ignored and FORCE performs \code{max_iter} gradient updates.}
 #' \item{\code{initial_mixing}}{a numeric between 0 and 1. Specifies how to construct the initial strictly feasible solution to the SDP relaxation.}
 #' \item{\code{kmeans_iter}}{an integer. The number of times to run a \eqn{K}-means solver during each search for an optimal clustering and dual certificate.}
 #' \item{\code{max_iter}}{an integer. The maximum number of gradient updates to perform.}
+#' \item{\code{primal_only}}{an integer. \code{primal_only == 1} indicates that the algorithm should not search for a dual certificate.}
 #' \item{\code{restarts}}{a vector of integers. This specifies the iterations at which to take the projection of the current iterate and restart the algorithm with that as the initial solution.}
 #' \item{\code{verbose}}{an integer. Specifies the level of verbosity requested from gforce.FORCE.}
 #' }
@@ -414,10 +424,6 @@ gforce.defaults <- function(d){
   options <- NULL
   options$adapt_init_mode = 0
   options$alpha = 10^-4
-  options$alpha_decrease_time = 10
-  options$alpha_max = 1
-  options$alpha_min = 10^-16
-  options$alpha_mode = 0
   options$dual_frequency = 50
   options$duality_gap = 10^-5
   options$early_stop_mode = 1
@@ -428,13 +434,8 @@ gforce.defaults <- function(d){
   options$initial_mixing = 2/d
   options$kmeans_iter = 10
   options$max_iter = 500
-  options$pgd_result_mode = 0
   options$primal_only = 0
-  options$random_seed = -1
   options$restarts = c(75)
-  options$slack_scale = 1
-  options$start_mode = 1
-  options$tau = 0.8
   options$verbose = 0
 
   return(options)

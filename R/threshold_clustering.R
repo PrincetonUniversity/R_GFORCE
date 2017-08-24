@@ -1,8 +1,7 @@
 
 #' Threshold Clustering.
 #'
-#' Solves the K-means problem using kmeans++ for the initialization and then 
-#' runs Lloyd's algorithm.
+#' Creates clusters based on elements in a row being above a certain
 #' @param X \eqn{n x m} matrix. Each row is treated as a point in \eqn{R^m}.
 #' @param K integer. The number of clusters to group the data into.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
@@ -21,7 +20,6 @@
 #' X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
 #' km_res <- gforce.kmeans(X,3)
 #'
-#' @export
 gforce.threshold_clustering <- function(X, threshold = 0.7,mode=1){
   res <- NULL
   d <- ncol(X)

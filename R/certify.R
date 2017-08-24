@@ -1,7 +1,7 @@
 # FUNCTIONS TO CONSTRUCT OPTIMALITY CERTIFICATES FOR THE 
 # K-MEANS SDP
 
-#' K-means optimality certificate.
+#' FORCE optimality certificate.
 #' 
 #' Given a proposed integer solution to the \eqn{K}-means SDP relaxation, this
 #' function attempts to construct a solution to the dual problem with matching
@@ -68,9 +68,9 @@ gforce.certify <- function(sol,D,eps1 = 0.01,eps2 = 10^-7,Y_T_min = 0.01) {
 }
 
 
-#' K-means optimality certificate (K is unknown).
+#' FORCE optimality certificate (\eqn{K} is unknown).
 #' 
-#' Given a proposed integer solution to the \eqn{K}-means SDP relaxation, this
+#' Given a proposed integer solution to the adaptive \eqn{K}-means SDP relaxation, this
 #' function attempts to construct a solution to the dual problem with matching
 #' objective value.
 #' @param sol vector of length \eqn{d}. This contains the assignment of variables or
@@ -92,16 +92,16 @@ gforce.certify <- function(sol,D,eps1 = 0.01,eps2 = 10^-7,Y_T_min = 0.01) {
 #' sig_hat <- (1/n)*t(dat$X)%*%dat$X
 #' gam_hat <- gforce.Gamma(dat$X)
 #' D <- diag(gam_hat) - sig_hat
-#' dual_cert <- gforce.certify(dat$group_assignments,D)
+#' dual_cert <- gforce.certify_adapt(dat$group_assignments,D)
 #' 
 #' @useDynLib GFORCE kmeans_dual_solution_primal_min_nok_R
 #' @export
-gforce.certify_nok <- function(sol,D,eps1 = 10^-7) {
+gforce.certify_adapt <- function(sol,D,eps1 = 10^-7) {
   # check inputs
   eps1 <- as.double(eps1)
 
   if(eps1 <= 0){
-    stop('gforce.certify_nok -- eps1 must be greater than 0.')
+    stop('gforce.certify_adapt -- eps1 must be greater than 0.')
   }
 
   K <- length(unique(sol))

@@ -5,11 +5,33 @@
 #' can either provide an estimate of the relevant covariance matrix or the data and cluster assignments. If cross validation
 #' is selected, the data and clusters must be provided.
 #' 
-#' @param K number of clusters.
+#' @param C_hat a \eqn{d x d} matrix. This is the estimated latent or group averages covariance matrix.
+#' @param X_vals a \eqn{n x d} matrix. This is a matrix where each row is a sample from the model.
+#' @param clusters a \eqn{d} dimensional integer vector. Contains the assignment of variables to groups.
+#' @param alpha a numeric. \code{alpha} is the confidence level.
+#' @param graph a string. It can either have value \code{'latent'} or \code{'averages'}.
+#' @param use_cv logical expression. Indicates whether or not to use cross validation.
+#' @param cv_opts an object. Contains options for cross validation procedure.
+#' @param lambda1 a numeric. Parameter for the first optimization problem.
+#' @param lambda2 a numeric. Parameter for the second optimization problem.
+#' 
+#'
+#' @return a \eqn{d x d x 3} array. The first \eqn{d x d} slice is the lower confidence bound, the 
+#' second the point estimate, and the third the upper confidence bound.
+#'
+#' @examples
+#' K <- 5
+#' n <- 50
+#' d <- 50
+#' dat <- gforce.generator(K,d,n,3,graph='scalefree')
+#' th_tilde <- gforce.glatent_confints(X_vals = dat$X,clusters = dat$group_assignments,use_cv = TRUE,graph='latent')
+#' 
+#'
+#' @seealso \code{\link{gforce.glatent_confints.cv_defaults}}
 #' @export
 gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha = 0.05,
                                     graph='latent',use_cv = FALSE,cv_opts = NULL,
-                                    lambda1=NULL,lambda2=NULL,use_scio_package=FALSE) {
+                                    lambda1=NULL,lambda2 = NULL) {
   res <- NULL
   # if user specified C_hat
   if(!is.null(C_hat)){
@@ -26,13 +48,13 @@ gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha =
   } else if(!is.null(clusters) && !is.null(X_vals)) {
     if(graph == 'latent') {
       if(use_cv){
-        res <- latent_confidence_intervals_all_cv(X_vals,clusters,alpha,use_scio_package,cv_opts)
+        res <- latent_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts)
       } else {
         stop('gforce.glatent_confints -- Option not implemented.')
       }
     } else if(graph == 'averages') {
       if(use_cv){
-        res <- averages_confidence_intervals_all_cv(X_vals,clusters,alpha,use_scio_package,cv_opts)
+        res <- averages_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts)
       } else {
         stop('gforce.glatent_confints -- Option not implemented.')
       }
@@ -49,7 +71,16 @@ gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha =
 
 #' Default Cross Validation Options for Confidence Intervals.
 #'
-#' 
+#' @return An object with following components
+#' \describe{
+#' \item{\code{grid_density}}{an integer. Indicates the number of values in the search grid.}
+#' \item{\code{lambda1_min_exp}}{a numeric. Minimum exponent for values of \eqn{\lambda_1} to search over.}
+#' \item{\code{lambda1_max_exp}}{a numeric. Maximum exponent for values of \eqn{\lambda_1} to search over.}
+#' \item{\code{lambda2_min_exp}}{a numeric. Minimum exponent for values of \eqn{\lambda_2} to search over.}
+#' \item{\code{lambda2_max_exp}}{a numeric. Maximum exponent for values of \eqn{\lambda_2} to search over.}
+#' \item{\code{num_folds}}{an integer. The number of cross-validation folds to use.}
+#' }
+#' @seealso \code{\link{gforce.glatent_confints}}
 #' @export
 gforce.glatent_confints.cv_defaults <- function() {
   res <- NULL
@@ -63,7 +94,7 @@ gforce.glatent_confints.cv_defaults <- function() {
 }
 
 
-latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,use_scio_package,cv_opts=NULL) {
+latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv_opts=NULL) {
   # check for cv_opts
   if(is.null(cv_opts)){
     cv_opts <- gforce.glatent_confints.cv_defaults()
@@ -83,19 +114,12 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,us
   
   #estimate theta *columnwise*
   theta_hat <- NULL
-  if(!use_scio_package){
-    theta_hat <- array(0,c(K,K))
-    for(k in 1:K){
-      objective_function <- function(ch,tha) scio_objective_function(ch,tha,k)
-      function_solver <- function(ch,lambda) gforce.scio(ch,lambda,k)
-      lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds)
-      theta_hat[,k] <- gforce.scio(Chat,lambda1,k)
-    }
-    
-    
-  } else {
-    lambda1 <- cv_lambda_selection_scio(X_vals,group_assignments,cv_opts$num_folds,1,20,0.7)
-    theta_hat <- scio_package(Chat,lambda1)
+  theta_hat <- array(0,c(K,K))
+  for(k in 1:K){
+    objective_function <- function(ch,tha) scio_objective_function(ch,tha,k)
+    function_solver <- function(ch,lambda) gforce.scio(ch,lambda,k)
+    lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds)
+    theta_hat[,k] <- gforce.scio(Chat,lambda1,k)
   }
 
   #estimate v *row-wise*
@@ -179,7 +203,7 @@ latent_confidence_intervals_all <- function(Chat,n,alpha,lambda1,lambda2) {
 }
 
 
-averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,use_scio_package,cv_opts=NULL) {
+averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv_opts=NULL) {
   # check for cv_opts
   if(is.null(cv_opts)){
     cv_opts <- gforce.glatent_confints.cv_defaults()

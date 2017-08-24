@@ -26,12 +26,10 @@ An object with following components
 \item{\code{Z_best}}{Iterate with best objective value found during projected gradient descent on the smoothed eigenvalue problem.}
 \item{\code{B_Z_best}}{Projection of \code{Z_best} to the border of the positive semi-definite cone.}
 \item{\code{B_Z_best_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_Z_T}.}
-\item{\code{km_best}}{Best clustering in terms of objective value of the SDP relaxation. This is found by running Lloyd's algorithm on the rows of \code{D_kmeans_matrix}.}
+\item{\code{km_best}}{Best clustering in terms of objective value of the SDP relaxation. This is found by running a complete linkage clustering algorithm on the rows of the iterate \code{Z_t}.}
 \item{\code{B_km}}{Partnership matrix corresponding to \code{km_best}.}
 \item{\code{km_opt_val}}{Objective value of the \eqn{K}-means SDP relaxation at \code{B_km}.}
 \item{\code{km_best_time}}{Time elapsed (in seconds) until \code{km_best} was found.}
-\item{\code{km_iter_best}}{Number of times a \eqn{K}-means algorithm was run before \code{km_best} was found.}
-\item{\code{km_iter_total}}{Total number of calls to a \eqn{K}-means solver (such as Lloyd's algorithm).}
 \item{\code{dual_certified}}{1 if a dual certificate was found, and 0 otherwise.}
 \item{\code{dual_certified_grad_iter}}{Number of gradient updates performed before a dual certificate was found.}
 \item{\code{dual_certified_time}}{Time elapsed (in seconds) until dual certificate was found for \code{B_km}.}
@@ -42,6 +40,17 @@ An object with following components
 }
 \description{
 Solves a K-means SDP Relaxation using the FORCE algorithm when \eqn{K} is unknown.
+}
+\examples{
+K <- 5
+n <- 50
+d <- 50
+dat <- gforce.generator(K,d,n,3,graph='scalefree')
+sig_hat <- (1/n)*t(dat$X)\%*\%dat$X
+gam_hat <- gforce.Gamma(dat$X)
+D <- diag(gam_hat) - sig_hat
+res <- gforce.FORCE_adapt(D)
+
 }
 \seealso{
 \code{\link{gforce.defaults}}

@@ -24,8 +24,7 @@ Returns an object with the components:
 }
 }
 \description{
-Solves the K-means problem using kmeans++ for the initialization and then 
-runs Lloyd's algorithm.
+Creates clusters based on elements in a row being above a certain
 }
 \examples{
 m <- 10 

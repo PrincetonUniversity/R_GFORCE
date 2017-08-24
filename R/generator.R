@@ -12,7 +12,7 @@
 #' @param n number of samples.
 #' @param d dimension of the observed random vector.
 #' @param m minimal group size.
-#' @param graph latent graph structure. Can be 'scalefree', 'hub', 'band' or 'DeltaC'.
+#' @param graph latent graph structure. Can be 'scalefree', 'hub', 'band', 'identity' or 'DeltaC'.
 #' @param num_hubs number of hubs in the latent graph. Ignored unless \code{graph == 'hub'}.
 #' @param band_size size of bands in the latent graph. Ignored unless \code{graph=='band'}.
 #' @param cov_gap_mult scales the size of \eqn{\Delta C}. Ignored unless \code{graph == 'DeltaC'}.
