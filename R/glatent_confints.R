@@ -30,8 +30,8 @@
 #' @seealso \code{\link{gforce.glatent_confints.cv_defaults}}
 #' @export
 gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha = 0.05,
-                                    graph='latent',use_cv = FALSE,cv_opts = NULL,
-                                    lambda1=NULL,lambda2 = NULL) {
+                                    graph='latent',variance_estimator='exact',use_cv = FALSE,
+                                    cv_opts = NULL,lambda1=NULL,lambda2 = NULL) {
   res <- NULL
   # if user specified C_hat
   if(!is.null(C_hat)){
@@ -48,7 +48,13 @@ gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha =
   } else if(!is.null(clusters) && !is.null(X_vals)) {
     if(graph == 'latent') {
       if(use_cv){
-        res <- latent_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts)
+        if(variance_estimator == 'exact') {
+          res <- latent_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts)
+        } else if(variance_estimator == 'simple') {
+          res <- averages_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts)
+        } else {
+          stop('gforce.glatent_confints -- You must specify either exact or simple estimator.')
+        }
       } else {
         stop('gforce.glatent_confints -- Option not implemented.')
       }
