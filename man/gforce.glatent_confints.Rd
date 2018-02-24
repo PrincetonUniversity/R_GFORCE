@@ -5,8 +5,8 @@
 \title{Confidence Intervals for Estimation in G-Latent Models.}
 \usage{
 gforce.glatent_confints(C_hat = NULL, X_vals = NULL, clusters = NULL,
-  alpha = 0.05, graph = "latent", use_cv = FALSE, cv_opts = NULL,
-  lambda1 = NULL, lambda2 = NULL)
+  alpha = 0.05, graph = "latent", variance_estimator = "exact",
+  use_cv = FALSE, cv_opts = NULL, lambda1 = NULL, lambda2 = NULL)
 }
 \arguments{
 \item{C_hat}{a \eqn{d x d} matrix. This is the estimated latent or group averages covariance matrix.}
