@@ -39,7 +39,7 @@ gforce.FDR_control <- function(test_stats,alpha) {
     #     R_tau_hat <- R_tau_hat - 1
     #     tau_hat <- tau_levels[R_tau_hat]
     #     p_tau <- beta * R_tau_hat
-    #     q_tau <- abs(qnorm(p_tau))
+    #     q_tau <- abs(stats::qnorm(p_tau))
     #     if(tau_hat > q_tau){
     #         found_min_tau <- 1
     #         # R_tau_hat <- R_tau_hat + 1
@@ -54,7 +54,7 @@ gforce.FDR_control <- function(test_stats,alpha) {
     for(R_tau_new in 1:num_hypotheses){
         min_tau_new <- tau_levels[R_tau_new]
         p_tau <- beta*R_tau_new
-        q_tau <- abs(qnorm(p_tau))
+        q_tau <- abs(stats::qnorm(p_tau))
         if(min_tau_new >= q_tau){
             tau_hat <- min_tau_new
             R_tau_hat <- R_tau_new
@@ -90,7 +90,7 @@ gforce.confint2test <- function(conf_ints,alpha) {
     K <- nrow(conf_ints)
     test_stats <- matrix(rep(0,K^2),nrow=K)
 
-    z_alpha <- qnorm(1 - (alpha/2))
+    z_alpha <- stats::qnorm(1 - (alpha/2))
 
     for(i in 1:K){
         for(j in 1:K){

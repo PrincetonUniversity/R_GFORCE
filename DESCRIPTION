@@ -7,5 +7,5 @@ Description: A complete suite of computationally efficient methods for high dime
 License: GPL-2
 LazyData: TRUE
 RoxygenNote: 5.0.1
-Imports: MASS,lpSolve
+Imports: MASS,lpSolve,scio,stats
 Suggests: testthat

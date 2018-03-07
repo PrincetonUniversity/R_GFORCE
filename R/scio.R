@@ -12,7 +12,6 @@
 #' @param k an integer. Indicates the column of the inverse to compute.
 #' @param eps a numeric. A threshold used as a stopping criterion.
 #' @param max_iter an integer. The max number of iterations of the SCIO algorithm.
-#' @param max_iter an integer. The max number of iterations of the SCIO algorithm.
 #' @param R_only logical expression. If \code{R_only == FALSE}, then the included
 #' native code implementation will be used. Otherwise, an R implementation is used.
 #' @return a \eqn{d} dimensional numeric vector that is the \code{k}th column of the inverse of \code{C}.
@@ -121,8 +120,7 @@ scio_objective_function <- function(Chat,theta,k){
 
 
 scio_package <- function(Chat, lambda, eps=10^-6, max_iter=10000, sym=FALSE) {
-  library(scio)
-  scio_res <- scio(Chat,lambda,thr=eps, maxit = max_iter, sym=sym)
+  scio_res <- scio::scio(Chat,lambda,thr=eps, maxit = max_iter, sym=sym)
   return(scio_res$w)
 }
 

@@ -20,8 +20,6 @@ gforce.scio(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,
 
 \item{R_only}{logical expression. If \code{R_only == FALSE}, then the included
 native code implementation will be used. Otherwise, an R implementation is used.}
-
-\item{max_iter}{an integer. The max number of iterations of the SCIO algorithm.}
 }
 \value{
 a \eqn{d} dimensional numeric vector that is the \code{k}th column of the inverse of \code{C}.

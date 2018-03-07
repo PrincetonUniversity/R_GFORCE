@@ -2,11 +2,16 @@
 % Please edit documentation in R/hclust.R
 \name{gforce.hclust.agglomerate}
 \alias{gforce.hclust.agglomerate}
-\title{Hierarchical Clustering with Estimation of \eqn{K}.}
+\title{Hierarchical Clustering Agglomeration.}
 \usage{
 gforce.hclust.agglomerate(X = NULL, dists = NULL)
 }
+\arguments{
+\item{X}{\eqn{n x m} matrix. Each row is treated as a point in \eqn{R^m}.}
+
+\item{dists}{\eqn{n x n} symmetric matrix. This encodes the distances between the \eqn{n} points.}
+}
 \description{
-Hierarchical Clustering with Estimation of \eqn{K}.
+Hierarchical Clustering Agglomeration.
 }
 

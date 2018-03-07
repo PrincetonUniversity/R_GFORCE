@@ -5,7 +5,7 @@
 \title{Solve PECOK Adaptive SDP with FORCE.}
 \usage{
 gforce.PECOK_adapt(X = NULL, D = NULL, sigma_hat = NULL,
-  force_opts = NULL, X0 = NULL, E = NULL, gamma_par = FALSE)
+  force_opts = NULL, X0 = NULL, gamma_par = FALSE)
 }
 \arguments{
 \item{X}{\eqn{n x d} matrix. Either this or \code{D} must be specified.}
@@ -20,12 +20,8 @@ optimal performance. If \code{X} is specified, it will be ignored.}
 
 \item{X0}{initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.}
 
-\item{E}{strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.}
-
 \item{gamma_par}{logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed,
 a multi-threaded method is called, otherwise a single-threaded method is called.}
-
-\item{K}{number of clusters.}
 }
 \description{
 Uses the FORCE algorithm to solve the PECOK SDP when \eqn{K} is unknown.

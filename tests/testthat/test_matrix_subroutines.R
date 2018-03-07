@@ -4,8 +4,8 @@ context('Test BLAS/LAPACK-Alike Matrix Routines')
 #' @useDynLib GFORCE test_daps
 test_that("daps",{
     d <- 20
-    A <- runif(d)
-    c <- runif(1)
+    A <- stats::runif(d)
+    c <- stats::runif(1)
 
     Apc_comp <- A + c
 
@@ -20,8 +20,8 @@ test_that("daps",{
 #' @useDynLib GFORCE test_dsmtd
 test_that("dsmtd",{
     d <- 20
-    A <- matrix(runif(d^2),ncol=d)
-    B <- runif(d)
+    A <- matrix(stats::runif(d^2),ncol=d)
+    B <- stats::runif(d)
 
     AB <- A %*% diag(B)
     BA <- diag(B) %*% A
@@ -47,7 +47,7 @@ test_that("dsmtd",{
 #' @useDynLib GFORCE test_dvexp
 test_that("dvexp",{
     d <- 100
-    A <- runif(d)
+    A <- stats::runif(d)
     A_exp_comp <- exp(A)
 
     result <- .C(test_dvexp,
@@ -61,7 +61,7 @@ test_that("dvexp",{
 #' @useDynLib GFORCE test_dsumv
 test_that("dsumv",{
     d <- 100
-    A <- runif(d)
+    A <- stats::runif(d)
     sum_r <- 0
 
     result <- .C(test_dsumv,
@@ -75,7 +75,7 @@ test_that("dsumv",{
 #' @useDynLib GFORCE test_dtrace
 test_that("dtrace",{
     d <- 20
-    A <- matrix(runif(d^2),ncol=d)
+    A <- matrix(stats::runif(d^2),ncol=d)
     trace_r <- 0
 
     result <- .C(test_dtrace,
@@ -89,7 +89,7 @@ test_that("dtrace",{
 #' @useDynLib GFORCE test_dcsum
 test_that("dcsum",{
     d <- 20
-    A <- matrix(runif(d^2),ncol=d)
+    A <- matrix(stats::runif(d^2),ncol=d)
 
     result <- .C(test_dcsum,
                  A = as.double(A),
@@ -102,8 +102,8 @@ test_that("dcsum",{
 #' @useDynLib GFORCE test_dxpyez
 test_that("dxpyez",{
     d <- 20
-    A <- matrix(runif(d^2),ncol=d)
-    B <- matrix(runif(d^2),ncol=d)
+    A <- matrix(stats::runif(d^2),ncol=d)
+    B <- matrix(stats::runif(d^2),ncol=d)
 
     result <- .C(test_dxpyez,
                  d = as.integer(d^2),

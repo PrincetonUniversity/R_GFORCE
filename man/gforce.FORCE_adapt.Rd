@@ -14,8 +14,6 @@ gforce.FORCE_adapt(D, force_opts = NULL, D_Kmeans = NULL, X0 = NULL)
 \item{D_Kmeans}{matrix to be used for initial integer solution. \code{NULL} signifies that \code{D} will be used.}
 
 \item{X0}{initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.}
-
-\item{E}{strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.}
 }
 \value{
 An object with following components

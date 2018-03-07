@@ -140,7 +140,6 @@ glatent_Gamma_hat <- function(sig_hat,group_assignments) {
 
 # Estimate \hat w
 w_hat <- function(Chat,t,lambda) {
-  require(lpSolve)
   Km1 <- nrow(Chat) - 1
   A_orig <- -1*Chat[-t,-t]
   #  print(A_orig)
@@ -163,7 +162,7 @@ w_hat <- function(Chat,t,lambda) {
   A[(Km1+1):(2*Km1),(Km1+1):(2*Km1)] <- A_orig
   
   # solve
-  res <- lp(direction="min",obj,A,rel,lp_rhs)
+  res <- lpSolve::lp(direction="min",obj,A,rel,lp_rhs)
 
   return(res$solution[1:Km1] - res$solution[(Km1+1):(2*Km1)])
 }

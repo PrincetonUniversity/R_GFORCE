@@ -10,6 +10,7 @@
 #' @param clusters a \eqn{d} dimensional integer vector. Contains the assignment of variables to groups.
 #' @param alpha a numeric. \code{alpha} is the confidence level.
 #' @param graph a string. It can either have value \code{'latent'} or \code{'averages'}.
+#' @param variance_estimator a string. It can either have value \code{'simple'} or \code{'exact'}.
 #' @param use_cv logical expression. Indicates whether or not to use cross validation.
 #' @param cv_opts an object. Contains options for cross validation procedure.
 #' @param lambda1 a numeric. Parameter for the first optimization problem.
@@ -143,7 +144,7 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv
   }
   
   #construct upper and lower confidence bounds
-  z_score <- qnorm(1 - (alpha/2))
+  z_score <- stats::qnorm(1 - (alpha/2))
 
   latent_variances <- latent_graph_variances(theta_hat,v_hat,gam_hat,group_assignments)
 
@@ -183,7 +184,7 @@ latent_confidence_intervals_all <- function(Chat,n,alpha,lambda1,lambda2) {
   }
   
   #construct upper and lower confidence bounds
-  z_score <- qnorm(1 - (alpha/2))
+  z_score <- stats::qnorm(1 - (alpha/2))
   for(t in 1:K){
     for(k in 1:K){
       variance <- NULL
@@ -250,7 +251,7 @@ averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,
   }
   
   #construct upper and lower confidence bounds
-  z_score <- qnorm(1 - (alpha/2))
+  z_score <- stats::qnorm(1 - (alpha/2))
   for(t in 1:K){
     for(k in 1:K){
       variance <- (xi_hat[t,k]^2 + xi_hat[t,t]*xi_hat[k,k])#/(xi_hat[t,t]^2)

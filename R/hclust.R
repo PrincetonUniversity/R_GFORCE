@@ -18,7 +18,7 @@
 #' @examples
 #' m <- 10 
 #' n <- 10
-#' X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
+#' X <- matrix(MASS::mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
 #' hc_res <- gforce.hclust(X=X)
 #'
 #' @useDynLib GFORCE hclust_R
@@ -29,20 +29,20 @@ gforce.hclust <- function(X=NULL,dists=NULL,R_only=FALSE) {
     if(is.null(X)) {
       stop('gforce.hclust -- need to specify X in R_only mode')
     }
-    dX <- dist(X)
-    hc <- hclust(dX)
+    dX <- stats::dist(X)
+    hc <- stats::hclust(dX)
     d <- ncol(X)
 
     MSEs <- rep(0,d)
     for(k in 2:d){
-      cc <- cutree(hc,k=k)
+      cc <- stats::cutree(hc,k=k)
       cc_mat <- gforce.clust2mat(cc)
       MSEs[k] <- 0.5*sum(cc_mat*as.matrix(dX))
     }
 
     lc <- L_curve_criterion(MSEs[2:(d-1)])
     res$K <- lc$max + 1
-    res$clusters <- cutree(hc,k=res$K)
+    res$clusters <- stats::cutree(hc,k=res$K)
     res$MSE <- MSEs
   } else {
     if(is.null(X) && is.null(dists)) {
@@ -76,7 +76,11 @@ gforce.hclust <- function(X=NULL,dists=NULL,R_only=FALSE) {
 }
 
 
-#' Hierarchical Clustering with Estimation of \eqn{K}.
+#' Hierarchical Clustering Agglomeration.
+#'
+#' @param X \eqn{n x m} matrix. Each row is treated as a point in \eqn{R^m}.
+#' @param dists \eqn{n x n} symmetric matrix. This encodes the distances between the \eqn{n} points.
+#'
 #' @useDynLib GFORCE hclust_agglomerate_R
 #' @export
 gforce.hclust.agglomerate <- function(X=NULL,dists = NULL) {
@@ -111,7 +115,10 @@ gforce.hclust.agglomerate <- function(X=NULL,dists = NULL) {
   return(res)
 }
 
-#' Hierarchical Clustering with Estimation of \eqn{K}.
+#' Hierarchical Clustering -- Convert Agglomeration to clustering.
+#' 
+#' @param hc an object. This encodes the order of agglomeration.
+#' @param K an integer. \code{K} is the number of clusters
 #'
 #' @export
 gforce.hclust.agg2clust <- function(hc,K) {

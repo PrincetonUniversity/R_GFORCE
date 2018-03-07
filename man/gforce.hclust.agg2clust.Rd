@@ -2,11 +2,16 @@
 % Please edit documentation in R/hclust.R
 \name{gforce.hclust.agg2clust}
 \alias{gforce.hclust.agg2clust}
-\title{Hierarchical Clustering with Estimation of \eqn{K}.}
+\title{Hierarchical Clustering -- Convert Agglomeration to clustering.}
 \usage{
 gforce.hclust.agg2clust(hc, K)
 }
+\arguments{
+\item{hc}{an object. This encodes the order of agglomeration.}
+
+\item{K}{an integer. \code{K} is the number of clusters}
+}
 \description{
-Hierarchical Clustering with Estimation of \eqn{K}.
+Hierarchical Clustering -- Convert Agglomeration to clustering.
 }
 

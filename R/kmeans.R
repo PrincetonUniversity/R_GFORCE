@@ -21,7 +21,7 @@
 #' @examples
 #' m <- 10 
 #' n <- 10
-#' X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
+#' X <- matrix(MASS::mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
 #' km_res <- gforce.kmeans(X,3)
 #'
 #' @useDynLib GFORCE kmeans_pp_R
@@ -68,6 +68,6 @@ kmeanspp <- function(D, K) {
     prob_dist <- distances[cbind(1:d, max.col(-distances[, 1:i, drop = FALSE]))]
   }
   centers[K] <- sample.int(d, 1, prob = prob_dist)
-  res <- kmeans(D, D[centers, ])
+  res <- stats::kmeans(D, D[centers, ])
   return(res)
 }

@@ -176,7 +176,6 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' @param force_opts tuning parameters. \code{NULL} signifies defaults will be used.
 #' @param D_Kmeans matrix to be used for initial integer solution. \code{NULL} signifies that \code{D} will be used.
 #' @param X0 initial iterate. \code{NULL} signifies that it will be generated randomly from \code{D_Kmeans}. If supplied, \code{E} must be supplied as well.
-#' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
 #'
 #' @return An object with following components
 #' \describe{
@@ -323,6 +322,7 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
 #' @param sigma_hat \eqn{d x d} matrix. If \code{D} is specified, this argument should be the
 #' estimated covariance matrix. It is not strictly necessary to provide it, but it should be for
 #' optimal performance. If \code{X} is specified, it will be ignored.
+#' @param E strictly feasible solutions. \code{NULL} signifies that it will be generated randomly. If supplied, \code{X0} must be supplied as well.
 #' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed,
 #' a multi-threaded method is called, otherwise a single-threaded method is called.
 #' @inheritParams gforce.FORCE
@@ -338,7 +338,7 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
     n <- nrow(X)
     gamma_hat <- gforce.Gamma(X)
     sigma_hat <- t(X)%*%X / n
-    D <- diag(gh)-sh
+    D <- diag(gamma_hat)-sigma_hat
   }
   if(is.null(sigma_hat)){
     sigma_hat <- D
@@ -355,7 +355,6 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
 #'
 #' Uses the FORCE algorithm to solve the PECOK SDP when \eqn{K} is unknown.
 #'
-#' @param K number of clusters.
 #' @param X \eqn{n x d} matrix. Either this or \code{D} must be specified.
 #' @param D \eqn{d x d} matrix. Either this or \code{X} must be specified.
 #' @param sigma_hat \eqn{d x d} matrix. If \code{D} is specified, this argument should be the
@@ -366,7 +365,7 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
 #' @inheritParams gforce.FORCE_adapt
 #' @seealso \code{\link{gforce.defaults}}
 #' @export
-gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL, X0 = NULL, E = NULL, gamma_par = FALSE) {
+gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL, X0 = NULL, gamma_par = FALSE) {
   if(is.null(X) && is.null(D)) {
     stop('gforce.PECOK -- You must specify one of X or D.')
   } else if (!is.null(X) && !is.null(D)) {
@@ -374,10 +373,11 @@ gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NU
   }
   if(is.null(D)){
     n <- nrow(X)
+    d <- ncol(X)
     gamma_hat <- gforce.Gamma(X)
     sigma_hat <- t(X)%*%X / n
-    D_orig <- diag(gh)-sh
-    kappa_hat <- max(gh)*(d/n + sqrt(d/n))
+    D_orig <- diag(gamma_hat)-sigma_hat
+    kappa_hat <- max(gamma_hat)*(d/n + sqrt(d/n))
     D <- D_orig + kappa_hat*diag(d)
   }
   if(is.null(sigma_hat)){
@@ -385,7 +385,7 @@ gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NU
   }
 
 
-  res <- gforce.FORCE_adapt(D,D_Kmeans = sigma_hat, force_opts = force_opts, X0 = X0, E = E)
+  res <- gforce.FORCE_adapt(D,D_Kmeans = sigma_hat, force_opts = force_opts, X0 = X0)
   res$D <- D
   return(res)
 }

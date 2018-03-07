@@ -28,7 +28,7 @@ Clusters \eqn{n} points of dimension \eqn{m} using a complete linkage algorithm 
 \examples{
 m <- 10 
 n <- 10
-X <- matrix(mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
+X <- matrix(MASS::mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
 hc_res <- gforce.hclust(X=X)
 
 }

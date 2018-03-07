@@ -19,6 +19,8 @@ gforce.glatent_confints(C_hat = NULL, X_vals = NULL, clusters = NULL,
 
 \item{graph}{a string. It can either have value \code{'latent'} or \code{'averages'}.}
 
+\item{variance_estimator}{a string. It can either have value \code{'simple'} or \code{'exact'}.}
+
 \item{use_cv}{logical expression. Indicates whether or not to use cross validation.}
 
 \item{cv_opts}{an object. Contains options for cross validation procedure.}

@@ -33,7 +33,7 @@ gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size
   res <- NULL
 
   # generate error variances
-  gamma_star <- runif(d,max=error_add)
+  gamma_star <- stats::runif(d,max=error_add)
   res$gamma_star <- gamma_star + error_base
 
   # build latent covariance structure
@@ -92,7 +92,7 @@ gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size
 
   if(graph != 'DeltaC'){
     if(normalize){
-      res$Cstar <- cov2cor(solve(res$Theta_star))
+      res$Cstar <- stats::cov2cor(solve(res$Theta_star))
       res$Theta_star <- solve(res$Cstar)
     } else {
       res$Cstar <- solve(res$Theta_star)
@@ -103,8 +103,8 @@ gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size
   res$group_assignments <- generate_random_partition(K,d,m)
 
   # Generate Data
-  res$E <- MASS:::mvrnorm(n,rep(0,d),diag(res$gamma_star))
-  res$Z <- MASS:::mvrnorm(n,rep(0,K),res$Cstar)
+  res$E <- MASS::mvrnorm(n,rep(0,d),diag(res$gamma_star))
+  res$Z <- MASS::mvrnorm(n,rep(0,K),res$Cstar)
   res$X <- matrix(rep(0,d*n),nrow=n)
   for(i in 1:K) {
     group_idx = which(res$group_assignments == i)
@@ -133,7 +133,7 @@ random_covariance <- function(K,zeta) {
   tries <- 0
   C <- NULL
   while(((min_eig <= 0) || (dc < zeta)) && (tries < 20)) {
-    a <- matrix(rnorm(K^2),ncol=K)
+    a <- matrix(stats::rnorm(K^2),ncol=K)
     C_new <- a%*%t(a)
     min_eig_new <- min(eigen(C_new)$values)
     dc_new <- delta_c(C_new)
