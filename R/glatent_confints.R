@@ -25,7 +25,8 @@
 #' n <- 50
 #' d <- 50
 #' dat <- gforce.generator(K,d,n,3,graph='scalefree')
-#' th_tilde <- gforce.glatent_confints(X_vals = dat$X,clusters = dat$group_assignments,use_cv = TRUE,graph='latent')
+#' th_tilde <- gforce.glatent_confints(X_vals = dat$X,clusters = dat$group_assignments,
+#'                                     use_cv = TRUE,graph='latent')
 #' 
 #'
 #' @seealso \code{\link{gforce.glatent_confints.cv_defaults}}
