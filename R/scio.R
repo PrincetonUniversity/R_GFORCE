@@ -112,18 +112,9 @@ scio_column <- function(C, k, lambda, eps = 10^-6, max_iter = 10000) {
   return(theta_t)
 }
 
-
-
 scio_objective_function <- function(Chat,theta,k){
   return((1/2)*(theta%*%Chat%*%theta) - theta[k])
 }
-
-
-scio_package <- function(Chat, lambda, eps=10^-6, max_iter=10000, sym=FALSE) {
-  scio_res <- scio::scio(Chat,lambda,thr=eps, maxit = max_iter, sym=sym)
-  return(scio_res$w)
-}
-
 
 scio_likelihood <- function(C, Cinv) {
   ot <- as.numeric(unlist(determinant(Cinv)))

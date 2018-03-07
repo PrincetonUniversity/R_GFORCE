@@ -40,54 +40,6 @@ cv_lambda_selection <- function(objective_function,function_solver,X_vals,group_
   return(lambda_sequence[which.min(lambda_test_values)])
 }
 
-#objective function takes only two arguments -- data and parameter
-#solver only takes two arguments -- data and tuning parameter
-cv_lambda_selection_scio <- function(X_vals,group_assignments,num_folds,lambda_max,max_levels,alpha){
-  # create test and train data
-  n <- nrow(X_vals)
-  groups <- unique(group_assignments)
-  K <- length(groups)
-  fold_assignments <- cross_validation_folds(n,num_folds)
-  
-  #compute C hat on all folds
-  train_data <- array(0,c(K,K,num_folds))
-  test_data <- array(0,c(K,K,num_folds))
-  for(i in 1:num_folds){
-    X <- X_vals[fold_assignments == i,] 
-    sig_hat <- (t(X)%*%X)/n
-    gam_hat <- glatent_Gamma_hat(sig_hat,group_assignments)
-    test_data[,,i] <- latent_spectrum_check(C_hat(sig_hat,gam_hat,group_assignments))
-    X <- X_vals[fold_assignments != i,]
-    sig_hat <- (t(X)%*%X)/n
-    gam_hat <- glatent_Gamma_hat(sig_hat,group_assignments)
-    train_data[,,i] <- latent_spectrum_check(C_hat(sig_hat,gam_hat,group_assignments))
-
-  }
-  
-  # setup -- get function pointer and generate lambda grid
-  # lambda_sequence <- 2^seq(lambda_min_exp,lambda_max_exp,by=1/subdivisions)
-  lambda_sequence <- rep(0,max_levels)
-  lambda_sequence[1]= lambda_max
-  for(i in 2:max_levels){
-    lambda_sequence[i] = lambda_sequence[i-1]*alpha
-  }
-  print(lambda_sequence)
-  lambda_total <- length(lambda_sequence)
-  lambda_test_values <- rep(0,lambda_total)
-  num_folds <- dim(train_data)[3]
-  
-  # try each lambda in grid
-  for(i in 1:lambda_total){
-    lambda <- lambda_sequence[i] 
-    for(j in 1:num_folds){
-      train_estimator <- scio_package(train_data[,,j],lambda)
-      lambda_test_values[i] <- lambda_test_values[i] + scio_likelihood(test_data[,,j],train_estimator)
-    }
-  }
-  print(lambda_test_values)
-  return(lambda_sequence[which.min(lambda_test_values)])
-}
-
 # returns indices for num-folds-fold cross-validation sample split
 cross_validation_folds <- function(num_samples,num_folds){
   shuffled_idx <- sample(num_samples)
