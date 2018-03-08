@@ -4,6 +4,7 @@ context('Test Dual Construction')
 
 #' @useDynLib GFORCE kmeans_dual_solution_primal_min_R
 test_that("Dual Construction",{
+    skip_on_cran()
     set.seed(12345) #need to set seed bc doesnt always exist
     d <- 20
     K <- 5
