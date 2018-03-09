@@ -42,4 +42,3 @@ D <- diag(gam_hat) - sig_hat
 dual_cert <- gforce.certify(dat$group_assignments,D)
 
 }
-

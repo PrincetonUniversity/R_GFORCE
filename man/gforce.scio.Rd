@@ -33,4 +33,3 @@ C <- diag(5)
 theta_1 <- gforce.scio(C,0.01,1)
 
 }
-

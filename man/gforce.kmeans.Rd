@@ -34,4 +34,3 @@ X <- matrix(MASS::mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
 km_res <- gforce.kmeans(X,3)
 
 }
-

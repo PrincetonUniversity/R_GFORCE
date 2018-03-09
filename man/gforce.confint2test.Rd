@@ -18,4 +18,3 @@ a \eqn{d x d} symmetric matrix of test statistics.
 Can convert a 4D array encoding the confidence intervals for a precision
 matrix to standard normal test-statistics.
 }
-

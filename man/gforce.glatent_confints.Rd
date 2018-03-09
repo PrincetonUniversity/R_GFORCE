@@ -51,4 +51,3 @@ th_tilde <- gforce.glatent_confints(X_vals = dat$X,clusters = dat$group_assignme
 \seealso{
 \code{\link{gforce.glatent_confints.cv_defaults}}
 }
-

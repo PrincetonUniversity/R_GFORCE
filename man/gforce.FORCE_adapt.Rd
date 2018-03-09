@@ -53,4 +53,3 @@ res <- gforce.FORCE_adapt(D)
 \seealso{
 \code{\link{gforce.defaults}}
 }
-

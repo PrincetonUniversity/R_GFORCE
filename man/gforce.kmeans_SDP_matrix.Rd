@@ -14,4 +14,3 @@ gforce.kmeans_SDP_matrix(D, K)
 \description{
 Constructs the SDP constraint matrices so they can be passed to a black-box solver.
 }
-

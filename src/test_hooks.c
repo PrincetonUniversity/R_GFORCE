@@ -72,8 +72,8 @@ void test_project_C_perpendicular(double* D, int* d0, int* K0, double* GX_t, dou
     int d = *d0;
     int K = *K0;
     double mu = 1;
-    double* E;
-    double* ESI;
+    double* E = NULL;
+    double* ESI = NULL;
 
     allocate_workspace_FORCE(d,K,&work);
     initialize_problem_instance(D,E,ESI,mu,d,K,&prob);
@@ -105,8 +105,8 @@ void test_project_C_perpendicular_nok(double* D, int* d0, double* GX_t, double* 
     problem_instance prob;
     int d = *d0;
     double mu = 1;
-    double* E;
-    double* ESI;
+    double* E = NULL;
+    double* ESI = NULL;
 
     allocate_workspace_FORCE(d,d,&work);
     initialize_problem_instance(D,E,ESI,mu,d,d,&prob);

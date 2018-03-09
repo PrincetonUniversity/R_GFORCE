@@ -23,4 +23,3 @@ An object with following components
 Performs the Banjamini and Yeuketli FDR control procedure. As input it takes a symmetric matrix of
 test statistics with standard normal null distributions.
 }
-

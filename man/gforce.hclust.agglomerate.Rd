@@ -14,4 +14,3 @@ gforce.hclust.agglomerate(X = NULL, dists = NULL)
 \description{
 Hierarchical Clustering Agglomeration.
 }
-

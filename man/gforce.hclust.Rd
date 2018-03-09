@@ -32,4 +32,3 @@ X <- matrix(MASS::mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
 hc_res <- gforce.hclust(X=X)
 
 }
-

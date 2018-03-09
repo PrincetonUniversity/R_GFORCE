@@ -31,4 +31,3 @@ dat <- gforce.generator(5,20,20,3)
 gam_hat <- gforce.Gamma(dat$X)
 
 }
-

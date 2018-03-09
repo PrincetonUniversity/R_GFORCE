@@ -14,4 +14,3 @@ gforce.hclust.agg2clust(hc, K)
 \description{
 Hierarchical Clustering -- Convert Agglomeration to clustering.
 }
-

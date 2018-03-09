@@ -29,4 +29,3 @@ Uses the FORCE algorithm to solve the PECOK SDP when \eqn{K} is unknown.
 \seealso{
 \code{\link{gforce.defaults}}
 }
-

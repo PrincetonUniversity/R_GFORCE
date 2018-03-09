@@ -20,4 +20,3 @@ Takes a clustering \eqn{G} and constructs \eqn{B(G)}.
 clusters <- c(1,1,1,2,2,2,3,3)
 B_clust <- gforce.clust2mat(clusters)
 }
-

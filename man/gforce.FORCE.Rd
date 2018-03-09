@@ -63,4 +63,3 @@ res <- gforce.FORCE(D,K)
 \seealso{
 \code{\link{gforce.defaults}}
 }
-

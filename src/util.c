@@ -70,7 +70,7 @@ void allocate_workspace_FORCE(int d, int K, workspace* work){
     int tmp1;
 
     // USE CASE 0 -- Find Space Needed for both types of DSYEVD Calls
-    double* X;
+    double* X = NULL;
     double dwork0[2];
     int iwork0[2];
     double dvec[2];
@@ -132,7 +132,7 @@ void allocate_workspace_FORCE_adapt(int d, workspace* work){
     int tmp1;
 
     // USE CASE 0 -- Find Space Needed for both types of DSYEVD Calls
-    double* X;
+    double* X = NULL;
     double dwork0[2];
     int iwork0[2];
     double dvec[2];

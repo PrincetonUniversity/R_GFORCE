@@ -33,4 +33,3 @@ Uses the FORCE algorithm to solve the PECOK SDP.
 \seealso{
 \code{\link{gforce.defaults}}
 }
-

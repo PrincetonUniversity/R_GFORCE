@@ -35,4 +35,3 @@ Provides the default tuning parameters for \code{\link{gforce.FORCE}}.
 \examples{
 opts <- gforce.defaults(20)
 }
-

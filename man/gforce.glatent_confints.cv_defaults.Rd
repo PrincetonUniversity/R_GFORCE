@@ -23,4 +23,3 @@ Default Cross Validation Options for Confidence Intervals.
 \seealso{
 \code{\link{gforce.glatent_confints}}
 }
-
