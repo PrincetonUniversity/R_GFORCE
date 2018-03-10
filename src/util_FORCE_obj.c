@@ -104,7 +104,6 @@ void smoothed_objective(problem_instance* prob, double* X, double* lambda_min_tp
     double obj_value;
     double* X_eigs;
     int X_eigs_idx;
-    int tmp;
     int d2 = d*d;
     
     X_eigs_idx = work -> dsyevd_ldwork_N;
@@ -312,7 +311,6 @@ void smoothed_objective_nok(problem_instance* prob, double* X, double* lambda_mi
     double obj_value;
     double* X_eigs;
     int X_eigs_idx;
-    int tmp;
     int d2 = d*d;
     int lapack_info;
     
@@ -330,7 +328,8 @@ void smoothed_objective_nok(problem_instance* prob, double* X, double* lambda_mi
 
     X_min = min_array(d,X_eigs);
     S_min = min_array(d2,GS_t);
-    lambda_min_n = -1*(S_min < X_min ? S_min : X_min);
+    lambda_min = S_min < X_min ? S_min : X_min;
+    lambda_min_n = -1*lambda_min;
     *lambda_min_tp1 = lambda_min;
 
 

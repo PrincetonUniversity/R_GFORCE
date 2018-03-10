@@ -22,7 +22,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     //// STEP 1 - Local Variable Initialization, Memory Allocation
     /////////////////////////////////////////////////////////////
     double dtmp1,dtmp2;
-    double* ptmp1;
+    double* ptmp1 = NULL;
     int d2 = d*d;
     double eps_obj = opts -> eps_obj;
     int lloyds_updates = 0;
@@ -50,7 +50,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
 
     // Non-convex rounding -- uses HC not KM
     hclust_t tmp_hc_sol;
-    int* km_clusters_tmp;
+    int* km_clusters_tmp = NULL;
     int* km_clusters_new = (int *) R_alloc(d,sizeof(int));
     int* km_clusters_best = (int *) R_alloc(d,sizeof(int));
     double km_val_best;
@@ -79,10 +79,10 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     double lambda_min_t;
     double lambda_min_tp1;
     double lambda_min_best;
-    double* X_t;
-    double* X_tp1;
-    double* Z_t;
-    double* Z_tp1; // use result as workspace
+    double* X_t = NULL;
+    double* X_tp1 = NULL;
+    double* Z_t = NULL;
+    double* Z_tp1 = NULL; // use result as workspace
     double* Z_best = results->Z_best; // store actual result
     double lambda_t = 0; // auxiliary sequence for nesterov acc
     double lambda_tp1 = 1;
@@ -97,8 +97,8 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     int current_restart = -1;
     int next_restart = -1;
     int last_restart = 0;
-    double* GX_t;
-    double* GS_t;
+    double* GX_t = NULL;
+    double* GS_t = NULL;
     double alpha = opts->alpha;
 
     if(number_restarts > 0){

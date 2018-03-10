@@ -21,7 +21,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     //// STEP 1 - Local Variable Initialization, Memory Allocation
     /////////////////////////////////////////////////////////////
     double dtmp1,dtmp2;
-    double* ptmp1;
+    double* ptmp1 = NULL;
     int d2 = d*d;
     double eps_obj = opts -> eps_obj;
     int lloyds_updates = 0;
@@ -50,7 +50,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     // Non-convex rounding
     int* km_clusters_new = (int *) R_alloc(d,sizeof(int));
     int* km_clusters_best = (int *) R_alloc(d,sizeof(int));
-    int* km_clusters_tmp;
+    int* km_clusters_tmp = NULL;
     double* km_centers_new = (double *) R_alloc(d*K,sizeof(double));
     double km_val_best;
     double km_val_new;
@@ -78,10 +78,10 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     double lambda_min_t;
     double lambda_min_tp1;
     double lambda_min_best;
-    double* X_t;
-    double* X_tp1;
-    double* Z_t;
-    double* Z_tp1; // use result as workspace
+    double* X_t = NULL;
+    double* X_tp1 = NULL;
+    double* Z_t = NULL;
+    double* Z_tp1 = NULL; // use result as workspace
     double* Z_best = results->Z_best; // store actual result
     double lambda_t = 0; // auxiliary sequence for nesterov acc
     double lambda_tp1 = 1;
@@ -96,8 +96,8 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     int current_restart = -1;
     int next_restart = -1;
     int last_restart = 0;
-    double* GX_t;
-    double* GS_t;
+    double* GX_t = NULL;
+    double* GS_t = NULL;
     double alpha = opts->alpha;
 
     if(number_restarts > 0){
@@ -117,7 +117,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     int early_stop_mode = opts -> early_stop_mode;
     int early_stop_lag = opts -> early_stop_lag;
     double early_stop_eps = opts -> early_stop_eps;
-    double* last_es_obj;
+    double* last_es_obj = NULL;
     if(early_stop_mode > 0){
         last_es_obj = (double *) R_alloc(early_stop_lag,sizeof(double));
         for(int i = 0; i < early_stop_lag; i++) {
