@@ -75,7 +75,6 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     int outer_iterations = 0;
     int next_iter = 1;
     int num_momentum_restarts = 0;
-    double lambda_min_t;
     double lambda_min_tp1;
     double lambda_min_best;
     double* X_t = NULL;
@@ -238,7 +237,6 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
             X_tp1 = 0; //Can remove later
             Z_tp1 = 0; //Can remove later
             obj_t = obj_tp1;
-            lambda_min_t = lambda_min_tp1;
 
             // STEP 3AC -- Update Auxiliary Sequences
             lambda_t = lambda_tp1;

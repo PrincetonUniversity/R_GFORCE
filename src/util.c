@@ -234,7 +234,6 @@ double time_difference_ms(clock_t start, clock_t end){
 
 double euclidean_distance(double const* restrict p1, double const* restrict p2, int m, double* restrict euclidean_distance_tmp) {
     double acc = 0.0;
-    double dtmp1;
 
     #pragma omp simd
     for(int i=0; i < m; i++){

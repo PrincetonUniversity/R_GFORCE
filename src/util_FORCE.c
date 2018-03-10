@@ -193,13 +193,12 @@ void project_C_perpendicular_nok(problem_instance* prob, double* GX_t, double* G
     // Local Declarations
     int lapack_info;
     double scale_factor;
-    double dtmp1, dtmp2;
+    double dtmp1;
     double* ptmp1;
 
     // Problem Instance Extraction, Workspace setup
     double* D_rsums = prob -> D_rsums;
     double* D = prob -> D;
-    double TrD = prob -> TrD;
     double DTD = prob -> DTD;
     int d = prob -> d;
     int* ipiv = work -> iwork;

@@ -25,8 +25,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     double* ptmp1 = NULL;
     int d2 = d*d;
     double eps_obj = opts -> eps_obj;
-    int lloyds_updates = 0;
-    double lloyds_runtime = 0.0;
 
     // Create Workspace, Initialize Problem Instance, Allocate Memory Pool
     problem_instance prob;
@@ -76,7 +74,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     int outer_iterations = 0;
     int next_iter = 1;
     int num_momentum_restarts = 0;
-    double lambda_min_t;
     double lambda_min_tp1;
     double lambda_min_best;
     double* X_t = NULL;
@@ -221,7 +218,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
             X_tp1 = 0; //Can remove later
             Z_tp1 = 0; //Can remove later
             obj_t = obj_tp1;
-            lambda_min_t = lambda_min_tp1;
 
             // STEP 3AC -- Update Auxiliary Sequences
             lambda_t = lambda_tp1;

@@ -73,13 +73,12 @@ void kmeans_dual_solution_impl(int* restrict ga_hat, problem_instance* restrict 
     double* Y_a_base;
     double* Y_a_best;
     double* R;
-    double* group_sums;
     double* T_d; // for reduction to tridiagonal form
     double* T_e; // for reduction to tridiagonal form
     double* T_tau; // for reduction to tridiagonal form
     int* group_sizes;
     double dtmp1,Y_T_max,Y_T_best,em_min;
-    int tmp1,tmp2,tmp3;
+    int tmp1,tmp2;
     int iter_feasible,done,same_group; //boolean values
     double* D = prob -> D;
     int d = prob -> d;
@@ -156,7 +155,7 @@ void kmeans_dual_solution_impl(int* restrict ga_hat, problem_instance* restrict 
 
             //find minimum eigenvalue -- first do transformation to tri-diagonal
             // R == ap, after call R has similarity transformation information
-            F77_CALL(dsptrd)("U",&d,R,T_d,T_e,T_tau,&lapack_info);
+            F77_CALL(dsptrd)(&lapack_format,&d,R,T_d,T_e,T_tau,&lapack_info);
 
             //Get tridiagonal eigenvalues
             F77_CALL(dsterf)(&d,T_d,T_e,&lapack_info);
@@ -203,7 +202,6 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
                                    double* restrict Y_a_r, int* restrict feasible_r, workspace* restrict work) {
     // Local Variable Declarations
     double* R;
-    double* group_sums;
     double* T_d; // for reduction to tridiagonal form
     double* T_e; // for reduction to tridiagonal form
     double* T_tau; // for reduction to tridiagonal form
@@ -262,7 +260,7 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
     if(feasible){
         //find minimum eigenvalue -- first do transformation to tri-diagonal
         // R == ap, after call R has similarity transformation information
-        F77_CALL(dsptrd)("U",&d,R,T_d,T_e,T_tau,&lapack_info);
+        F77_CALL(dsptrd)(&lapack_format,&d,R,T_d,T_e,T_tau,&lapack_info);
 
         //Get tridiagonal eigenvalues
         F77_CALL(dsterf)(&d,T_d,T_e,&lapack_info);
