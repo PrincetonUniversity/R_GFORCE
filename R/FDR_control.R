@@ -1,7 +1,8 @@
 #' FDR Control Procedure.
 #'
 #' Performs the Banjamini and Yeuketli FDR control procedure. As input it takes a symmetric matrix of
-#' test statistics with standard normal null distributions.
+#' test statistics with standard normal null distributions. The number of hypotheses tested is
+#' \eqn{d(d-1)/2}.
 #' 
 #' @param test_stats \eqn{d x d} symmetric matrix of test statistics.
 #' @param alpha alpha level for the FDR control procedure.
@@ -11,6 +12,7 @@
 #' \item{\code{reject_null}}{\eqn{d x d} upper triangular matrix. \code{TRUE} entries indicate the null hypothesis should be rejected.}
 #' \item{\code{R_tau_hat}}{an integer. Indicates the number of hypotheses rejected.}
 #' \item{\code{tau_hat}}{a real number. Indicates a threshold above which the null hypothesis is rejected.}
+#' \item{\code{num_hypotheses}}{an integer. Indicates the number of hypotheses tested.}
 #' }
 #'
 #' @export
@@ -32,20 +34,6 @@ gforce.FDR_control <- function(test_stats,alpha) {
     # get descending tau value possibilities
     tau_levels <- sort(test_stats_step_up,decreasing=TRUE)
     tau_levels <- tau_levels[1:num_hypotheses]
-    #R_tau_hat <- num_hypotheses
-    # found_min_tau <- 0
-    # tau_hat <- tau_levels[R_tau_hat]
-    # while(!found_min_tau && R_tau_hat > 1){
-    #     R_tau_hat <- R_tau_hat - 1
-    #     tau_hat <- tau_levels[R_tau_hat]
-    #     p_tau <- beta * R_tau_hat
-    #     q_tau <- abs(stats::qnorm(p_tau))
-    #     if(tau_hat > q_tau){
-    #         found_min_tau <- 1
-    #         # R_tau_hat <- R_tau_hat + 1
-    #         # tau_hat <- tau_levels[R_tau_hat]
-    #     }
-    # }
 
     # reject greater than or equal to tau
     R_tau_hat <- 0
@@ -69,6 +57,7 @@ gforce.FDR_control <- function(test_stats,alpha) {
     res$reject_null <- true_discoveries
     res$R_tau_hat <- R_tau_hat
     res$tau_hat <- tau_hat
+    res$num_hypotheses <- num_hypotheses
 
     return(res)
 }

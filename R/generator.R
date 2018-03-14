@@ -50,8 +50,8 @@ gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size
     
   } else if(graph == 'scalefree') {
     A <- matrix(rep(0,K^2), nrow=K)
-    A[1,2] <- 0.3
-    A[2,1] <- 0.3
+    A[1,2] <- corr_value
+    A[2,1] <- corr_value
     for(i in 3:K){
       # get current probability distribution
       probd <- colSums(A)
@@ -59,8 +59,8 @@ gforce.generator <- function(K,d,n,m, graph = 'DeltaC', num_hubs=NULL, band_size
       
       #add new edge and node
       ne <- sample(x = 1:K, 1, replace = T, prob = probd)
-      A[i,ne] <- 0.3
-      A[ne,i] <- 0.3
+      A[i,ne] <- corr_value
+      A[ne,i] <- corr_value
     }
     res$Theta_star <- A + (abs(min(eigen(A)$values)) + 0.2)*diag(K)
 
