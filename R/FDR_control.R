@@ -1,11 +1,13 @@
 #' FDR Control Procedure.
 #'
-#' Performs the Banjamini and Yeuketli FDR control procedure. As input it takes a symmetric matrix of
-#' test statistics with standard normal null distributions. The number of hypotheses tested is
-#' \eqn{d(d-1)/2}.
+#' Performs by default the Benjamini-Yeuketeli FDR control procedure. Optionally, the Benjamini-Hochberg thresholding
+#' rule can be used instead. As input it takes a symmetric matrix of test statistics with standard normal null
+#' distributions. The number of hypotheses tested is \eqn{d(d-1)/2}.
 #' 
 #' @param test_stats \eqn{d x d} symmetric matrix of test statistics.
 #' @param alpha alpha level for the FDR control procedure.
+#' @param procedure a string. \code{procedure == 'BY'} indicates to use the Benjamini-Yeuketeli thresholding rule.
+#'        \code{procedure == 'BH'} indicates to use the Benjamini-Hochberg thresholding rule.
 #'
 #' @return An object with following components
 #' \describe{
@@ -16,13 +18,21 @@
 #' }
 #'
 #' @export
-gforce.FDR_control <- function(test_stats,alpha) {
+gforce.FDR_control <- function(test_stats,alpha,procedure='BY') {
     # set up
     K <- nrow(test_stats)
     num_hypotheses <- (K^2 - K)/2
-    N_BY <- sum(1/(1:num_hypotheses))
-    beta <- alpha / (2*num_hypotheses*N_BY)
+    beta <- NULL
+    if(procedure == 'BY') {
+        N_BY <- sum(1/(1:num_hypotheses))
+        beta <- alpha / (2*num_hypotheses*N_BY)
+    } else if(procedure == 'BH') {
+        beta <- alpha / (2*num_hypotheses)
+    } else {
+        stop('gforce.FDR_control -- procedure must be BH or BY.')
+    }
     
+
     # create absolute values of test_stats for
     # procedure
     test_stats_step_up <- abs(test_stats)

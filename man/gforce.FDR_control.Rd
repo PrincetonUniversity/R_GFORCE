@@ -4,12 +4,15 @@
 \alias{gforce.FDR_control}
 \title{FDR Control Procedure.}
 \usage{
-gforce.FDR_control(test_stats, alpha)
+gforce.FDR_control(test_stats, alpha, procedure = "BY")
 }
 \arguments{
 \item{test_stats}{\eqn{d x d} symmetric matrix of test statistics.}
 
 \item{alpha}{alpha level for the FDR control procedure.}
+
+\item{procedure}{a string. \code{procedure == 'BY'} indicates to use the Benjamini-Yeuketeli thresholding rule.
+\code{procedure == 'BH'} indicates to use the Benjamini-Hochberg thresholding rule.}
 }
 \value{
 An object with following components
@@ -21,7 +24,7 @@ An object with following components
 }
 }
 \description{
-Performs the Banjamini and Yeuketli FDR control procedure. As input it takes a symmetric matrix of
-test statistics with standard normal null distributions. The number of hypotheses tested is
-\eqn{d(d-1)/2}.
+Performs by default the Benjamini-Yeuketeli FDR control procedure. Optionally, the Benjamini-Hochberg thresholding
+rule can be used instead. As input it takes a symmetric matrix of test statistics with standard normal null
+distributions. The number of hypotheses tested is \eqn{d(d-1)/2}.
 }
