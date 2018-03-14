@@ -17,9 +17,11 @@ An object with following components
 \item{\code{reject_null}}{\eqn{d x d} upper triangular matrix. \code{TRUE} entries indicate the null hypothesis should be rejected.}
 \item{\code{R_tau_hat}}{an integer. Indicates the number of hypotheses rejected.}
 \item{\code{tau_hat}}{a real number. Indicates a threshold above which the null hypothesis is rejected.}
+\item{\code{num_hypotheses}}{an integer. Indicates the number of hypotheses tested.}
 }
 }
 \description{
 Performs the Banjamini and Yeuketli FDR control procedure. As input it takes a symmetric matrix of
-test statistics with standard normal null distributions.
+test statistics with standard normal null distributions. The number of hypotheses tested is
+\eqn{d(d-1)/2}.
 }
