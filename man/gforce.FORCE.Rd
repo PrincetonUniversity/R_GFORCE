@@ -60,6 +60,13 @@ D <- diag(gam_hat) - sig_hat
 res <- gforce.FORCE(D,K)
 
 }
+\references{
+C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+
+J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
+
+J. Renegar.  Efficient first-order methods for linear programming and semidefinite programming. \emph{arXiv:1409.5832}, 2014.
+}
 \seealso{
 \code{\link{gforce.defaults}}
 }

@@ -42,3 +42,6 @@ D <- diag(gam_hat) - sig_hat
 dual_cert <- gforce.certify(dat$group_assignments,D)
 
 }
+\references{
+C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+}

@@ -26,6 +26,13 @@ a multi-threaded method is called, otherwise a single-threaded method is called.
 \description{
 Uses the FORCE algorithm to solve the PECOK SDP when \eqn{K} is unknown.
 }
+\references{
+C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+
+J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
+
+F. Bunea, C. Giraud, M. Royer and N. Verzelen. PECOK: a convex optimization approach to variable clustering. \emph{arXiv:1606.05100}, 2016.
+}
 \seealso{
 \code{\link{gforce.defaults}}
 }

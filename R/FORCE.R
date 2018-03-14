@@ -52,6 +52,10 @@
 #' D <- diag(gam_hat) - sig_hat
 #' res <- gforce.FORCE(D,K)
 #'
+#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+#' @references J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
+#' @references J. Renegar.  Efficient first-order methods for linear programming and semidefinite programming. \emph{arXiv:1409.5832}, 2014.
+#'
 #' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE FORCE_R
 #' @export
@@ -207,6 +211,10 @@ gforce.FORCE <- function(D,K,force_opts = NULL,D_Kmeans = NULL, X0 = NULL,
 #' D <- diag(gam_hat) - sig_hat
 #' res <- gforce.FORCE_adapt(D)
 #'
+#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+#' @references J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
+#' @references J. Renegar.  Efficient first-order methods for linear programming and semidefinite programming. \emph{arXiv:1409.5832}, 2014.
+#'
 #' @seealso \code{\link{gforce.defaults}}
 #' @useDynLib GFORCE FORCE_adapt_R
 #' @export
@@ -326,6 +334,11 @@ gforce.FORCE_adapt <- function(D,force_opts = NULL,D_Kmeans = NULL, X0 = NULL) {
 #' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed,
 #' a multi-threaded method is called, otherwise a single-threaded method is called.
 #' @inheritParams gforce.FORCE
+#'
+#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+#' @references J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
+#' @references F. Bunea, C. Giraud, M. Royer and N. Verzelen. PECOK: a convex optimization approach to variable clustering. \emph{arXiv:1606.05100}, 2016.
+#'
 #' @seealso \code{\link{gforce.defaults}}
 #' @export
 gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL, X0 = NULL, E = NULL, gamma_par = FALSE) {
@@ -363,6 +376,11 @@ gforce.PECOK <- function(K, X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL,
 #' @param gamma_par logical expression. If \code{gamma_par==TRUE}, then if \eqn{\Gamma} is computed,
 #' a multi-threaded method is called, otherwise a single-threaded method is called.
 #' @inheritParams gforce.FORCE_adapt
+#'
+#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+#' @references J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
+#' @references F. Bunea, C. Giraud, M. Royer and N. Verzelen. PECOK: a convex optimization approach to variable clustering. \emph{arXiv:1606.05100}, 2016.
+#'
 #' @seealso \code{\link{gforce.defaults}}
 #' @export
 gforce.PECOK_adapt <- function(X=NULL, D=NULL, sigma_hat = NULL, force_opts = NULL, X0 = NULL, gamma_par = FALSE) {

@@ -31,3 +31,6 @@ dat <- gforce.generator(5,20,20,3)
 gam_hat <- gforce.Gamma(dat$X)
 
 }
+\references{
+F. Bunea, C. Giraud, M. Royer and N. Verzelen. PECOK: a convex optimization approach to variable clustering. \emph{arXiv:1606.05100}, 2016.
+}

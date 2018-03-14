@@ -20,6 +20,9 @@
 #' C <- diag(5)
 #' theta_1 <- gforce.scio(C,0.01,1)
 #'
+#' @references T. Cai, W. Liu and X. Luo. A constrained l1 minimization approach to sparse precision
+#'             matrix estimation. \emph{Journal of the American Statistical Association}, 2011.
+#' 
 #' @useDynLib GFORCE scio_column_R
 #' @export
 gforce.scio <- function(C, lambda, k = NULL, eps = 10^-6, max_iter = 10000,R_only=FALSE) {

@@ -11,7 +11,7 @@ gforce.FDR_control(test_stats, alpha, procedure = "BY")
 
 \item{alpha}{alpha level for the FDR control procedure.}
 
-\item{procedure}{a string. \code{procedure == 'BY'} indicates to use the Benjamini-Yeuketeli thresholding rule.
+\item{procedure}{a string. \code{procedure == 'BY'} indicates to use the Benjamini-Yekutieli thresholding rule.
 \code{procedure == 'BH'} indicates to use the Benjamini-Hochberg thresholding rule.}
 }
 \value{
@@ -24,7 +24,14 @@ An object with following components
 }
 }
 \description{
-Performs by default the Benjamini-Yeuketeli FDR control procedure. Optionally, the Benjamini-Hochberg thresholding
+Performs by default the Benjamini-Yekutieli FDR control procedure. Optionally, the Benjamini-Hochberg thresholding
 rule can be used instead. As input it takes a symmetric matrix of test statistics with standard normal null
 distributions. The number of hypotheses tested is \eqn{d(d-1)/2}.
+}
+\references{
+Y. Benjamini and Y. Hochberg. Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.
+            \emph{Journal of the Royal Statistical Society}, 1995.
+
+Y. Benjamini and D. Yekutieli. The Control of the False Discovery Rate in Multiple Testing Under Dependency.
+            \emph{The Annals of Statistics}, 2001.
 }

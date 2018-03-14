@@ -34,3 +34,8 @@ X <- matrix(MASS::mvrnorm(m*n,rep(0,m*n),diag(m*n)), nrow = n)
 km_res <- gforce.kmeans(X,3)
 
 }
+\references{
+S.P. Lloyd. Least Squares Quantization in PCM. \emph{IEEE Transactions on Information Theory}, 1982.
+
+D. Arthur and S. Vassilvitskii. k-means++: The Advantages of Careful Seeding. \emph{SODA}, 2007.
+}
