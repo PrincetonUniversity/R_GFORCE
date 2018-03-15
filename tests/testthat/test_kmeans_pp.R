@@ -21,7 +21,7 @@ test_that("K-means++",{
                      group_assignments = as.integer(rep(0,d)),
                      centers = numeric(K*d),
                      num_iters = as.integer(0),
-                     run_time = numeric(0))
+                     run_time = as.double(0))
         purity_experiment <- purity_measure(result$group_assignments,dat$group_assignments)
         if(purity_experiment != 1){
             count_not_perfect <- count_not_perfect + 1
