@@ -161,54 +161,6 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv
 }
 
 
-# construct decorrelated confidence intervals for all entries
-# returns 3 dimensional array. Last dimension is lower confidence bound, deco estimate, upper confidence bound
-latent_confidence_intervals_all <- function(Chat,n,alpha,lambda1,lambda2) {
-  K <- nrow(Chat)
-  res <- array(0,c(K,K,3))
-  
-  #estimate theta *columnwise*
-  theta_hat <- array(0,c(K,K))
-  for(k in 1:K){
-    theta_hat[,k] <- gforce.scio(Chat,lambda1,k)
-  }
-  
-  #estimate v *row-wise*
-  v_hat <- array(0,c(K,K))
-  for(t in 1:K){
-    v_hat[t,] <- v_hat(Chat,t,lambda2)
-  }
-  
-  #estimate \tilde \theta_t,k *row-wise*
-  for(t in 1:K){
-    res[t,,2] <- decorrelated_estimator_t(Chat,theta_hat,v_hat[t,],t)
-  }
-  
-  #construct upper and lower confidence bounds
-  z_score <- stats::qnorm(1 - (alpha/2))
-  for(t in 1:K){
-    for(k in 1:K){
-      variance <- NULL
-      if(t == k){
-        c_tt <- Chat[t,t]
-        t_kt <- theta_hat[k,t]
-        t_kk <- theta_hat[k,k]
-        t_tt <- theta_hat[t,t]
-        variance <- c_tt^2 + t_kk*( 3*c_tt - 3*c_tt^2*t_tt + c_tt^3*t_tt^2 )
-      }else{
-        c_tt <- Chat[t,t]
-        t_kk <- theta_hat[k,k]
-        t_tt <- theta_hat[t,t]
-        variance <- 1 +t_kk*(3*c_tt - 3*c_tt^2*t_tt + c_tt^3*t_tt^2)
-      }
-      conf_range <- sqrt(variance)*z_score/sqrt(n)
-      res[t,k,1] <- res[t,k,2] - conf_range
-      res[t,k,3] <- res[t,k,2] + conf_range
-    }
-  }
-  
-  return(res)
-}
 
 
 averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv_opts=NULL) {
