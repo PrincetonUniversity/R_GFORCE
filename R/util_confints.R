@@ -6,7 +6,7 @@ decorrelated_estimator <- function(C,theta_k,v,t,k){
 
 decorrelated_estimator_t <- function(C,theta_hat,v_t,t) {
   prod <- as.numeric(v_t%*%C[,-t]%*%theta_hat[-t,])
-  return( (v_t - prod) / (v_t%*%C[,t]) )
+  return((v_t - prod) / as.vector(v_t%*%C[,t]))
 }
 
 

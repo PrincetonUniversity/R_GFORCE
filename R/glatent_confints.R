@@ -32,7 +32,7 @@
 #' @seealso \code{\link{gforce.glatent_confints.cv_defaults}}
 #' @export
 gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha = 0.05,
-                                    graph='latent',variance_estimator='exact',use_cv = FALSE,
+                                    graph='latent',variance_estimator='simple',use_cv = FALSE,
                                     cv_opts = NULL,lambda1=NULL,lambda2 = NULL) {
   res <- NULL
   # if user specified C_hat
@@ -50,13 +50,7 @@ gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha =
   } else if(!is.null(clusters) && !is.null(X_vals)) {
     if(graph == 'latent') {
       if(use_cv){
-        if(variance_estimator == 'exact') {
-          res <- latent_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts)
-        } else if(variance_estimator == 'simple') {
-          res <- averages_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts)
-        } else {
-          stop('gforce.glatent_confints -- You must specify either exact or simple estimator.')
-        }
+          res <- latent_confidence_intervals_all_cv(X_vals,clusters,alpha,cv_opts,variance_estimator=variance_estimator)
       } else {
         stop('gforce.glatent_confints -- Option not implemented.')
       }
@@ -69,7 +63,6 @@ gforce.glatent_confints <- function(C_hat=NULL,X_vals=NULL,clusters=NULL,alpha =
     } else {
       stop('gforce.glatent_confints -- You must specify either latent or averages graphs.')
     }
-
 
   } else {
     stop('gforce.glatent_confints -- You must specify one of C_hat or clusters and X.')
@@ -101,8 +94,7 @@ gforce.glatent_confints.cv_defaults <- function() {
   return(res)
 }
 
-
-latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv_opts=NULL) {
+latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv_opts=NULL,variance_estimator='simple') {
   # check for cv_opts
   if(is.null(cv_opts)){
     cv_opts <- gforce.glatent_confints.cv_defaults()
@@ -126,7 +118,8 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv
   for(k in 1:K){
     objective_function <- function(ch,tha) scio_objective_function(ch,tha,k)
     function_solver <- function(ch,lambda) gforce.scio(ch,lambda,k)
-    lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds)
+    lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,
+                                    cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds,graph='latent')
     theta_hat[,k] <- gforce.scio(Chat,lambda1,k)
   }
 
@@ -135,10 +128,10 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv
   for(t in 1:K){
     objective_function <- function(ch,tha) max(abs(ch%*%tha))
     function_solver <- function(ch,lambda) v_hat(ch,t,lambda)
-    lambda2 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda2_min_exp,cv_opts$lambda2_max_exp,cv_opts$num_folds)
+    lambda2 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,
+                                    cv_opts$lambda2_min_exp,cv_opts$lambda2_max_exp,cv_opts$num_folds,graph='latent')
     v_hat[t,] <- v_hat(Chat,t,lambda2)
   }
-
   #estimate \tilde \theta_t,k *row-wise*
   for(t in 1:K){
     res[t,,2] <- decorrelated_estimator_t(Chat,theta_hat,v_hat[t,],t)
@@ -147,21 +140,30 @@ latent_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv
   #construct upper and lower confidence bounds
   z_score <- stats::qnorm(1 - (alpha/2))
 
-  latent_variances <- latent_graph_variances(theta_hat,v_hat,gam_hat,group_assignments)
-
-  for(k in 1:K){
+  if(variance_estimator=='simple') {
     for(t in 1:K){
-      conf_range <- sqrt(latent_variances[t,k])*z_score/sqrt(n)
-      res[t,k,1] <- res[t,k,2] - conf_range
-      res[t,k,3] <- res[t,k,2] + conf_range
+      for(k in 1:K){
+        variance <- (theta_hat[t,k]^2 + theta_hat[t,t]*theta_hat[k,k])#/(xi_hat[t,t]^2)
+        conf_range <- sqrt(variance)*z_score/sqrt(n)
+        res[t,k,1] <- res[t,k,2] - conf_range
+        res[t,k,3] <- res[t,k,2] + conf_range
+      }
     }
+  } else if(variance_estimator=='exact') {
+    latent_variances <- latent_graph_variances(theta_hat,v_hat,gam_hat,group_assignments)
+    for(k in 1:K){
+      for(t in 1:K){
+        conf_range <- sqrt(latent_variances[t,k])*z_score/sqrt(n)
+        res[t,k,1] <- res[t,k,2] - conf_range
+        res[t,k,3] <- res[t,k,2] + conf_range
+      }
+    }
+  } else {
+    stop('Variance Estimator must be simple or exact')
   }
-  
+
   return(res)
 }
-
-
-
 
 averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,cv_opts=NULL) {
   # check for cv_opts
@@ -185,7 +187,8 @@ averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,
   for(k in 1:K){
     objective_function <- function(ch,tha) scio_objective_function(ch,tha,k)
     function_solver <- function(ch,lambda) gforce.scio(ch,lambda,k)
-    lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds)
+    lambda1 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,
+                                    cv_opts$lambda1_min_exp,cv_opts$lambda1_max_exp,cv_opts$num_folds,graph='averages')
     xi_hat[,k] <- gforce.scio(s_hat,lambda1,k)
   }
   
@@ -194,10 +197,10 @@ averages_confidence_intervals_all_cv <- function(X_vals,group_assignments,alpha,
   for(t in 1:K){
     objective_function <- function(ch,tha) max(abs(ch%*%tha))
     function_solver <- function(ch,lambda) v_hat(ch,t,lambda)
-    lambda2 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,cv_opts$lambda2_min_exp,cv_opts$lambda2_max_exp,cv_opts$num_folds)
+    lambda2 <- cv_lambda_selection(objective_function,function_solver,X_vals,group_assignments,
+                                    cv_opts$lambda2_min_exp,cv_opts$lambda2_max_exp,cv_opts$num_folds,graph='averages')
     v_hat[t,] <- v_hat(s_hat,t,lambda2)
   }
-  
   #estimate \tilde \theta_t,k *row-wise*
   for(t in 1:K){
     res[t,,2] <- decorrelated_estimator_t(s_hat,xi_hat,v_hat[t,],t)
