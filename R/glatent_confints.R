@@ -27,7 +27,8 @@
 #' dat <- gforce.generator(K,d,n,3,graph='scalefree')
 #' th_tilde <- gforce.glatent_confints(X_vals = dat$X,clusters = dat$group_assignments,
 #'                                     use_cv = TRUE,graph='latent')
-#' 
+#'
+#' @references C. Eisenach, F. Bunea, Y. Ning, and C. Dinicu. Efficient, High-Dimensional Inference for Cluster-Based Graphical Models. \emph{Manuscript submitted for publication}, 2018. 
 #'
 #' @seealso \code{\link{gforce.glatent_confints.cv_defaults}}
 #' @export

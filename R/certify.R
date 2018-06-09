@@ -30,7 +30,7 @@
 #' D <- diag(gam_hat) - sig_hat
 #' dual_cert <- gforce.certify(dat$group_assignments,D)
 #' 
-#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{arXiv:1806.00530}, 2018.
 #'
 #' @useDynLib GFORCE kmeans_dual_solution_primal_min_R
 #' @export
@@ -96,7 +96,7 @@ gforce.certify <- function(sol,D,eps1 = 0.01,eps2 = 10^-7,Y_T_min = 0.01) {
 #' D <- diag(gam_hat) - sig_hat
 #' dual_cert <- gforce.certify_adapt(dat$group_assignments,D)
 #' 
-#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+#' @references C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{arXiv:1806.00530}, 2018.
 #'
 #' @useDynLib GFORCE kmeans_dual_solution_primal_min_nok_R
 #' @export

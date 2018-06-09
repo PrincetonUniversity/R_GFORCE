@@ -5,7 +5,7 @@
 \title{Confidence Intervals for Estimation in G-Latent Models.}
 \usage{
 gforce.glatent_confints(C_hat = NULL, X_vals = NULL, clusters = NULL,
-  alpha = 0.05, graph = "latent", variance_estimator = "exact",
+  alpha = 0.05, graph = "latent", variance_estimator = "simple",
   use_cv = FALSE, cv_opts = NULL, lambda1 = NULL, lambda2 = NULL)
 }
 \arguments{
@@ -46,7 +46,9 @@ dat <- gforce.generator(K,d,n,3,graph='scalefree')
 th_tilde <- gforce.glatent_confints(X_vals = dat$X,clusters = dat$group_assignments,
                                     use_cv = TRUE,graph='latent')
 
-
+}
+\references{
+C. Eisenach, F. Bunea, Y. Ning, and C. Dinicu. Efficient, High-Dimensional Inference for Cluster-Based Graphical Models. \emph{Manuscript submitted for publication}, 2018.
 }
 \seealso{
 \code{\link{gforce.glatent_confints.cv_defaults}}

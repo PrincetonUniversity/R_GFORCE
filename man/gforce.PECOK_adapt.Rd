@@ -27,7 +27,7 @@ a multi-threaded method is called, otherwise a single-threaded method is called.
 Uses the FORCE algorithm to solve the PECOK SDP when \eqn{K} is unknown.
 }
 \references{
-C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{arXiv:1806.00530}, 2018.
 
 J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
 

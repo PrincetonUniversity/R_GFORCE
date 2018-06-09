@@ -51,7 +51,7 @@ res <- gforce.FORCE_adapt(D)
 
 }
 \references{
-C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{Manuscript submitted for publication}, 2018.
+C. Eisenach and H. Liu. Efficient, Certifiably Optimal High-Dimensional Clustering. \emph{arXiv:1806.00530}, 2018.
 
 J. Peng and Y. Wei. Approximating K-means-type Clustering via Semidefinite Programming. \emph{SIAM Journal on Optimization}, 2007.
 
