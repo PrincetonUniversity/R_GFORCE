@@ -13,8 +13,8 @@ This package provides implementations of state-of-the-art clustering algorithms 
  - Eisenach, C., Bunea, F., Ning, Y. and Dinicu, C. (2018). Efficient, High-Dimensional Inference for Cluster-Based Graphical Models. *Manuscript submitted for publication*.
 
 The new methods implemented include:
- 1. FORCE - a fast solver for a semi-definite programming (SDP) relaxation of the K-means problem. For certain data generating distributions it produces a certificate of optimality with high probability, and
- 2. Inferential procedures and FDR control for cluster based graphical models.
+ - FORCE - a fast solver for a semi-definite programming (SDP) relaxation of the K-means problem. For certain data generating distributions it produces a certificate of optimality with high probability, and
+ - Inferential procedures and FDR control for cluster based graphical models.
 
 Also provided are high quality implementations of traditional clustering algorithms:
  - Lloyd's algorithm,
