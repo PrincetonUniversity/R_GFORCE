@@ -66,8 +66,8 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     double* Y_a_best = (double *) R_alloc(d,sizeof(double));
 
     // Projected Gradient Descent A - declarations
-    clock_t start_time = clock();
-    clock_t cur_time;
+    struct timespec start_time, cur_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
     int grad_iter_best = -1;
     double grad_iter_best_time = 0;
     int grad_iter_total = 1;
@@ -131,12 +131,12 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
         hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
         K_hat = tmp_hc_sol.K;
         km_val_best = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
-        cur_time = clock();
-        km_best_time = time_difference_ms(start_time,cur_time);
+        clock_gettime(CLOCK_MONOTONIC, &cur_time);
+        km_best_time = time_difference_ms(&start_time,&cur_time);
         kmeans_dual_solution_nok_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,Y_a_best, &dc, &work);
         if(dc == 1){
-            cur_time = clock();
-            dc_time = time_difference_ms(start_time,cur_time);
+            clock_gettime(CLOCK_MONOTONIC, &cur_time);
+            dc_time = time_difference_ms(&start_time,&cur_time);
             dc_grad_iter = grad_iter_total;
         }
     }
@@ -279,8 +279,8 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
                 obj_best = obj_tp1;
                 lambda_min_best = lambda_min_tp1;
                 grad_iter_best = grad_iter_total;
-                cur_time = clock();
-                grad_iter_best_time = time_difference_ms(start_time,cur_time);
+                clock_gettime(CLOCK_MONOTONIC, &cur_time);
+                grad_iter_best_time = time_difference_ms(&start_time,&cur_time);
             }
 
             if(verbosity > 0){
@@ -324,14 +324,14 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
             km_iter_best = km_iter_total;
             K_hat = tmp_hc_sol.K;
             new_best_km = 1;
-            cur_time = clock();
-            km_best_time = time_difference_ms(start_time,cur_time);
+            clock_gettime(CLOCK_MONOTONIC, &cur_time);
+            km_best_time = time_difference_ms(&start_time,&cur_time);
         }
         if(new_best_km && dc == 0){
             kmeans_dual_solution_nok_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,Y_a_best, &dc, &work);
             if(dc == 1){
-                cur_time = clock();
-                dc_time = time_difference_ms(start_time,cur_time);
+                clock_gettime(CLOCK_MONOTONIC, &cur_time);
+                dc_time = time_difference_ms(&start_time,&cur_time);
                 dc_grad_iter = grad_iter_total;
             }
         }
@@ -374,8 +374,8 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     results->grad_iter_best = grad_iter_best;
     results->grad_iter_best_time = grad_iter_best_time;
     results->kmeans_opt_val = km_val_best;
-    cur_time = clock();
-    results->total_time = time_difference_ms(start_time,cur_time);
+    clock_gettime(CLOCK_MONOTONIC, &cur_time);
+    results->total_time = time_difference_ms(&start_time,&cur_time);
 
     if(verbosity > -1){
         Rprintf("\tFORCE Algorithm Complete\r\n");
