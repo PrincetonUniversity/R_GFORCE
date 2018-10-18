@@ -307,12 +307,13 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
             }
             grad_iter_total++;
 
-            // STEP 3AH -- Check early stop relative error criterion
             if(early_stop_mode > 0) {
+                dtmp1 = last_es_obj[ grad_iter_total % early_stop_lag];
                 last_es_obj[ grad_iter_total % early_stop_lag] = obj_tp1;
             }
+            // STEP 3AH -- Check early stop relative error criterion
             if(early_stop_mode == 1 && grad_iter_total-last_restart > early_stop_lag) {
-                //absolute error
+                //absolute error                
                 dtmp1 = min_array(early_stop_lag,last_es_obj);
                 dtmp2 = max_array(early_stop_lag,last_es_obj);
                 dtmp1 = dtmp2 - dtmp1;
@@ -320,12 +321,18 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
             }
             if(early_stop_mode == 2 && grad_iter_total-last_restart > early_stop_lag) {
                 //relative error
-                dtmp1 = min_array(early_stop_lag,last_es_obj);
                 dtmp2 = max_array(early_stop_lag,last_es_obj);
-                dtmp1 = (dtmp2 - dtmp1) / (dtmp1 + 0.000001);
+                if(verbosity > 2){
+                    Rprintf("\t\tDebug %f\r\n",early_stop_eps);
+                    Rprintf("\t\tDebug %f\r\n",dtmp1);
+                    Rprintf("\t\tDebug %f\r\n",dtmp2);
+                }
+                dtmp1 = (dtmp2 - dtmp1) / (abs(dtmp1) + 0.000001);
+                if(verbosity > 2) {
+                    Rprintf("\t\tDebug %f\r\n",dtmp1);
+                }
                 early_stop = dtmp1 > early_stop_eps ? 0 : 1;
             }
-
 
         }
 
