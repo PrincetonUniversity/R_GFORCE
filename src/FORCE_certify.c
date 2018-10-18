@@ -7,6 +7,7 @@
 #include "util.h"
 #include "util_mops.h"
 
+
 // FUNCTION PROTOTPES
 void precompute_values(double* restrict Y_a_base, int* restrict group_sizes, double* restrict primal_value, double* restrict D, int* restrict ga_hat,
                         int d, int K, double* restrict dwork, int* restrict iwork);
@@ -246,7 +247,7 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
             same_group = ga_hat[a] == ga_hat[b];
             //checks dual feasibility of Y_ab
             if(!same_group){
-                if(dtmp1 < 0.0){
+                if(dtmp1 < eps1){
                     feasible = 0;
                 }
                 R[tmp1] = 0;
