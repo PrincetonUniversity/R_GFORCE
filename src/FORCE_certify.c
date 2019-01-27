@@ -192,7 +192,6 @@ void kmeans_dual_solution_impl(int* restrict ga_hat, problem_instance* restrict 
 }
 
 
-
 //Internal Access Point
 //KMEANS DUAL SOLUTION MIN PRIMAL FORM (K IS UNKNOWN)
 //ga_hat should be in "Standard Form" - group names are use 1...K
@@ -374,3 +373,5 @@ void compute_Y_a(double* restrict Y_a_base, double* restrict Y_a_new, double Y_T
         Y_a_new[i] = Y_a_base[i] - Y_T/(2*group_sizes[tmp1]);
     }
 }
+
+
