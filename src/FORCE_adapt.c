@@ -54,7 +54,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     double km_val_best;
     double km_val_new;
     double km_best_time = -1;
-    // int K_hat = -1;
     int km_iter_best = 1;
     int km_iter_total = 1;
     int new_best_km = 0;
@@ -129,7 +128,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     if(primal_only == 0) {
         tmp_hc_sol.clusters = km_clusters_best;
         hclust_FORCE(D_kmeans,d,&tmp_hc_sol,&work);
-        // K_hat = tmp_hc_sol.K;
         prob.K = tmp_hc_sol.K;
         km_val_best = clust_to_opt_val_adapt(&prob,&tmp_hc_sol,&work);
         clock_gettime(CLOCK_MONOTONIC, &cur_time);
@@ -308,11 +306,12 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
                     Rprintf("\t\tDebug %f\r\n",dtmp1);
                     Rprintf("\t\tDebug %f\r\n",dtmp2);
                 }
-                dtmp1 = (dtmp2 - dtmp1) / (abs(dtmp1) + 0.000001);
+                double dtmp3 = dtmp1 > 0 ? dtmp1 : -1.0*dtmp1;
+                double dtmp4 = (dtmp2 - dtmp1) / (dtmp3 + 0.000001);
                 if(verbosity > 2) {
-                    Rprintf("\t\tDebug %f\r\n",dtmp1);
+                    Rprintf("\t\tDebug %f\r\n",dtmp4);
                 }
-                early_stop = dtmp1 > early_stop_eps ? 0 : 1;
+                early_stop = dtmp4 > early_stop_eps ? 0 : 1;
             }
 
         }
@@ -331,7 +330,6 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
                 km_clusters_best = km_clusters_new;
                 km_clusters_new = km_clusters_tmp;
                 km_iter_best = km_iter_total;
-                // K_hat = tmp_hc_sol.K;
                 prob.K = tmp_hc_sol.K;
                 new_best_km = 1;
                 clock_gettime(CLOCK_MONOTONIC, &cur_time);
