@@ -337,7 +337,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
         }
 
         // STEP 3B -- Dual Certificate Search
-        if(primal_only == 0) {
+        if(primal_only == 0  && dc == 0) {
             new_best_km = 0;
             project_E(&prob,Z_best,lambda_min_best,results->B_Z_best);
             for(int i=0; i < km_rep; i++){
@@ -355,7 +355,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
                     km_best_time = time_difference_ms(&start_time,&cur_time);
                 }
             }
-            if(new_best_km && dc == 0){
+            if(new_best_km){
                 kmeans_dual_solution_impl(km_clusters_best,&prob,DUAL_EPS1_DEFAULT,
                                                 DUAL_EPS2_DEFAULT, DUAL_Y_T_MIN_DEFAULT,
                                                 Y_a_best, &Y_T_best, &dc, &work);
