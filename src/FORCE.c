@@ -328,11 +328,12 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
                     Rprintf("\t\tDebug %f\r\n",dtmp1);
                     Rprintf("\t\tDebug %f\r\n",dtmp2);
                 }
-                dtmp1 = (dtmp2 - dtmp1) / (abs(dtmp1) + 0.000001);
+                double dtmp3 = dtmp1 > 0 ? dtmp1 : -1.0*dtmp1;
+                double dtmp4 = (dtmp2 - dtmp1) / (dtmp3 + 0.000001);
                 if(verbosity > 2) {
-                    Rprintf("\t\tDebug %f\r\n",dtmp1);
+                    Rprintf("\t\tDebug %f\r\n",dtmp4);
                 }
-                early_stop = dtmp1 > early_stop_eps ? 0 : 1;
+                early_stop = dtmp4 > early_stop_eps ? 0 : 1;
             }
 
         }
