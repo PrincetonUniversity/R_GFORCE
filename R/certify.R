@@ -225,3 +225,61 @@ dual_solution <- function(ga_hat,D,eps = 0.01,eps2 = 10^-7,Y_T_min = 0.01){
   
   return(return_dual)
 }
+
+
+certify_adapt <- function(ga_hat,D,eps2 = 10^-7){
+  print(ga_hat)
+  group_ids <- unique(ga_hat)
+  K <- length(group_ids)
+  d <- dim(D)[1]
+  group_idxs <- list()
+  group_sizes <- rep(0,K)
+  group_sums <- rep(0,K)
+  for(i in 1:K){
+    ga_hat_k <- which(ga_hat == group_ids[i])
+    group_idxs[[i]] <- ga_hat_k
+    group_sizes[i] <- length(ga_hat_k)
+    group_sums[i] <- sum(D[ga_hat_k,ga_hat_k])
+  }
+  
+  # get primal optimal
+  B_opt <- gforce.clust2mat(ga_hat)
+  primal_value <- sum(-D*B_opt) # because max_B <-D,B>
+
+  M <- matrix(rep(0,d*(d+1)),ncol=d)
+  b_base <- matrix(rep(0,d+1),ncol=1)
+  
+  for(k in 1:K){
+    g_k_idx <- group_idxs[[k]]
+    g_k_size <- group_sizes[k]
+    M[g_k_idx,g_k_idx] <- matrix(rep(1,g_k_size^2),ncol=g_k_size) + g_k_size*diag(g_k_size)
+    if(g_k_size == 1){
+      b_base[g_k_idx] <- -D[g_k_idx,g_k_idx]
+    } else{
+      b_base[g_k_idx] <- colSums(-D[g_k_idx,g_k_idx])
+    }
+  }
+  M[d+1,1:d] <- 2*rep(1,d)
+  b_base[d+1] <- primal_value
+  Y_a_new <- qr.solve(M,b_base)
+
+  # update current solution
+  A <- matrix(rep(0,d*d),ncol=d)
+  for(a in 1:d){
+    A <- A + Y_a_new[a]*GFORCE:::R_a(d,a)
+  }
+  Y_ab_new <- A + D
+  Y_ab_new[B_opt > 0] <- 0
+  R_new <- A + D - Y_ab_new
+  R_evals <- eigen(R_new,only.values=TRUE)$values
+  em_new <- min(Re(R_evals))
+
+  res <- NULL
+  res$Y_ab <- Y_ab_new
+  res$Y_a <- Y_a_new
+  res$R_evals <- R_evals
+  res$R_min <- em_new
+  res$feasible <- (em_new > -eps2) && (min(Y_ab_new) > -eps2)
+
+  return(res)
+}
