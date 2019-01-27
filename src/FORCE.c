@@ -169,6 +169,7 @@ void FORCE(double* D, double* D_kmeans, double* E, double* ESI, double* X0,
     smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
     lambda_min_best = lambda_min_tp1;
     obj_best = obj_tp1;
+    memcpy(Z_best,Z_tp1,d2*sizeof(double));
 
     if(verbosity > -1){
         Rprintf("\tSolving K-Means SDP with FORCE\r\n");

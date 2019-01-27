@@ -114,7 +114,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     int early_stop_mode = opts -> early_stop_mode;
     int early_stop_lag = opts -> early_stop_lag;
     double early_stop_eps = opts -> early_stop_eps;
-    double* last_es_obj;
+    double* last_es_obj = NULL;
     if(early_stop_mode > 0){
         last_es_obj = (double *) R_alloc(early_stop_lag,sizeof(double));
         for(int i = 0; i < early_stop_lag; i++) {
@@ -150,6 +150,7 @@ void FORCE_adapt(double* D, double* D_kmeans, double* E, double* ESI,
     smoothed_objective(&prob,Z_tp1,&lambda_min_tp1,&obj_tp1,&work);
     lambda_min_best = lambda_min_tp1;
     obj_best = obj_tp1;
+    memcpy(Z_best,Z_tp1,d2*sizeof(double));
 
     if(verbosity > -1){
         Rprintf("\tSolving K-Means SDP with FORCE\r\n");
