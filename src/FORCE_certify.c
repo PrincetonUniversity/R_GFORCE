@@ -209,6 +209,7 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
     int* group_sizes;
     double dtmp1,em_min;
     int tmp1;
+    int tmp2;
     int same_group; //boolean values
     double* D = prob -> D;
     int d = prob -> d;
@@ -242,8 +243,8 @@ void kmeans_dual_solution_nok_impl(int* restrict ga_hat, problem_instance* restr
     tmp1 = 0;
     for(int b = 0; b < d && feasible; b++){
         for(int a = 0; a <= b && feasible; a++) {
-            tmp1 = b*d+a; // index into D
-            dtmp1 = D[tmp1] + Y_a_r[a] + Y_a_r[b];
+            tmp2 = b*d+a; // index into D 
+            dtmp1 = D[tmp2] + Y_a_r[a] + Y_a_r[b];
             same_group = ga_hat[a] == ga_hat[b];
             //checks dual feasibility of Y_ab
             if(!same_group){

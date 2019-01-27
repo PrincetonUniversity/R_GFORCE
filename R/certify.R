@@ -228,7 +228,6 @@ dual_solution <- function(ga_hat,D,eps = 0.01,eps2 = 10^-7,Y_T_min = 0.01){
 
 
 certify_adapt <- function(ga_hat,D,eps2 = 10^-7){
-  print(ga_hat)
   group_ids <- unique(ga_hat)
   K <- length(group_ids)
   d <- dim(D)[1]
